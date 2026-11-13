@@ -2,7 +2,7 @@
 <html lang="uk"><head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>Фото → Фігура → Хвиля v15</title>
+<title>Фото → Фігура → Хвиля v17</title>
 <link rel="manifest" id="mf-link">
 <meta name="theme-color" content="#060a14">
 <meta name="mobile-web-app-capable" content="yes">
@@ -134,6 +134,19 @@ body.draw-mode #btn-draw-go{display:block}
 #install-screen #inst-icon{margin-top:auto}
 #install-screen #inst-skip-wrap{margin-bottom:auto}
 #inst-skip-wrap{font-size:.75rem;color:#789;display:flex;align-items:center;gap:6px}
+#cam-view{display:none;position:fixed;inset:0;z-index:70;background:#000;flex-direction:column}
+#cam-view.show{display:flex}
+#cam-video{flex:1;width:100%;min-height:0;object-fit:cover;background:#000}
+#cam-bar{display:flex;gap:10px;justify-content:center;align-items:center;flex-wrap:wrap;padding:12px 10px calc(14px + env(safe-area-inset-bottom));background:rgba(6,10,20,.92)}
+#cam-bar .btn{font-size:.9rem;padding:11px 16px;border-radius:22px}
+#perm-help{display:none;position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.88);align-items:center;justify-content:center;padding:18px}
+#perm-help.show{display:flex}
+#perm-box{max-width:380px;width:100%;max-height:90vh;overflow:auto;background:#0e1a34;border:1px solid rgba(120,180,255,.45);border-radius:14px;padding:14px;color:#def;font-size:.85rem;line-height:1.5}
+#perm-box ol{padding-left:20px;margin:6px 0}
+#perm-box .row2{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:10px}
+#upd-box{display:none;position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:95;width:min(92vw,380px);background:#0e1f3e;border:1px solid #5cf;border-radius:14px;padding:14px;color:#def;font-size:.86rem;line-height:1.45;box-shadow:0 8px 30px rgba(0,0,0,.6),0 0 18px rgba(80,200,255,.25)}
+#upd-box.show{display:block}
+#upd-box .row2{display:flex;gap:8px;justify-content:flex-end;margin-top:10px}
 </style>
 </head>
 <body>
@@ -162,7 +175,8 @@ body.draw-mode #btn-draw-go{display:block}
     <button class="btn" id="btn-power">⏻ Безперервно</button>
     <label class="btn accent" id="btn-photo" for="file-in">📷 Фото</label>
     <label class="btn accent" id="btn-face-photo" for="file-in">🙂 Обличчя</label>
-    <label class="btn accent" id="btn-cam" for="cam-in">📸</label>
+    <button class="btn accent" id="btn-cam">📸</button>
+    <button class="btn" id="btn-perm" title="Дозволи: камера й галерея">🔐</button>
     <button class="btn accent" id="btn-draw">✏️ Малювати</button>
     <button class="btn ok" id="btn-save">💾 Зберегти</button>
     <button class="btn" id="btn-install" title="Ярлик на головний екран">📲</button>
@@ -206,6 +220,21 @@ body.draw-mode #btn-draw-go{display:block}
   </div>
 </div>
 <div id="toast"></div>
+<div id="upd-box"><div id="upd-text"></div>
+  <div class="row2"><button class="btn" id="btn-upd-later">Пізніше</button><button class="btn ok" id="btn-upd-go">🔄 Оновити</button></div>
+</div>
+<div id="cam-view">
+  <video id="cam-video" playsinline="" muted="" autoplay=""></video>
+  <div id="cam-bar">
+    <button class="btn ok" id="btn-snap">📸 Предмет</button>
+    <button class="btn accent" id="btn-snap-face">🙂 Обличчя</button>
+    <button class="btn" id="btn-cam-flip">🔄</button>
+    <button class="btn danger" id="btn-cam-close">✖</button>
+  </div>
+</div>
+<div id="perm-help"><div id="perm-box"><div id="perm-text"></div>
+  <div class="row2"><button class="btn ok" id="btn-perm-retry">↻ Спробувати знову</button><button class="btn" id="btn-perm-close">Закрити</button></div>
+</div></div>
 <div id="install-screen">
   <button class="btn btn-lang" style="position:absolute;top:calc(12px + env(safe-area-inset-top));right:14px">🌐 EN</button>
   <img id="inst-icon" alt="">
@@ -253,7 +282,7 @@ const APP_SRC=(()=>{ try{
 }catch(e){ return ""; } })();
 /* Адреса сайту програми. Порожньо = файл ще не прив'язаний. Заповнюється автоматично після публікації на GitHub */
 const BOUND_SITE=/*BOUND*/"https://86alieksandrkozlov86-create.github.io/shape-wave/";
-const APP_VER=15;   /* номер версії: якщо файл новіший за сайт — власнику пропонується оновити сайт */
+const APP_VER=17;   /* номер версії: якщо файл новіший за сайт — власнику пропонується оновити сайт */
 (function(){
 "use strict";
 const F_MIN=100,F_MAX=1200,TRACE_LEN=400,DB_KEY="geo_shapes_db_v1";
@@ -1740,7 +1769,71 @@ $("btn-play").onclick=()=>{ if(current) playShape(1); else toast("Немає ф�
 $("btn-power").onclick=()=>setPower(!powerOn);
 $("btn-photo").onclick=()=>{ setDrawMode(false); nextMode="auto"; };
 $("btn-face-photo").onclick=()=>{ setDrawMode(false); nextMode="face"; };
-$("btn-cam").onclick=()=>{ setDrawMode(false); nextMode="auto"; };
+/* ================= Камера всередині програми (getUserMedia) =================
+   Встановлена веб-програма не має власних дозволів Android — вона користується дозволами Chrome.
+   Запит getUserMedia викликає системне вікно дозволу, і дозвіл запам'ятовується для сайту. */
+let camStream=null, camFacing="environment", permRetry=null;
+function stopCam(){ if(camStream){ camStream.getTracks().forEach(t=>t.stop()); camStream=null; } $("cam-video").srcObject=null; }
+function closeCam(){ stopCam(); $("cam-view").classList.remove("show"); }
+async function openCam(){
+  setDrawMode(false); nextMode="auto";
+  if(!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia)){ $("cam-in").click(); return; }
+  try{
+    stopCam();
+    camStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:camFacing},width:{ideal:1280},height:{ideal:1280}},audio:false});
+    const v=$("cam-video"); v.srcObject=camStream; v.style.transform=camFacing==="user"?"scaleX(-1)":"none";
+    $("cam-view").classList.add("show");
+    try{ await v.play(); }catch(e){}
+  }catch(e){
+    console.warn("cam",e); stopCam();
+    if(e&&(e.name==="NotAllowedError"||e.name==="SecurityError"||e.name==="PermissionDeniedError")) showPermHelp("camera",openCam);
+    else { toast(L("Камера недоступна — відкриваю системну камеру","Camera unavailable — opening the system camera"),2500); $("cam-in").click(); }
+  }
+}
+function snapCam(mode){
+  const v=$("cam-video"); if(!camStream||!v.videoWidth){ toast(L("Камера ще не готова","Camera is not ready yet")); return; }
+  const c=document.createElement("canvas"); c.width=v.videoWidth; c.height=v.videoHeight;
+  const x=c.getContext("2d"); if(camFacing==="user"){ x.translate(c.width,0); x.scale(-1,1); }
+  x.drawImage(v,0,0);
+  c.toBlob(b=>{
+    if(!b){ toast(L("Не вдалося зробити знімок","Could not take the photo")); return; }
+    closeCam();
+    loadImageFile(new File([b],(mode==="face"?L("Обличчя","Face"):L("Фото","Photo"))+".jpg",{type:"image/jpeg"}),mode);
+  },"image/jpeg",0.92);
+}
+function showPermHelp(kind,retry){
+  permRetry=retry||null;
+  const what=kind==="camera"?L("Камеру","The camera"):L("Галерею","The gallery");
+  $("perm-text").innerHTML=LANG==="en"
+    ?"<b>🔐 "+what+" is blocked</b><br>An installed web app uses <b>Chrome's</b> permissions — that's why the switches in the shortcut's settings can't be moved. Allow it here:<ol><li>Phone <b>Settings → Apps → Chrome → Permissions</b> → <b>Camera</b> and <b>Photos and videos</b> (or <b>Files and media</b>) → <b>Allow</b></li><li>In <b>Chrome</b>: <b>⋮ → Settings → Site settings → Camera</b> → find <b>github.io</b> under «Blocked» → <b>Allow</b></li><li>Come back here and tap <b>↻ Try again</b></li></ol><small>Xiaomi / Redmi / POCO: also <b>Settings → Apps → Chrome → Other permissions</b> — allow everything about the camera.</small>"
+    :"<b>🔐 "+what+" заблоковано</b><br>Встановлена веб-програма користується дозволами <b>Chrome</b>, тому в налаштуваннях ярлика перемикачі не рухаються. Дозволь так:<ol><li><b>Налаштування телефона → Додатки → Chrome → Дозволи</b> → <b>Камера</b> і <b>Фото й відео</b> (або <b>Файли й медіа</b>) → <b>Дозволити</b></li><li>У <b>Chrome</b>: <b>⋮ → Налаштування → Налаштування сайтів → Камера</b> → знайди <b>github.io</b> у «Заблоковано» → <b>Дозволити</b></li><li>Повернись сюди й натисни <b>↻ Спробувати знову</b></li></ol><small>Xiaomi / Redmi / POCO: ще <b>Налаштування → Додатки → Chrome → Інші дозволи</b> — дозволь усе, що стосується камери.</small>";
+  $("btn-perm-retry").style.display=permRetry?"inline-block":"none";
+  $("perm-help").classList.add("show");
+}
+async function requestPerms(){
+  let cam="unknown";
+  try{ if(navigator.permissions&&navigator.permissions.query){ cam=(await navigator.permissions.query({name:"camera"})).state; } }catch(e){}
+  if(cam==="granted"){ toast(L("✓ Камера дозволена · галерея працює без окремого дозволу","✓ Camera allowed · the gallery needs no separate permission"),3500); return; }
+  if(cam==="denied"){ showPermHelp("camera",requestPerms); return; }
+  if(!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia)){ toast(L("Цей браузер не дає запитати камеру — відкрий сайт у Chrome","This browser can't request the camera — open the site in Chrome"),3500); return; }
+  try{
+    const st=await navigator.mediaDevices.getUserMedia({video:true,audio:false});
+    st.getTracks().forEach(t=>t.stop());
+    toast(L("✓ Дозвіл на камеру отримано й збережено","✓ Camera permission granted and saved"),3000);
+  }catch(e){
+    if(e&&(e.name==="NotAllowedError"||e.name==="SecurityError")) showPermHelp("camera",requestPerms);
+    else toast(L("Камеру не знайдено: ","Camera not found: ")+(e&&e.name||e),3000);
+  }
+}
+$("btn-cam").onclick=openCam;
+$("btn-perm").onclick=requestPerms;
+$("btn-snap").onclick=()=>snapCam("auto");
+$("btn-snap-face").onclick=()=>snapCam("face");
+$("btn-cam-flip").onclick=()=>{ camFacing=camFacing==="environment"?"user":"environment"; openCam(); };
+$("btn-cam-close").onclick=closeCam;
+$("btn-perm-close").onclick=()=>$("perm-help").classList.remove("show");
+$("btn-perm-retry").onclick=()=>{ $("perm-help").classList.remove("show"); if(permRetry) permRetry(); };
+document.addEventListener("visibilitychange",()=>{ if(document.hidden&&camStream) closeCam(); });
 $("file-in").onchange=e=>{ if(e.target.files[0]) loadImageFile(e.target.files[0],nextMode); e.target.value=""; };
 $("cam-in").onchange=e=>{ if(e.target.files[0]) loadImageFile(e.target.files[0],nextMode); e.target.value=""; };
 $("btn-draw").onclick=()=>{ if(dbSelect) setDbSelect(false); setDrawMode(true); };
@@ -1884,8 +1977,8 @@ const GH_KEY="shape_wave_gh";
 const SW_SRC=`const CACHE="shape-wave-"+"__VER__";
 self.addEventListener("install",e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(["./","./index.html","./manifest.webmanifest","./icon-192.png","./icon-512.png"]).catch(()=>c.addAll(["./"]))).then(()=>self.skipWaiting()));});
 self.addEventListener("activate",e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==CACHE).map(x=>caches.delete(x)))).then(()=>self.clients.claim()));});
-self.addEventListener("fetch",e=>{const u=new URL(e.request.url);if(e.request.method!=="GET"||u.origin!==self.location.origin)return;
-e.respondWith(fetch(e.request).then(r=>{if(r&&r.ok){const c=r.clone();caches.open(CACHE).then(x=>x.put(e.request,c));}return r;}).catch(()=>caches.match(e.request,{ignoreSearch:true}).then(m=>m||caches.match("./index.html"))));});`;
+self.addEventListener("fetch",e=>{const u=new URL(e.request.url);if(e.request.method!=="GET"||u.origin!==self.location.origin||/version\.json$/.test(u.pathname))return;
+e.respondWith(fetch(e.request.url,{cache:"no-cache",credentials:"same-origin"}).then(r=>{if(r&&r.ok){const c=r.clone();caches.open(CACHE).then(x=>x.put(e.request,c));}return r;}).catch(()=>caches.match(e.request,{ignoreSearch:true}).then(m=>m||caches.match("./index.html"))));});`;
 if("serviceWorker" in navigator&&location.protocol==="https:"&&/github\.io$/.test(location.hostname)){
   window.addEventListener("load",()=>{ navigator.serviceWorker.register("sw.js").catch(()=>{}); });
 }
@@ -1975,6 +2068,8 @@ async function ghPublish(){
       icons:[{src:"icon-192.png",sizes:"192x192",type:"image/png",purpose:"any"},{src:"icon-512.png",sizes:"512x512",type:"image/png",purpose:"any"},{src:"icon-maskable-512.png",sizes:"512x512",type:"image/png",purpose:"maskable"}]
     },null,1),"Manifest");
     ghLog("✓ manifest, icons");
+    await ghPutFile(token,owner,repo,branch,"version.json",JSON.stringify({ver:APP_VER,published:new Date().toISOString()}),"Version "+APP_VER);
+    ghLog("✓ version.json · v"+APP_VER+L(" — інші пристрої отримають запит на оновлення"," — other devices will be asked to update"));
     ghLog(L("Вмикаю GitHub Pages…","Enabling GitHub Pages…"));
     let pg=await gh(token,"GET",`/repos/${owner}/${repo}/pages`);
     if(pg.status===404){
@@ -2051,6 +2146,45 @@ $("btn-gh-open").onclick=()=>{ const u=$("gh-url").href; if(u) location.href=u; 
 $("btn-gh-token").onclick=()=>{ window.open("https://github.com/settings/tokens/new?scopes=public_repo&description=Shape%20Wave%20publisher","_blank"); };
 $("gh-remember").onchange=()=>{ if(!$("gh-remember").checked){ const st=ghLoad(); delete st.token; ghSave(st); } };
 
+/* ================= Перевірка оновлень з GitHub ================= */
+let updRemote=0, updLastCheck=0, updArrived=(location.search.match(/[?&]v=(\d+)/)||[])[1]|0;
+function siteBase(){
+  if(location.protocol==="https:"&&/github\.io$/.test(location.hostname)) return location.href.split(/[?#]/)[0].replace(/[^\/]*$/,"");
+  const t=siteTarget(); return t?t.replace(/[^\/]*$/,""):"";
+}
+async function checkUpdate(force){
+  const base=siteBase(); if(!base) return;
+  const now=Date.now(); if(!force&&now-updLastCheck<5*60*1000) return; updLastCheck=now;
+  let ver=0;
+  try{ const r=await fetch(base+"version.json?t="+now,{cache:"no-store"}); if(!r.ok) return; const j=await r.json(); ver=+j.ver||0; }catch(e){ return; }
+  if(ver<=APP_VER) return;
+  let later=0; try{ later=+sessionStorage.getItem("upd_later")||0; }catch(e){}
+  if(!force&&later>=ver) return;
+  if(updArrived>=ver&&APP_VER<ver){ toast(L("GitHub ще поширює оновлення — спробуй за хвилину","GitHub is still rolling out the update — try again in a minute"),3500); try{ sessionStorage.setItem("upd_later",String(ver)); }catch(e){} return; }
+  updRemote=ver;
+  const onSite=/^https?:$/.test(location.protocol);
+  $("upd-text").innerHTML=LANG==="en"
+    ?"<b>🔄 Update available</b><br>A new version <b>v"+ver+"</b> is on GitHub (you have v"+APP_VER+"). "+(onSite?"Update now? Your saved drawings stay.":"It will open from the app's site.")
+    :"<b>🔄 Доступне оновлення</b><br>На GitHub нова версія <b>v"+ver+"</b> (у тебе v"+APP_VER+"). "+(onSite?"Оновити зараз? Збережені малюнки залишаться.":"Вона відкриється з сайту програми.");
+  $("upd-box").classList.add("show");
+}
+async function applyUpdate(){
+  const ver=updRemote; $("btn-upd-go").disabled=true; $("btn-upd-go").textContent="…";
+  if(!/^https?:$/.test(location.protocol)){ location.href=siteBase()+"?v="+ver; return; }
+  try{ if(navigator.serviceWorker){ const regs=await navigator.serviceWorker.getRegistrations(); await Promise.all(regs.map(r=>r.update().catch(()=>{}))); } }catch(e){}
+  try{ if(window.caches){ const ks=await caches.keys(); await Promise.all(ks.map(k=>caches.delete(k))); } }catch(e){}
+  location.replace(location.pathname+"?v="+ver+"&t="+Date.now());
+}
+$("btn-upd-go").onclick=applyUpdate;
+$("btn-upd-later").onclick=()=>{ try{ sessionStorage.setItem("upd_later",String(updRemote)); }catch(e){} $("upd-box").classList.remove("show"); };
+(function(){
+  const m=location.search.match(/[?&]v=(\d+)/);
+  if(m){ if(APP_VER>=+m[1]) setTimeout(()=>toast(L("✓ Оновлено до v","✓ Updated to v")+APP_VER,3000),600);
+    try{ history.replaceState(null,"",location.pathname+location.hash); }catch(e){} }
+})();
+setTimeout(()=>checkUpdate(true),1200);
+document.addEventListener("visibilitychange",()=>{ if(!document.hidden) checkUpdate(false); });
+
 /* ================= Мова інтерфейсу: UA / EN ================= */
 const LANG_KEY="shape_wave_lang";
 let LANG=(()=>{ try{ const v=localStorage.getItem(LANG_KEY); if(v==="uk"||v==="en") return v; }catch(e){}
@@ -2104,6 +2238,9 @@ const I18N_EXACT={
 "Палець можна відривати · потім ▶ Старт":"You can lift your finger · then ▶ Start",
 "📷 Фото, 🙂 Обличчя, ✏️ Малювати або 🌊⬇ Хвиля":"📷 Photo, 🙂 Face, ✏️ Draw or 🌊⬇ Wave",
 "Вибрати":"Select",
+"Пізніше":"Later","🔄 Оновити":"🔄 Update",
+"📸 Предмет":"📸 Object","↻ Спробувати знову":"↻ Try again","Закрити":"Close",
+"Дозволи: камера й галерея":"Permissions: camera and gallery",
 "🚀 Оновити сайт на GitHub":"🚀 Update the site on GitHub",
 "📲 Ярлик ставиться тільки з сайту програми":"📲 A shortcut can only be added from the app's website",
 "Маєш посилання на сайт (його надсилає власник програми)? Встав його сюди — ключ не потрібен:":"Have a link to the site (the app owner sends it)? Paste it here — no key needed:",
