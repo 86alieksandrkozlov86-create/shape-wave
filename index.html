@@ -2,7 +2,7 @@
 <html lang="uk"><head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>Фото → Фігура → Хвиля v10</title>
+<title>Фото → Фігура → Хвиля v14</title>
 <link rel="manifest" id="mf-link">
 <meta name="theme-color" content="#060a14">
 <meta name="mobile-web-app-capable" content="yes">
@@ -121,7 +121,7 @@ body.draw-mode #btn-draw-go{display:block}
 #gh-log .ok{color:#7f9}#gh-log .err{color:#f88}
 #gh-done{display:none;flex-direction:column;gap:6px}
 #gh-url{color:#7df;word-break:break-all}
-#install-screen{overflow-y:auto;justify-content:flex-start}
+#install-screen{overflow-y:auto;justify-content:flex-start;padding-top:calc(30px + env(safe-area-inset-top))}
 #install-screen #inst-icon{margin-top:auto}
 #install-screen #inst-skip-wrap{margin-bottom:auto}
 #inst-skip-wrap{font-size:.75rem;color:#789;display:flex;align-items:center;gap:6px}
@@ -178,6 +178,10 @@ body.draw-mode #btn-draw-go{display:block}
 <div id="overlay">
   <div id="overlay-hint" style="font-size:.68rem;color:#9cf;text-align:center;margin-bottom:4px;line-height:1.35;max-width:92vw"></div>
   <canvas id="preview" style="cursor:crosshair;touch-action:none"></canvas>
+  <div id="zone-bar" style="display:none;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;font-size:.75rem;color:#9df">
+    <span id="zone-count">Зони: 0 з 0</span>
+    <button class="btn" id="btn-zone-all">☑ Усі зони</button>
+  </div>
   <input type="text" id="name-in" placeholder="Назва фігури">
   <label id="tex-wrap" style="display:inline-flex;align-items:center;gap:5px;font-size:.7rem;color:#fe9"><input type="checkbox" id="ch-tex"> 🧩 Текстура всередині</label>
   <span id="tex-amt-wrap" class="slider-wrap" style="display:none"><span>Деталі</span><input type="range" id="tex-amt" min="1" max="10" step="1" value="5" style="width:110px"></span>
@@ -201,8 +205,15 @@ body.draw-mode #btn-draw-go{display:block}
   <button class="btn ok big" id="btn-inst-do">📲 Встановити на головний екран</button>
   <div id="inst-guide"></div>
   <div id="gh-panel">
+    <b>📲 Ярлик ставиться тільки з сайту програми</b>
+    <span>Маєш посилання на сайт (його надсилає власник програми)? Встав його сюди — ключ не потрібен:</span>
+    <input type="text" id="site-in" placeholder="https://….github.io/shape-wave/" autocomplete="off" spellcheck="false" inputmode="url">
+    <button class="btn ok big" id="btn-site-go">🌐 Відкрити сайт і встановити</button>
+    <button class="btn" id="btn-gh-owner" style="font-size:.72rem;opacity:.85">🔑 Я власник — створити сайт на GitHub</button>
+    <div id="gh-owner" style="display:none;flex-direction:column;gap:8px">
+    <div id="gh-note" style="display:none;background:rgba(120,90,10,.35);border:1px solid #fc6;border-radius:10px;padding:8px;color:#fec;line-height:1.45"></div>
     <b>🚀 Опублікувати на GitHub Pages</b>
-    <span>Програма відкрита як файл, а ярлик ставиться тільки з сайту. Я сам створю сайт у твоєму GitHub. Потрібно один раз:</span>
+    <span>Програма сама створить сайт у твоєму GitHub. Потрібно один раз:</span>
     <span>1. Мати акаунт GitHub і створити токен (галочка <b>public_repo</b> вже стоїть):</span>
     <button class="btn" id="btn-gh-token">🔑 Створити токен на GitHub</button>
     <span>2. Скопіювати токен і вставити сюди:</span>
@@ -215,8 +226,12 @@ body.draw-mode #btn-draw-go{display:block}
       <span>Сайт програми:</span>
       <a id="gh-url" target="_blank" rel="noopener"></a>
       <button class="btn ok big" id="btn-gh-open">🌐 Відкрити сайт → там 📲 Встановити</button>
+      <span>Файл для інших телефонів — кнопка «📲» у ньому одразу відкриє твій сайт, без GitHub:</span>
+      <div class="row2"><button class="btn" id="btn-gh-share">📤 Надіслати файл</button><button class="btn" id="btn-gh-save">💾 Зберегти файл</button></div>
+    </div>
     </div>
   </div>
+  <button class="btn" id="btn-gh-admin" style="display:none;font-size:.72rem;padding:5px 12px;opacity:.8">⚙️ Оновити сайт на GitHub</button>
   <button class="btn big" id="btn-inst-open">▶ Відкрити програму</button>
   <label id="inst-skip-wrap"><input type="checkbox" id="ch-inst-skip"> більше не показувати</label>
 </div>
@@ -227,6 +242,9 @@ const APP_SRC=(()=>{ try{
   ["mf-link","ati-link","fav-link"].forEach(id=>{ const e=c.querySelector("#"+id); if(e) e.removeAttribute("href"); });
   return "<!DOCTYPE html>\n"+c.outerHTML;
 }catch(e){ return ""; } })();
+/* Адреса сайту програми. Порожньо = файл ще не прив'язаний. Заповнюється автоматично після публікації на GitHub */
+const BOUND_SITE=/*BOUND*/"https://86alieksandrkozlov86-create.github.io/shape-wave/";
+const APP_VER=14;   /* номер версії: якщо файл новіший за сайт — власнику пропонується оновити сайт */
 (function(){
 "use strict";
 const F_MIN=100,F_MAX=1200,TRACE_LEN=400,DB_KEY="geo_shapes_db_v1";
@@ -664,6 +682,54 @@ function circlePx(){
   return pts;
 }
 
+/* ================= Кілька автоматичних зон ================= */
+const ZONE_HUES=[190,50,320,120,25,270,160,0,90,220], ZONE_MAX=10;
+function compMask(labels,N,id,w,h){ const cm=new Uint8Array(N); for(let i=0;i<N;i++) if(labels[i]===id) cm[i]=1; return fillHoles(cm,w,h); }
+function makeZone(cm,w,h,src,poly){
+  poly=poly||maskToContour(cm,w,h,140); if(!poly) return null;
+  let a=0,sx=0,sy=0; for(let i=0;i<cm.length;i++) if(cm[i]){ a++; sx+=i%w; sy+=(i/w)|0; }
+  if(a<20) return null;
+  return {poly,mask:cm,area:a,cx:sx/a,cy:sy/a,src};
+}
+function zoneIoU(a,b){ let i=0,u=0; const A=a.mask,B=b.mask; for(let k=0;k<A.length;k++){ const x=A[k],y=B[k]; if(x&&y) i++; if(x||y) u++; } return u?i/u:0; }
+function zoneDupOf(z,list){ for(let k=0;k<list.length;k++) if(zoneIoU(list[k],z)>0.6) return k; return -1; }
+/* зони за кольором: k-means по всьому кадру → зв'язні області кожного кольору */
+function colorRegionZones(){
+  const w=_w,h=_h,N=w*h,lab=_lab, idx=[]; for(let i=0;i<N;i+=3) idx.push(i);
+  const C=kmeans(lab,idx,5,6), cl=new Uint8Array(N), cand=[];
+  for(let i=0;i<N;i++){ let bj=0,bd=1e18; const p=i*3;
+    for(let j=0;j<C.length;j++){ const c=C[j],a=lab[p]-c[0],b=lab[p+1]-c[1],d2=lab[p+2]-c[2],d=a*a+b*b+d2*d2; if(d<bd){bd=d;bj=j;} }
+    cl[i]=bj; }
+  for(let j=0;j<C.length;j++){
+    let m=new Uint8Array(N); for(let i=0;i<N;i++) m[i]=cl[i]===j?1:0;
+    m=majority(majority(m,w,h),w,h); m=morph(morph(m,w,h,false),w,h,true);
+    const {labels,comps}=labelComps(m,w,h);
+    comps.forEach(c=>{
+      if(c.count<N*0.006||c.count>N*0.6) return;
+      const touch=(c.minX<=1?1:0)+(c.minY<=1?1:0)+(c.maxX>=w-2?1:0)+(c.maxY>=h-2?1:0);
+      if(touch>=3) return;               /* фон уздовж країв кадру — не зона */
+      cand.push({c,labels});
+    });
+  }
+  cand.sort((a,b)=>b.c.count-a.c.count);
+  return cand.slice(0,14).map(o=>makeZone(compMask(o.labels,N,o.c.id,w,h),w,h,"color")).filter(Boolean);
+}
+function detectZones(){
+  const w=_w,h=_h,N=w*h, list=[];
+  /* 1) головні предмети (як раніше), найкращий — першим */
+  const r=segmentObject(null,true);
+  if(r&&r.comps.length){
+    const cs=r.comps.filter(c=>c.count>=N*0.004&&c.count<=N*0.75).map(c=>{
+      const dist=Math.hypot(c.sx/c.count-w/2,c.sy/c.count-h/2)/(Math.hypot(w,h)/2);
+      const touch=(c.minX<=1?1:0)+(c.minY<=1?1:0)+(c.maxX>=w-2?1:0)+(c.maxY>=h-2?1:0);
+      return {c,score:c.count*(1.3-dist)*(1-0.18*touch)};
+    }).sort((a,b)=>b.score-a.score);
+    cs.forEach(o=>{ if(list.length>=ZONE_MAX) return; const z=makeZone(compMask(r.labels,N,o.c.id,w,h),w,h,"object"); if(z&&zoneDupOf(z,list)<0) list.push(z); });
+  }
+  /* 2) додаткові зони за кольором */
+  colorRegionZones().forEach(z=>{ if(list.length<ZONE_MAX&&zoneDupOf(z,list)<0) list.push(z); });
+  return list;
+}
 let _w=0,_h=0,_imgData=null,_lab=null,_D=null,texOn=false,texRoute=null,texKey="",texBusy=false;
 function prepareImage(img){
   const maxSide=560;
@@ -681,7 +747,7 @@ function prepareImage(img){
 /* Покращена сегментація об'єкта: модель кольору фону/об'єкта (k-means у Lab)
    + ітеративне уточнення (спрощений GrabCut) + згладжування + вибір головного об'єкта.
    seed={x,y} — тап по об'єкту (необов'язково). */
-function segmentObject(seed){
+function segmentObject(seed,wantAll){
   const w=_w,h=_h,N=w*h,lab=_lab,minWH=Math.min(w,h);
   const bias=1.3-(thresh-20)/160*0.7;
   const margin=Math.max(3,Math.round(minWH*0.05));
@@ -721,6 +787,7 @@ function segmentObject(seed){
   let m=fillHoles(mask,w,h);
   m=morph(morph(m,w,h,false),w,h,true);
   const {labels,comps}=labelComps(m,w,h);
+  if(wantAll) return {labels,comps};
   if(!comps.length) return null;
   let best=null;
   if(seed){
@@ -916,7 +983,9 @@ const TEX_POINTS=3675, TEX_F0=12, TEX_BUDGET=5200;
 /* Один замкнений шлях: контур + «заходи» по лініях текстури всередині (як і в режимі обличчя) */
 function buildTextureRoute(poly,detail){
   const w=_w,h=_h,N=w*h;
-  let er=polyMask(poly,w,h);
+  const polys=Array.isArray(poly[0])?poly:[poly]; poly=polys[0];
+  let er=polyMask(polys[0],w,h);
+  for(let k=1;k<polys.length;k++){ const m2=polyMask(polys[k],w,h); for(let i=0;i<N;i++) if(m2[i]) er[i]=1; }
   const rr=Math.max(2,Math.round(Math.min(w,h)*0.012));
   for(let k=0;k<rr;k++) er=morph(er,w,h,false);
   const D=ensureD(), vals=[];
@@ -951,6 +1020,18 @@ function buildTextureRoute(poly,detail){
     }
     if(list.length>=45) comps.push(list);
   }
+  if(polys.length>1){
+    const loops=orderLoops(polys.map(q=>resampleClosed(q,Math.max(120,Math.min(320,q.length)))));
+    let cur2=loops[loops.length-1][0], rem=comps.slice(), nT=0; const vis2=new Uint8Array(N);
+    while(rem.length){
+      let bc=0,bs=0,bdd=1e18;
+      rem.forEach((l,ci)=>{ for(let a=0;a<l.length;a++){ const px=l[a]%w, py=(l[a]/w)|0, d=(px-cur2.x)*(px-cur2.x)+(py-cur2.y)*(py-cur2.y); if(d<bdd){bdd=d;bc=ci;bs=l[a];} } });
+      rem.splice(bc,1);
+      const walk=walkComp(bs,sk,vis2,w).map(idx=>({x:idx%w,y:(idx/w)|0}));
+      loops.push(walk); nT+=walk.length; cur2={x:bs%w,y:(bs/w)|0};
+    }
+    return {route:piecesRoute(loops,TEX_POINTS),nTex:nT,comps:comps.length};
+  }
   const cont=resampleClosed(poly,Math.max(120,Math.min(320,poly.length)));
   if(!comps.length) return {route:resampleClosed(cont,TEX_POINTS),nTex:0,comps:0};
   let bi=0,bd=1e18;
@@ -978,6 +1059,25 @@ function buildTextureRoute(poly,detail){
   const out=[];
   pieces.forEach((pl,i)=>{ resampleOpen(pl,counts[i]).forEach(p=>out.push(p)); });
   return {route:out,nTex,comps:comps.length};
+}
+function orderLoops(polys){
+  const rest=polys.map(p=>p.slice()), out=[]; let cur=null;
+  while(rest.length){
+    let bi=0,bk=0,bd=1e18;
+    if(cur) rest.forEach((p,i)=>p.forEach((q,k)=>{ const d=(q.x-cur.x)*(q.x-cur.x)+(q.y-cur.y)*(q.y-cur.y); if(d<bd){bd=d;bi=i;bk=k;} }));
+    const p=rest.splice(bi,1)[0], rot=p.slice(bk).concat(p.slice(0,bk));
+    rot.push({x:rot[0].x,y:rot[0].y}); out.push(rot); cur=rot[0];
+  }
+  return out;
+}
+function piecesRoute(pieces,total){
+  const lens=pieces.map(pl=>{ let L=0; for(let i=1;i<pl.length;i++) L+=Math.hypot(pl[i].x-pl[i-1].x,pl[i].y-pl[i-1].y); return L; });
+  const tl=lens.reduce((a,b)=>a+b,0), step=tl/Math.max(1,total-pieces.length);
+  const counts=lens.map(L=>Math.max(2,Math.round(L/step)));
+  let big=0; counts.forEach((c,i)=>{ if(c>counts[big]) big=i; });
+  counts[big]+=total-counts.reduce((a,b)=>a+b,0);
+  const out=[]; pieces.forEach((pl,i)=>resampleOpen(pl,counts[i]).forEach(q=>out.push(q)));
+  return out;
 }
 function resampleOpen(p,n){
   const L=[0]; for(let i=1;i<p.length;i++) L.push(L[i-1]+Math.hypot(p[i].x-p[i-1].x,p[i].y-p[i-1].y));
@@ -1011,16 +1111,19 @@ function jumpFlags(pts){
   return any?f:null;
 }
 function getJF(c){ if(c._jfp!==c.points){ c._jf=jumpFlags(c.points); c._jfp=c.points; } return c._jf; }
+function selPolys(){ return [...zoneSel].sort((a,b)=>a-b).map(i=>zones[i]).filter(Boolean).map(z=>z.poly); }
 function basePoly(){
   if(mode==="manual") return manualPts.length>=3?manualPts:null;
+  if(mode==="auto"&&zones.length){ const ps=selPolys(); return ps.length>1?ps:(ps[0]||null); }
   return contourPx&&contourPx.length>=3?contourPx:null;
 }
 function ensureTex(){
   const poly=basePoly();
   if(!poly||!_imgData){ texRoute=null; return; }
   const detail=+$("tex-amt").value; let hs=0;
-  poly.forEach((p,i)=>{ hs+=p.x*(i+1)+p.y*(i+3); });
-  const key=detail+"|"+poly.length+"|"+hs.toFixed(2);
+  const flat=Array.isArray(poly[0])?[].concat(...poly):poly;
+  flat.forEach((p,i)=>{ hs+=p.x*(i+1)+p.y*(i+3); });
+  const key=detail+"|"+flat.length+"|"+hs.toFixed(2);
   if(key===texKey||texBusy) return;
   texBusy=true; toast("Аналіз текстури…",1500);
   setTimeout(()=>{
@@ -1031,14 +1134,15 @@ function ensureTex(){
 }
 
 /* ================= Попередній перегляд / режими ================= */
+let zones=[], zoneSel=new Set();
 let mode="auto", contourPx=null, manualPts=[], dragIdx=-1, procToken=0, lastSeed=null, reTimer=null;
 const HINTS={
-  auto:"<b>Авто:</b> торкнись предмета, щоб уточнити виділення · «Чутл.» змінює деталізацію · ✏️ Точки — підправити вручну",
+  auto:"<b>Авто:</b> пунктиром — знайдені зони. Торкнись зони, щоб додати чи прибрати її · торкнись поза зонами — знайду ще предмет · ☑ Усі зони · «Чутл.» — деталізація · ✏️ Точки — вручну",
   face:"<b>Обличчя:</b> контур + очі/рот (потрібен інтернет для першого запуску моделі; без нього — грубий контур за кольором шкіри) · ✏️ Точки — підправити",
   manual:"<b>Ручний контур:</b> тягни точки або став нові по краю предмета → ✓ Використати"
 };
 const HINTS_EN={
-  auto:"<b>Auto:</b> tap the object to refine the selection · «Sens.» changes detail · ✏️ Points — fix by hand",
+  auto:"<b>Auto:</b> dashed outlines are detected zones. Tap a zone to add or remove it · tap outside the zones to find another object · ☑ All zones · «Sens.» — detail · ✏️ Points — by hand",
   face:"<b>Face:</b> contour + eyes/mouth (internet needed on first run to load the model; without it — rough skin-colour contour) · ✏️ Points — fix",
   manual:"<b>Manual contour:</b> drag points or add new ones along the object's edge → ✓ Use"
 };
@@ -1047,6 +1151,27 @@ function setMode(m){
   [["auto","btn-auto"],["face","btn-face-ov"],["manual","btn-manual"]].forEach(([k,id])=>$(id).classList.toggle("active",k===m));
   $("overlay-hint").innerHTML=(LANG==="en"?HINTS_EN:HINTS)[m];
   $("detail-wrap").style.display=m==="face"?"inline-flex":"none";
+  updateZoneBar();
+}
+function updateZoneBar(){
+  const bar=$("zone-bar"); if(!bar) return;
+  const on=mode==="auto"&&zones.length>1;
+  bar.style.display=on?"flex":"none";
+  if(on){
+    $("zone-count").textContent="Зони: "+zoneSel.size+" з "+zones.length;
+    $("btn-zone-all").textContent=zoneSel.size===zones.length?"☐ Жодної":"☑ Усі зони";
+  }
+}
+function updateZoneRoute(){
+  const ps=selPolys();
+  contourPx=ps.length?ps[0]:null;   /* для ✏️ Точки — перша вибрана зона */
+  updateZoneBar();
+}
+function zoneAt(x,y){
+  const xi=Math.round(x),yi=Math.round(y); if(xi<0||yi<0||xi>=_w||yi>=_h) return -1;
+  const i=yi*_w+xi; let best=-1,ba=1e18;
+  zones.forEach((z,k)=>{ if(z.mask[i]&&z.area<ba){ ba=z.area; best=k; } });  /* найменша зона під пальцем — можна вибрати частину всередині предмета */
+  return best;
 }
 
 function loadImageFile(file,startMode){
@@ -1057,7 +1182,7 @@ function loadImageFile(file,startMode){
     pendingImg=img;
     let nm=file.name.replace(/\.[^.]+$/,"").slice(0,40); if(!nm||/^[\d_\-\s]+$/.test(nm)) nm=(startMode==="face"?"Обличчя":"Фігура"); $("name-in").value=nm;
     prepareImage(img);
-    manualPts=[]; contourPx=null; lastSeed=null; dragIdx=-1;
+    manualPts=[]; contourPx=null; lastSeed=null; dragIdx=-1; zones=[]; zoneSel=new Set();
     $("overlay").classList.add("show");
     if(startMode==="face") runFace(); else runAuto(null);
   };
@@ -1067,13 +1192,29 @@ function loadImageFile(file,startMode){
 
 function runAuto(seed){
   setMode("auto"); lastSeed=seed||null;
-  const tok=++procToken; toast("Аналіз зображення…");
+  const tok=++procToken; toast(seed?"Аналіз зображення…":"Шукаю зони…");
   setTimeout(()=>{
     if(tok!==procToken) return;
-    let px=null;
-    try{ px=segmentObject(seed); }catch(e){ console.warn(e); }
-    if(!px){ px=circlePx(); toast("Не вдалося виділити — торкнись предмета або ✏️ Точки",3200); }
-    contourPx=px; renderPreview();
+    if(!seed){
+      try{ zones=detectZones(); }catch(e){ console.warn(e); zones=[]; }
+      zoneSel=new Set(zones.length?[0]:[]);
+      if(!zones.length){ contourPx=circlePx(); toast("Не вдалося виділити — торкнись предмета або ✏️ Точки",3200); updateZoneBar(); }
+      else { updateZoneRoute(); if(zones.length>1) toast("Знайдено зон: "+zones.length+" · торкайся, щоб вибрати",3000); }
+    } else {
+      let px=null;
+      try{ px=segmentObject(seed); }catch(e){ console.warn(e); }
+      if(!px){ toast("Не вдалося виділити — торкнись предмета або ✏️ Точки",3200); }
+      else {
+        const z=makeZone(polyMask(px,_w,_h),_w,_h,"tap",px);
+        if(z){
+          const dup=zoneDupOf(z,zones);
+          if(dup>=0){ zoneSel.add(dup); toast("Ця зона вже є — вибрано"); }
+          else { zones.push(z); zoneSel.add(zones.length-1); toast("Зону додано"); }
+          updateZoneRoute();
+        }
+      }
+    }
+    renderPreview();
   },30);
 }
 async function runFace(){
@@ -1124,6 +1265,26 @@ function renderPreview(){
       });
     }
     $("info-badge").textContent=manualPts.length+" pts";
+  } else if(mode==="auto"&&zones.length){
+    pctx.lineJoin="round";
+    zones.forEach((z,i)=>{
+      const sel=zoneSel.has(i), hue=ZONE_HUES[i%ZONE_HUES.length];
+      pctx.beginPath(); z.poly.forEach((q,k)=>k?pctx.lineTo(q.x,q.y):pctx.moveTo(q.x,q.y)); pctx.closePath();
+      if(sel){ pctx.fillStyle="rgba(0,229,255,0.17)"; pctx.fill(); pctx.setLineDash([]); pctx.strokeStyle="#00e5ff"; pctx.lineWidth=lw; }
+      else { pctx.setLineDash([lw*2.4,lw*1.8]); pctx.strokeStyle="hsla("+hue+",95%,62%,.9)"; pctx.lineWidth=Math.max(1.5,lw*0.7); }
+      pctx.stroke(); pctx.setLineDash([]);
+    });
+    const rr=Math.max(8,w/36);
+    zones.forEach((z,i)=>{
+      const sel=zoneSel.has(i), hue=ZONE_HUES[i%ZONE_HUES.length];
+      pctx.beginPath(); pctx.arc(z.cx,z.cy,rr,0,Math.PI*2);
+      pctx.fillStyle=sel?"#00b8d4":"rgba(0,0,0,.62)"; pctx.fill();
+      pctx.lineWidth=2; pctx.strokeStyle=sel?"#e0ffff":"hsl("+hue+",95%,62%)"; pctx.stroke();
+      pctx.fillStyle="#fff"; pctx.font="bold "+Math.round(rr*1.15)+"px sans-serif"; pctx.textAlign="center"; pctx.textBaseline="middle";
+      pctx.fillText(sel?"✓":String(i+1),z.cx,z.cy+1);
+    });
+    if(lastSeed){ pctx.beginPath(); pctx.arc(lastSeed.x,lastSeed.y,Math.max(4,w/60),0,Math.PI*2); pctx.fillStyle="#fe6"; pctx.fill(); }
+    $("info-badge").textContent=zoneSel.size+"/"+zones.length;
   } else if(contourPx&&contourPx.length>2){
     pctx.strokeStyle="#00e5ff"; pctx.lineWidth=lw; pctx.lineJoin="round";
     pctx.beginPath();
@@ -1156,7 +1317,9 @@ function onPreviewDown(e){
     else { manualPts.push({x:p.x,y:p.y}); dragIdx=manualPts.length-1; }
     renderPreview();
   } else if(mode==="auto"){
-    runAuto(p);
+    const zi=zoneAt(p.x,p.y);
+    if(zi>=0){ if(zoneSel.has(zi)) zoneSel.delete(zi); else zoneSel.add(zi); updateZoneRoute(); renderPreview(); }
+    else runAuto(p);
   }
 }
 function onPreviewMove(e){
@@ -1189,7 +1352,11 @@ $("btn-manual").onclick=()=>{
   toast("Тягни точки або додай нові");
 };
 $("btn-undo-pt").onclick=()=>{ if(mode==="manual"&&manualPts.length){ manualPts.pop(); renderPreview(); } };
-$("btn-clear-pts").onclick=()=>{ manualPts=[]; if(mode!=="manual") contourPx=null; renderPreview(); };
+$("btn-clear-pts").onclick=()=>{ manualPts=[]; if(mode!=="manual"){ contourPx=null; zoneSel.clear(); updateZoneBar(); } renderPreview(); };
+$("btn-zone-all").onclick=()=>{
+  if(zoneSel.size===zones.length) zoneSel.clear(); else zones.forEach((z,i)=>zoneSel.add(i));
+  updateZoneRoute(); renderPreview();
+};
 $("btn-cancel").onclick=()=>{ procToken++; $("overlay").classList.remove("show"); };
 
 function normalizePx(px,dg){
@@ -1214,23 +1381,29 @@ function usePending(){
     if(manualPts.length<3){ toast("Постав мінімум 3 точки по краю предмета"); return; }
     px=resampleClosed(manualPts,Math.max(60,Math.min(140,manualPts.length*8)));
   } else px=contourPx;
+  let polys=null;
+  if(mode==="auto"&&zones.length){
+    polys=selPolys();
+    if(!polys.length){ toast("Вибери хоча б одну зону"); return; }
+    px=polys.length===1?polys[0]:piecesRoute(orderLoops(polys),TEX_POINTS);
+  }
   if(!px||px.length<3){ toast("Спочатку виділи фігуру"); return; }
   let usedTex=false;
   if(texOn){
-    try{ const r=buildTextureRoute(px,+$("tex-amt").value); if(r&&r.route&&r.nTex>0){ px=r.route; usedTex=true; } }
+    try{ const r=buildTextureRoute(polys&&polys.length>1?polys:(polys?polys[0]:px),+$("tex-amt").value); if(r&&r.route&&r.nTex>0){ px=r.route; usedTex=true; } }
     catch(e){ console.warn(e); }
   }
   procToken++;
-  const thumb=makeThumb(mode==="manual"?manualPts:contourPx);
+  const thumb=makeThumb(mode==="manual"?manualPts:(polys?[].concat(...polys):contourPx));
   const name=$("name-in").value.trim()||"Фігура";
   const hue=(Math.random()*360)|0;
   current={
     id:"s_"+Date.now()+"_"+Math.random().toString(36).slice(2,7),
-    name, points:normalizePx(px,usedTex?3:4), color:"hsl("+hue+",80%,65%)", created:Date.now(), thumb
+    name, points:normalizePx(px,px.length>1000?3:4), color:"hsl("+hue+",80%,65%)", created:Date.now(), thumb
   };
   $("overlay").classList.remove("show");
   showCurrentInfo(); playShape(1);
-  toast(usedTex?"Фігуру з текстурою застосовано ·"+current.points.length+" точок":"Фігуру застосовано — можна зберегти в базу або відправити хвилею");
+  toast(usedTex?"Фігуру з текстурою застосовано ·"+current.points.length+" точок":(polys&&polys.length>1?"Застосовано зон: "+polys.length+" · "+current.points.length+" точок":"Фігуру застосовано — можна зберегти в базу або відправити хвилею"));
 }
 function showCurrentInfo(){
   $("shape-title").textContent=current.name;
@@ -1609,7 +1782,7 @@ $("btn-sound").onclick=function(){ soundMode=(soundMode+1)%SOUND_MODES.length; t
 $("btn-rotate").onclick=function(){ rotateOn=!rotateOn; this.textContent=rotateOn?"Rotate ON":"Rotate OFF"; this.classList.toggle("active",rotateOn); };
 $("thresh").oninput=e=>{
   thresh=+e.target.value;
-  if(pendingImg&&$("overlay").classList.contains("show")&&mode==="auto"){ clearTimeout(reTimer); reTimer=setTimeout(()=>runAuto(lastSeed),250); }
+  if(pendingImg&&$("overlay").classList.contains("show")&&mode==="auto"){ clearTimeout(reTimer); reTimer=setTimeout(()=>runAuto(null),250); }
 };
 $("speed").oninput=e=>speed=+e.target.value;
 $("vol").oninput=e=>{ volume=+e.target.value; applySound(); };
@@ -1659,6 +1832,12 @@ async function doInstall(){
     deferredPrompt=null; return;
   }
   if(location.protocol==="file:"||location.protocol==="content:"||!/^https?:$/.test(location.protocol)){
+    const target=siteTarget(), st0=ghLoad();
+    if(target&&st0.owner&&!(st0.ver>=APP_VER)){
+      /* власник відкрив новішу версію файлу — не перекидаємо на старий сайт, а пропонуємо оновити */
+      showGhPanel(true,true); return;
+    }
+    if(target){ showGuide(L("➜ Відкриваю сайт програми…<br>Там натисни <b>📲 Встановити</b> ще раз.","➜ Opening the app website…<br>Tap <b>📲 Add to home screen</b> there again.")); setTimeout(()=>{ location.href=target; },700); return; }
     showGhPanel(); return;
   }
   if(isIOS()){
@@ -1671,6 +1850,7 @@ async function doInstall(){
 }
 function showInstallScreen(force){
   $("gh-panel").classList.remove("show");
+  $("btn-gh-admin").style.display=(!/^https?:$/.test(location.protocol)&&siteTarget())?"inline-block":"none";
   let skip=false; try{ skip=localStorage.getItem(INST_KEY)==="1"; }catch(e){}
   if(!force&&(isStandalone()||skip)) return;
   $("inst-guide").classList.remove("show");
@@ -1720,7 +1900,28 @@ async function ghPutFile(token,owner,repo,branch,path,text,msg){
   }
   throw new Error("upload "+path);
 }
-let ghBusy=false;
+let ghBusy=false, lastBoundSrc="";
+function boundSource(src,url){
+  /* вписує адресу сайту в копію програми (токен НІКОЛИ не потрапляє у файл) */
+  return src.replace(/const BOUND_SITE=\/\*BOUND\*\/"[^"]*";/,'const BOUND_SITE=/*BOUND*/'+JSON.stringify(url)+';');
+}
+function siteTarget(){ return BOUND_SITE||ghLoad().url||""; }
+function boundFile(){
+  const url=siteTarget(); if(!url) return null;
+  const src=lastBoundSrc||boundSource(APP_SRC,url);
+  return new File([src],"Photo_to_Shape_Wave.html",{type:"text/html"});
+}
+function saveBoundFile(share){
+  const f=boundFile(); if(!f){ toast(L("Спочатку опублікуй сайт","Publish the site first")); return; }
+  if(share&&navigator.canShare&&navigator.canShare({files:[f]})){
+    navigator.share({files:[f],title:"Photo → Shape → Wave"}).catch(err=>{ if(err&&err.name!=="AbortError") downloadBound(f); });
+  } else downloadBound(f);
+}
+function downloadBound(f){
+  const a=document.createElement("a"); a.href=URL.createObjectURL(f); a.download=f.name;
+  document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },1500);
+  toast(L("Збережено: ","Saved: ")+f.name,3000);
+}
 async function ghPublish(){
   if(ghBusy) return;
   const token=$("gh-token").value.trim(), repo=($("gh-repo").value.trim()||"shape-wave").replace(/[^A-Za-z0-9._-]/g,"-");
@@ -1740,8 +1941,10 @@ async function ghPublish(){
     } else if(!rp.ok) throw new Error((rp.json&&rp.json.message)||"HTTP "+rp.status);
     else ghLog(L("Репозиторій уже є — оновлюю","Repository exists — updating"));
     const branch=(rp.json&&rp.json.default_branch)||"main";
+    const url=`https://${owner.toLowerCase()}.github.io/${repo}/`;
     ghLog(L("Завантажую програму…","Uploading the app…"));
-    const src=await appSource(), ver=Date.now().toString(36);
+    const src=boundSource(await appSource(),url), ver=Date.now().toString(36);
+    lastBoundSrc=src;
     await ghPutFile(token,owner,repo,branch,"index.html",src,"Update app");
     await ghPutFile(token,owner,repo,branch,"sw.js",SW_SRC.replace("__VER__",ver),"Update service worker");
     ghLog("✓ index.html, sw.js");
@@ -1755,7 +1958,6 @@ async function ghPublish(){
       }
       if(!(pg.ok||pg.status===409)) throw new Error("Pages: "+((pg.json&&pg.json.message)||"HTTP "+pg.status));
     }
-    const url=`https://${owner.toLowerCase()}.github.io/${repo}/`;
     ghLog(L("Чекаю публікації (зазвичай 30–90 с)…","Waiting for publishing (usually 30–90 s)…"));
     let built=false;
     for(let i=0;i<60&&!built;i++){
@@ -1766,10 +1968,12 @@ async function ghPublish(){
       else if(st==="errored") throw new Error(L("GitHub не зміг опублікувати сторінку","GitHub failed to publish the page"));
       else if(i%3===2) ghLog("… "+(st||L("очікування","waiting")));
     }
-    const store={owner,repo,url}; if($("gh-remember").checked) store.token=token;
+    const store={owner,repo,url,ver:APP_VER}; if($("gh-remember").checked) store.token=token;
     ghSave(store);
     ghLog(built?L("✓ Опубліковано!","✓ Published!"):L("Публікація ще триває — посилання запрацює за хвилину-дві","Still publishing — the link will work in a minute or two"),"ok");
     showGhDone(url);
+    $("gh-note").style.display="none";
+    $("btn-gh-go").textContent=L("🚀 Оновити сайт на GitHub","🚀 Update the site on GitHub");
   }catch(e){
     console.warn("gh",e); ghLog("✖ "+(e&&e.message||e),"err");
   }finally{ ghBusy=false; $("btn-gh-go").disabled=false; }
@@ -1777,16 +1981,45 @@ async function ghPublish(){
 function showGhDone(url){
   $("gh-url").textContent=url; $("gh-url").href=url; $("gh-done").style.display="flex";
 }
-function showGhPanel(){
+function normSite(v){
+  v=(v||"").trim(); if(!v) return "";
+  if(!/^https?:\/\//i.test(v)) v="https://"+v;
+  try{ const u=new URL(v); if(u.protocol!=="https:"&&u.protocol!=="http:") return ""; if(!/\.[a-z]{2,}$/i.test(u.hostname)) return ""; if(!u.pathname.endsWith("/")&&!/\.html?$/i.test(u.pathname)) u.pathname+="/"; return u.href; }catch(e){ return ""; }
+}
+function goSite(){
+  const url=normSite($("site-in").value);
+  if(!url){ toast(L("Встав повне посилання, напр. https://name.github.io/shape-wave/","Paste the full link, e.g. https://name.github.io/shape-wave/"),3500); $("site-in").focus(); return; }
+  const st=ghLoad(); st.url=url; ghSave(st);     /* запам'ятовуємо: наступного разу 📲 одразу відкриє сайт */
+  toast(L("Відкриваю сайт… там натисни 📲 ще раз","Opening the site… tap 📲 there again"),2500);
+  setTimeout(()=>{ location.href=url; },500);
+}
+function showGhPanel(owner,needUpdate){
   const st=ghLoad();
+  const note=$("gh-note");
+  if(owner&&st.url&&!(st.ver>=APP_VER)){
+    note.style.display="block";
+    note.innerHTML=LANG==="en"
+      ?"⚠️ This file is a <b>newer version (v"+APP_VER+")</b> than the one on your site. Tap <b>🚀 Update the site</b> — the site and the shortcut will get the new version."
+      :"⚠️ Цей файл — <b>новіша версія (v"+APP_VER+")</b>, ніж на твоєму сайті. Натисни <b>🚀 Оновити сайт</b> — сайт і ярлик отримають нову версію.";
+  } else note.style.display="none";
+  $("btn-gh-go").textContent=st.url?L("🚀 Оновити сайт на GitHub","🚀 Update the site on GitHub"):L("🚀 Завантажити на GitHub","🚀 Upload to GitHub");
+  $("gh-owner").style.display=owner?"flex":"none";
+  $("btn-gh-owner").style.display=owner?"none":"inline-block";
+  $("site-in").value=st.url||"";
   $("inst-guide").classList.remove("show");
   $("gh-repo").value=st.repo||"shape-wave";
   if(st.token){ $("gh-token").value=st.token; $("gh-remember").checked=true; }
   $("gh-log").innerHTML=""; $("gh-done").style.display="none";
-  if(st.url) showGhDone(st.url);
+  if(st.url&&owner) showGhDone(st.url);
   $("gh-panel").classList.add("show");
 }
 $("btn-gh-go").onclick=ghPublish;
+$("btn-site-go").onclick=goSite;
+$("site-in").addEventListener("keydown",e=>{ if(e.key==="Enter") goSite(); });
+$("btn-gh-owner").onclick=()=>{ $("gh-owner").style.display="flex"; $("btn-gh-owner").style.display="none"; };
+$("btn-gh-share").onclick=()=>saveBoundFile(true);
+$("btn-gh-save").onclick=()=>saveBoundFile(false);
+$("btn-gh-admin").onclick=()=>showGhPanel(true);
 $("btn-gh-open").onclick=()=>{ const u=$("gh-url").href; if(u) location.href=u; };
 $("btn-gh-token").onclick=()=>{ window.open("https://github.com/settings/tokens/new?scopes=public_repo&description=Shape%20Wave%20publisher","_blank"); };
 $("gh-remember").onchange=()=>{ if(!$("gh-remember").checked){ const st=ghLoad(); delete st.token; ghSave(st); } };
@@ -1844,6 +2077,15 @@ const I18N_EXACT={
 "Палець можна відривати · потім ▶ Старт":"You can lift your finger · then ▶ Start",
 "📷 Фото, 🙂 Обличчя, ✏️ Малювати або 🌊⬇ Хвиля":"📷 Photo, 🙂 Face, ✏️ Draw or 🌊⬇ Wave",
 "Вибрати":"Select",
+"🚀 Оновити сайт на GitHub":"🚀 Update the site on GitHub",
+"📲 Ярлик ставиться тільки з сайту програми":"📲 A shortcut can only be added from the app's website",
+"Маєш посилання на сайт (його надсилає власник програми)? Встав його сюди — ключ не потрібен:":"Have a link to the site (the app owner sends it)? Paste it here — no key needed:",
+"🌐 Відкрити сайт і встановити":"🌐 Open the site and install",
+"🔑 Я власник — створити сайт на GitHub":"🔑 I'm the owner — create the site on GitHub",
+"Програма сама створить сайт у твоєму GitHub. Потрібно один раз:":"The app will create the site in your GitHub. One-time setup:",
+"Шукаю зони…":"Looking for zones…","☑ Усі зони":"☑ All zones","☐ Жодної":"☐ None",
+"Ця зона вже є — вибрано":"This zone already exists — selected","Зону додано":"Zone added",
+"Вибери хоча б одну зону":"Select at least one zone",
 "🚀 Опублікувати на GitHub Pages":"🚀 Publish to GitHub Pages",
 "Програма відкрита як файл, а ярлик ставиться тільки з сайту. Я сам створю сайт у твоєму GitHub. Потрібно один раз:":"The app is open as a file, and a shortcut can only be added from a website. It will create the site in your GitHub for you. One-time setup:",
 "1. Мати акаунт GitHub і створити токен (галочка":"1. Have a GitHub account and create a token (the",
@@ -1854,7 +2096,9 @@ const I18N_EXACT={
 "запам'ятати токен на цьому телефоні (для оновлень)":"remember the token on this phone (for updates)",
 "🚀 Завантажити на GitHub":"🚀 Upload to GitHub",
 "Сайт програми:":"App website:",
-"🌐 Відкрити сайт → там 📲 Встановити":"🌐 Open the site → then 📲 Install"
+"🌐 Відкрити сайт → там 📲 Встановити":"🌐 Open the site → then 📲 Install",
+"Файл для інших телефонів — кнопка «📲» у ньому одразу відкриє твій сайт, без GitHub:":"File for other phones — its «📲» button opens your site directly, no GitHub needed:",
+"📤 Надіслати файл":"📤 Send file","💾 Зберегти файл":"💾 Save file","⚙️ Оновити сайт на GitHub":"⚙️ Update the site on GitHub"
 };
 const I18N_RX=[
 [/^Малюнок (\d{1,2}:\d{2})$/,"Drawing $1"],
@@ -1872,7 +2116,10 @@ const I18N_RX=[
 [/^Фігуру з хвилі відновлено й додано в базу \((\d+)% збіг\)$/,"Shape restored from wave and added to library ($1% match)"],
 [/^Малюнок перетворено на хвилю · (\d+) штрих\. · 💾 Зберегти або 🌊⬆ Хвиля$/,"Drawing turned into a wave · $1 strokes · 💾 Save or 🌊⬆ Wave"],
 [/^Файл хвилі збережено: (.+) · у месенджер — лише як файл\/документ$/,"Wave file saved: $1 · send to messengers only as a file/document"],
-[/^Помилка: (.*)$/,"Error: $1"]
+[/^Помилка: (.*)$/,"Error: $1"],
+[/^Зони: (\d+) з (\d+)$/,"Zones: $1 of $2"],
+[/^Знайдено зон: (\d+) · торкайся, щоб вибрати$/,"Zones found: $1 · tap to select"],
+[/^Застосовано зон: (\d+) · (\d+) точок$/,"Zones applied: $1 · $2 points"]
 ];
 const CYR=/[А-Яа-яЇїІіЄєҐґ]/;
 function trEN(s){
