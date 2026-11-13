@@ -2,7 +2,7 @@
 <html lang="uk"><head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>Фото → Фігура → Хвиля v14</title>
+<title>Фото → Фігура → Хвиля v15</title>
 <link rel="manifest" id="mf-link">
 <meta name="theme-color" content="#060a14">
 <meta name="mobile-web-app-capable" content="yes">
@@ -29,8 +29,17 @@
     x.shadowBlur=S/30; x.shadowColor="#fff"; x.fillStyle="#fff"; x.beginPath(); x.arc(pts[300][0],pts[300][1],S*0.035,0,Math.PI*2); x.fill();
     return c.toDataURL("image/png");
   }
+  window.__drawIcon=drawIcon;
   try{
     var i192=drawIcon(192,false), i512=drawIcon(512,false), m512=drawIcon(512,true);
+    /* на сайті GitHub Pages — справжні файли маніфесту й значків (Chrome на Android має завантажити їх за адресою) */
+    if(location.protocol==="https:"&&/github\.io$/.test(location.hostname)){
+      window.__APP_ICON=i192;
+      document.getElementById("fav-link").href="icon-192.png";
+      document.getElementById("ati-link").href="apple-touch-icon.png";
+      document.getElementById("mf-link").href="manifest.webmanifest";
+      return;
+    }
     window.__APP_ICON=i192;
     document.getElementById("fav-link").href=i192;
     document.getElementById("ati-link").href=drawIcon(180,false);
@@ -244,7 +253,7 @@ const APP_SRC=(()=>{ try{
 }catch(e){ return ""; } })();
 /* Адреса сайту програми. Порожньо = файл ще не прив'язаний. Заповнюється автоматично після публікації на GitHub */
 const BOUND_SITE=/*BOUND*/"https://86alieksandrkozlov86-create.github.io/shape-wave/";
-const APP_VER=14;   /* номер версії: якщо файл новіший за сайт — власнику пропонується оновити сайт */
+const APP_VER=15;   /* номер версії: якщо файл новіший за сайт — власнику пропонується оновити сайт */
 (function(){
 "use strict";
 const F_MIN=100,F_MAX=1200,TRACE_LEN=400,DB_KEY="geo_shapes_db_v1";
@@ -1828,7 +1837,7 @@ async function doInstall(){
   if(isStandalone()){ showGuide(L("✓ Програма вже відкрита з ярлика.","✓ The app is already open from the shortcut.")); return; }
   if(deferredPrompt){
     deferredPrompt.prompt();
-    try{ const r=await deferredPrompt.userChoice; if(r&&r.outcome==="accepted") toast("Встановлюю ярлик…"); }catch(e){}
+    try{ const r=await deferredPrompt.userChoice; if(r&&r.outcome==="accepted"){ toast("Встановлюю ярлик…"); if(/Xiaomi|Redmi|POCO|MIUI|HyperOS/i.test(navigator.userAgent)) showGuide(L("Якщо значок не з'явився на екрані:","If the icon didn't appear:")+L("<br><b>Налаштування → Додатки → Chrome → Інші дозволи → «Ярлики на робочому столі» → Дозволити</b>","<br><b>Settings → Apps → Chrome → Other permissions → «Home screen shortcuts» → Allow</b>")); } }catch(e){}
     deferredPrompt=null; return;
   }
   if(location.protocol==="file:"||location.protocol==="content:"||!/^https?:$/.test(location.protocol)){
@@ -1845,8 +1854,14 @@ async function doInstall(){
     showGuide("<b>iPhone / iPad (Safari):</b><ol><li>Натисни <b>Поділитися</b> ⬆︎ внизу екрана</li><li>Прокрути й вибери <b>«На початковий екран»</b></li><li>Натисни <b>«Додати»</b></li></ol>Якщо відкрито не в Safari — спершу відкрий це посилання в Safari.");
     return;
   }
-  if(LANG==="en"){ showGuide("<b>Android (Chrome):</b><ol><li>Tap <b>⋮</b> at the top right</li><li>Choose <b>«Add to Home screen»</b> or <b>«Install app»</b></li><li>Confirm</li></ol>If the item is missing, reload the page and wait a few seconds."); return; }
-  showGuide("<b>Android (Chrome):</b><ol><li>Натисни <b>⋮</b> угорі праворуч</li><li>Вибери <b>«Додати на головний екран»</b> або <b>«Встановити застосунок»</b></li><li>Підтверди</li></ol>Якщо пункту немає — онови сторінку й зачекай кілька секунд.");
+  const ua=navigator.userAgent, inApp=/Telegram|FBAN|FBAV|Instagram|Viber|WhatsApp|; wv\)|MiuiBrowser|XiaoMi\/MiuiBrowser/i.test(ua), xiaomi=/Xiaomi|Redmi|POCO|MIUI|HyperOS|\bM2\d{3}|\b2\d{3}[A-Z0-9]{5,}\b/i.test(ua);
+  if(inApp){
+    showGuide(L("⚠️ Сайт відкрито <b>всередині іншого застосунку</b> (Telegram, Viber, Mi Browser тощо) — звідси ярлик не ставиться.<ol><li>Натисни <b>⋮</b> → <b>«Відкрити в браузері / в Chrome»</b></li><li>У Chrome натисни 📲 ще раз</li></ol>","⚠️ The site is open <b>inside another app</b> (Telegram, Viber, Mi Browser…) — shortcuts can't be added from here.<ol><li>Tap <b>⋮</b> → <b>«Open in browser / in Chrome»</b></li><li>In Chrome tap 📲 again</li></ol>"));
+    return;
+  }
+  const xiaomiTip=L("<br><br><b>Xiaomi / Redmi / POCO:</b> якщо Chrome пише «додано», а ярлика немає — дозволь його: <b>Налаштування → Додатки → Chrome → Інші дозволи → «Ярлики на робочому столі» → Дозволити</b>, потім повтори.","<br><br><b>Xiaomi / Redmi / POCO:</b> if Chrome says «added» but there's no icon — allow it: <b>Settings → Apps → Chrome → Other permissions → «Home screen shortcuts» → Allow</b>, then try again.");
+  if(LANG==="en"){ showGuide("<b>Android (Chrome):</b><ol><li>Tap <b>⋮</b> at the top right</li><li>Choose <b>«Add to Home screen»</b> or <b>«Install app»</b></li><li>Confirm</li></ol>If the item is missing, reload the page and wait a few seconds."+xiaomiTip); return; }
+  showGuide("<b>Android (Chrome):</b><ol><li>Натисни <b>⋮</b> угорі праворуч</li><li>Вибери <b>«Додати на головний екран»</b> або <b>«Встановити застосунок»</b></li><li>Підтверди</li></ol>Якщо пункту немає — онови сторінку й зачекай кілька секунд."+xiaomiTip);
 }
 function showInstallScreen(force){
   $("gh-panel").classList.remove("show");
@@ -1867,7 +1882,7 @@ showInstallScreen(false);
 /* ================= Публікація на GitHub Pages (одна кнопка) ================= */
 const GH_KEY="shape_wave_gh";
 const SW_SRC=`const CACHE="shape-wave-"+"__VER__";
-self.addEventListener("install",e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(["./","./index.html"])).then(()=>self.skipWaiting()));});
+self.addEventListener("install",e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(["./","./index.html","./manifest.webmanifest","./icon-192.png","./icon-512.png"]).catch(()=>c.addAll(["./"]))).then(()=>self.skipWaiting()));});
 self.addEventListener("activate",e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==CACHE).map(x=>caches.delete(x)))).then(()=>self.clients.claim()));});
 self.addEventListener("fetch",e=>{const u=new URL(e.request.url);if(e.request.method!=="GET"||u.origin!==self.location.origin)return;
 e.respondWith(fetch(e.request).then(r=>{if(r&&r.ok){const c=r.clone();caches.open(CACHE).then(x=>x.put(e.request,c));}return r;}).catch(()=>caches.match(e.request,{ignoreSearch:true}).then(m=>m||caches.match("./index.html"))));});`;
@@ -1888,9 +1903,9 @@ async function gh(token,method,path,body){
   return {status:r.status,ok:r.ok,json:j};
 }
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
-async function ghPutFile(token,owner,repo,branch,path,text,msg){
+async function ghPutFile(token,owner,repo,branch,path,text,msg,isB64){
   const cur=await gh(token,"GET",`/repos/${owner}/${repo}/contents/${path}?ref=${encodeURIComponent(branch)}`);
-  const body={message:msg,content:b64utf8(text),branch};
+  const body={message:msg,content:isB64?text:b64utf8(text),branch};
   if(cur.ok&&cur.json&&cur.json.sha) body.sha=cur.json.sha;
   for(let i=0;i<4;i++){
     const r=await gh(token,"PUT",`/repos/${owner}/${repo}/contents/${path}`,body);
@@ -1948,6 +1963,18 @@ async function ghPublish(){
     await ghPutFile(token,owner,repo,branch,"index.html",src,"Update app");
     await ghPutFile(token,owner,repo,branch,"sw.js",SW_SRC.replace("__VER__",ver),"Update service worker");
     ghLog("✓ index.html, sw.js");
+    ghLog(L("Значки й маніфест для Android…","Icons and manifest for Android…"));
+    const ic=(S,m)=>window.__drawIcon(S,m).split(",")[1];
+    await ghPutFile(token,owner,repo,branch,"icon-192.png",ic(192,false),"Icon",true);
+    await ghPutFile(token,owner,repo,branch,"icon-512.png",ic(512,false),"Icon",true);
+    await ghPutFile(token,owner,repo,branch,"icon-maskable-512.png",ic(512,true),"Icon",true);
+    await ghPutFile(token,owner,repo,branch,"apple-touch-icon.png",ic(180,false),"Icon",true);
+    await ghPutFile(token,owner,repo,branch,"manifest.webmanifest",JSON.stringify({
+      name:"Фото → Фігура → Хвиля",short_name:"Хвиля-фігура",lang:"uk",id:"./",start_url:"./",scope:"./",
+      display:"standalone",orientation:"portrait",background_color:"#060a14",theme_color:"#060a14",
+      icons:[{src:"icon-192.png",sizes:"192x192",type:"image/png",purpose:"any"},{src:"icon-512.png",sizes:"512x512",type:"image/png",purpose:"any"},{src:"icon-maskable-512.png",sizes:"512x512",type:"image/png",purpose:"maskable"}]
+    },null,1),"Manifest");
+    ghLog("✓ manifest, icons");
     ghLog(L("Вмикаю GitHub Pages…","Enabling GitHub Pages…"));
     let pg=await gh(token,"GET",`/repos/${owner}/${repo}/pages`);
     if(pg.status===404){
