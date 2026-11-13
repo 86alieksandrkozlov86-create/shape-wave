@@ -1,0 +1,1954 @@
+<!DOCTYPE html>
+<html lang="uk"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Фото → Фігура → Хвиля v10</title>
+<link rel="manifest" id="mf-link">
+<meta name="theme-color" content="#060a14">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Хвиля-фігура">
+<link rel="apple-touch-icon" id="ati-link">
+<link rel="icon" type="image/png" id="fav-link">
+<script>
+/* Усе вбудовано в цей файл: значок малюється кодом, маніфест створюється на льоту */
+(function(){
+  function drawIcon(S,maskable){
+    var c=document.createElement("canvas"); c.width=c.height=S; var x=c.getContext("2d");
+    x.fillStyle="#060a14"; x.fillRect(0,0,S,S);
+    var sc=S*(maskable?0.30:0.36), cx=S/2, cy=S*0.46, pts=[];
+    for(var i=0;i<400;i++){ var a=i/400*Math.PI*2;
+      pts.push([cx+16*Math.pow(Math.sin(a),3)/18*sc, cy-(13*Math.cos(a)-5*Math.cos(2*a)-2*Math.cos(3*a)-Math.cos(4*a))/18*sc]); }
+    x.lineJoin="round"; x.lineCap="round";
+    x.beginPath(); pts.forEach(function(p,i){ i?x.lineTo(p[0],p[1]):x.moveTo(p[0],p[1]); }); x.closePath();
+    x.shadowColor="#ff648c"; x.shadowBlur=S/18; x.strokeStyle="#ff82a5"; x.lineWidth=Math.max(2,S/40); x.stroke();
+    var wy=S*(maskable?0.76:0.80), amp=S*0.05; x.beginPath();
+    for(var k=0;k<=200;k++){ var px=S*0.12+k/200*S*0.76, py=wy-amp*Math.sin(k/200*4*Math.PI); k?x.lineTo(px,py):x.moveTo(px,py); }
+    x.shadowColor="#00ffdc"; x.shadowBlur=S/24; x.strokeStyle="#a0fff5"; x.lineWidth=Math.max(2,S/60); x.stroke();
+    x.shadowBlur=S/30; x.shadowColor="#fff"; x.fillStyle="#fff"; x.beginPath(); x.arc(pts[300][0],pts[300][1],S*0.035,0,Math.PI*2); x.fill();
+    return c.toDataURL("image/png");
+  }
+  try{
+    var i192=drawIcon(192,false), i512=drawIcon(512,false), m512=drawIcon(512,true);
+    window.__APP_ICON=i192;
+    document.getElementById("fav-link").href=i192;
+    document.getElementById("ati-link").href=drawIcon(180,false);
+    var base=location.href.split("#")[0].split("?")[0];
+    var mf={name:"Фото → Фігура → Хвиля",short_name:"Хвиля-фігура",lang:"uk",
+      start_url:base,scope:base.replace(/[^\/]*$/,""),id:base,display:"standalone",orientation:"portrait",
+      background_color:"#060a14",theme_color:"#060a14",
+      icons:[{src:i192,sizes:"192x192",type:"image/png",purpose:"any"},{src:i512,sizes:"512x512",type:"image/png",purpose:"any"},{src:m512,sizes:"512x512",type:"image/png",purpose:"maskable"}]};
+    document.getElementById("mf-link").href=URL.createObjectURL(new Blob([JSON.stringify(mf)],{type:"application/manifest+json"}));
+  }catch(e){ console.warn("manifest",e); }
+})();
+</script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden;background:#060a14;font-family:system-ui,-apple-system,sans-serif;color:#c8d8ff;touch-action:manipulation;-webkit-user-select:none;user-select:none}
+#app{display:flex;flex-direction:column;height:100%;width:100%}
+#wave-strip{flex:0 0 56px;position:relative;background:#081020;border-bottom:1px solid rgba(80,160,255,.45);overflow:hidden}
+#wave-strip canvas{position:absolute;inset:0;width:100%;height:100%}
+#wave-label{position:absolute;top:3px;left:8px;font-size:.55rem;font-weight:700;color:rgba(140,220,255,.7);z-index:2;pointer-events:none}
+#info-badge{position:absolute;top:2px;right:8px;font-size:.55rem;font-weight:700;color:#7ee;background:rgba(10,20,40,.8);padding:2px 7px;border-radius:4px;border:1px solid rgba(80,200,255,.35);z-index:2;pointer-events:none}
+#main-area{flex:1 1 0;position:relative;min-height:0;background:#070b18}
+#main-area canvas{position:absolute;inset:0;width:100%;height:100%}
+#shape-title{position:absolute;top:6px;left:8px;font-size:.72rem;font-weight:700;color:#9ef;background:rgba(10,18,35,.85);padding:4px 9px;border-radius:6px;z-index:3;pointer-events:none;border:1px solid rgba(100,180,255,.3);max-width:70%}
+#hint{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);font-size:.55rem;color:rgba(160,200,255,.45);background:rgba(8,14,28,.7);padding:3px 10px;border-radius:8px;z-index:3;pointer-events:none;white-space:nowrap}
+#db-wrap{flex:0 0 auto;max-height:130px;background:#0a1228;border-top:1px solid rgba(80,140,220,.25);overflow:hidden}
+#db-list{display:flex;gap:6px;overflow-x:auto;padding:6px 8px;-webkit-overflow-scrolling:touch}
+.db-item{flex:0 0 auto;width:64px;text-align:center;cursor:pointer;border-radius:8px;padding:3px;border:2px solid transparent;background:rgba(15,30,60,.75);position:relative}
+.db-item.active{border-color:#5cf;box-shadow:0 0 10px rgba(60,180,255,.4)}
+.db-item canvas,.db-item img{display:block;width:48px;height:48px;margin:0 auto 2px;border-radius:4px;object-fit:cover;background:#0a1528}
+.db-item .lab{font-size:.48rem;color:#9ab;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:60px;margin:0 auto}
+.db-item .del{position:absolute;top:-4px;right:-4px;width:18px;height:18px;border-radius:50%;background:#c33;color:#fff;font-size:11px;line-height:18px;text-align:center;border:none;cursor:pointer;display:none}
+.db-item:hover .del,.db-item:active .del{display:block}
+#db-bar{display:none;gap:6px;padding:6px 8px 0;align-items:center;flex-wrap:wrap}
+body.db-select #db-bar{display:flex}
+#db-bar .btn{font-size:.72rem;padding:5px 10px}
+#db-bar #db-sel-count{font-size:.72rem;color:#9bc;margin-right:auto}
+#btn-db-del.armed{background:#c33;border-color:#f88;color:#fff}
+.db-tool{flex:0 0 auto;width:52px;border-radius:8px;border:1px dashed rgba(120,170,230,.5);background:rgba(15,30,60,.5);color:#9cf;font-size:.6rem;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer}
+.db-tool b{font-size:1.1rem}
+body.db-select .db-item .del{display:none!important}
+.db-item .chk{display:none;position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;border:2px solid #9bc;background:rgba(0,0,0,.55);color:#fff;font-size:11px;line-height:14px;text-align:center}
+body.db-select .db-item .chk{display:block}
+.db-item.sel{border-color:#f66;box-shadow:0 0 10px rgba(255,90,90,.45)}
+.db-item.sel .chk{background:#e33;border-color:#fbb}
+#controls{flex:0 0 auto;max-height:38vh;overflow-y:auto;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:5px 6px;padding:7px 6px 10px;background:#0a1225;border-top:1px solid rgba(60,120,200,.35)}
+.btn{background:rgba(20,40,90,.9);border:1.5px solid rgba(80,180,220,.55);color:#b0e0ff;padding:6px 10px;border-radius:12px;font-size:.68rem;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.btn:active,.btn.active{background:rgba(40,90,180,.95);border-color:#5cf}
+.btn.on{background:rgba(30,120,80,.9);border-color:#5e8;color:#cfe}
+.btn.accent{border-color:rgba(255,200,80,.75);color:#fec}
+.btn.danger{border-color:rgba(255,100,100,.55);color:#faa}
+.btn.ok{border-color:rgba(100,220,140,.65);color:#bfe}
+.btn.wave{border-color:rgba(150,150,255,.85);color:#dde}
+.slider-wrap{display:flex;align-items:center;gap:3px;font-size:.6rem;color:#8ab}
+.slider-wrap input[type=range]{width:52px;height:4px;-webkit-appearance:none;appearance:none;background:rgba(60,100,180,.4);border-radius:2px}
+.slider-wrap input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:#5cf}
+#status{width:100%;text-align:center;font-size:.58rem;color:#7a9acc;padding-top:2px}
+#file-in,#cam-in,#import-in,#wave-in{position:fixed;left:-9999px;top:0;width:1px;height:1px;opacity:0}
+label.btn{display:inline-block}
+#overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.94);z-index:50;align-items:center;justify-content:center;flex-direction:column;gap:10px;padding:16px}
+#overlay.show{display:flex}
+#overlay canvas{max-width:92vw;max-height:48vh;border:1px solid rgba(80,160,255,.4);border-radius:8px;background:#000}
+#overlay .row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+#overlay input[type=text]{background:#122;border:1px solid #456;color:#def;padding:6px 10px;border-radius:8px;font-size:.85rem;width:min(260px,80vw);-webkit-user-select:text;user-select:text}
+#detail-wrap{display:none;align-items:center;gap:5px;font-size:.7rem;color:#bde}
+#toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:rgba(20,60,40,.95);color:#cfe;padding:8px 14px;border-radius:10px;font-size:.75rem;z-index:60;display:none;border:1px solid #5a8;max-width:88vw;text-align:center}
+#toast.show{display:block}
+body.draw-mode #hint{color:#fec}
+body.draw-mode #main-area{cursor:crosshair}
+body.draw-mode #toast,body.draw-mode #wave-strip,body.draw-mode #db-wrap,body.draw-mode #controls,body.draw-mode #shape-title{display:none}
+body.draw-mode #hint{bottom:auto;top:calc(8px + env(safe-area-inset-top))}
+#btn-draw-go{display:none;position:absolute;left:50%;bottom:calc(18px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:5;font-size:1rem;padding:12px 34px;border-radius:24px;background:rgba(20,90,60,.95);border:2px solid #5e8;color:#dfe;font-weight:700;box-shadow:0 0 18px rgba(80,230,140,.35);cursor:pointer;-webkit-tap-highlight-color:transparent}
+#btn-draw-go:active{background:rgba(40,140,90,.98)}
+body.draw-mode #btn-draw-go{display:block}
+#install-screen{display:none;position:fixed;inset:0;z-index:80;background:radial-gradient(circle at 50% 35%,#0d1a36 0%,#060a14 70%);flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px calc(20px + env(safe-area-inset-right)) calc(24px + env(safe-area-inset-bottom)) calc(20px + env(safe-area-inset-left));text-align:center}
+#install-screen.show{display:flex}
+#install-screen img{width:112px;height:112px;border-radius:26px;box-shadow:0 0 30px rgba(255,110,150,.35),0 0 2px rgba(120,200,255,.6)}
+#install-screen h1{font-size:1.25rem;color:#dff;font-weight:700}
+#install-screen p{font-size:.85rem;color:#9bc;line-height:1.45;max-width:330px}
+#install-screen .big{font-size:1rem;padding:13px 26px;border-radius:24px;min-width:250px}
+#inst-guide{display:none;font-size:.85rem;color:#def;background:rgba(20,40,80,.7);border:1px solid rgba(100,180,255,.35);border-radius:12px;padding:12px 14px;max-width:340px;line-height:1.5;text-align:left}
+#inst-guide.show{display:block}
+#inst-guide ol{padding-left:20px}
+#gh-panel{display:none;flex-direction:column;gap:8px;width:100%;max-width:360px;background:rgba(14,26,52,.85);border:1px solid rgba(100,180,255,.35);border-radius:14px;padding:12px;text-align:left;font-size:.8rem;color:#cde}
+#gh-panel.show{display:flex}
+#gh-panel input[type=text],#gh-panel input[type=password]{width:100%;background:#0a1428;border:1px solid #2a4a7a;border-radius:8px;color:#def;padding:8px;font-size:.85rem}
+#gh-panel .row2{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+#gh-log{max-height:110px;overflow:auto;font-size:.72rem;color:#9bc;font-family:monospace}
+#gh-log .ok{color:#7f9}#gh-log .err{color:#f88}
+#gh-done{display:none;flex-direction:column;gap:6px}
+#gh-url{color:#7df;word-break:break-all}
+#install-screen{overflow-y:auto;justify-content:flex-start}
+#install-screen #inst-icon{margin-top:auto}
+#install-screen #inst-skip-wrap{margin-bottom:auto}
+#inst-skip-wrap{font-size:.75rem;color:#789;display:flex;align-items:center;gap:6px}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="wave-strip">
+    <div id="wave-label">WAVE</div>
+    <div id="info-badge">0 pts</div>
+    <canvas id="scope"></canvas>
+  </div>
+  <div id="main-area">
+    <div id="shape-title">Додай фото фігури</div>
+    <canvas id="main"></canvas>
+    <div id="hint">Фото / Обличчя / Малювати → фігура → хвиля + звук</div>
+    <button id="btn-draw-go">▶ Старт</button>
+  </div>
+  <div id="db-wrap">
+    <div id="db-bar">
+      <span id="db-sel-count">Вибрано: 0</span>
+      <button class="btn" id="btn-db-all">☑ Усі</button>
+      <button class="btn" id="btn-db-del">🗑 Видалити</button>
+      <button class="btn" id="btn-db-cancel">✖</button>
+    </div>
+    <div id="db-list"></div>
+  </div>
+  <div id="controls">
+    <button class="btn" id="btn-power">⏻ Безперервно</button>
+    <label class="btn accent" id="btn-photo" for="file-in">📷 Фото</label>
+    <label class="btn accent" id="btn-face-photo" for="file-in">🙂 Обличчя</label>
+    <label class="btn accent" id="btn-cam" for="cam-in">📸</label>
+    <button class="btn accent" id="btn-draw">✏️ Малювати</button>
+    <button class="btn ok" id="btn-save">💾 Зберегти</button>
+    <button class="btn" id="btn-install" title="Ярлик на головний екран">📲</button>
+    <button class="btn btn-lang" id="btn-lang">🌐 EN</button>
+    <button class="btn wave" id="btn-wave-out">🌊⬆ Хвиля</button>
+    <label class="btn wave" id="btn-wave-in" for="wave-in">🌊⬇ Хвиля</label>
+    <button class="btn" id="btn-export">JSON ⬆</button>
+    <label class="btn" id="btn-import" for="import-in">JSON ⬇</label>
+    <button class="btn" id="btn-play">🔊 Звук</button>
+    <button class="btn" id="btn-sound">Sine</button>
+    <button class="btn active" id="btn-rotate">Rotate ON</button>
+    <div class="slider-wrap"><span>Чутл.</span><input type="range" id="thresh" min="20" max="180" step="5" value="100" title="Нижче = більше деталей / шуму"></div>
+    <div class="slider-wrap"><span>Speed</span><input type="range" id="speed" min="0.2" max="2.5" step="0.05" value="1"></div>
+    <div class="slider-wrap"><span>Vol</span><input type="range" id="vol" min="0" max="0.4" step="0.01" value="0.18"></div>
+    <div id="status"><span id="st-name">немає фігури</span> · <span id="st-pitch">—</span> · база: <span id="st-db">0</span></div>
+  </div>
+</div>
+<input type="file" id="file-in" accept="image/*">
+<input type="file" id="cam-in" accept="image/*" capture="environment">
+<input type="file" id="import-in">
+<input type="file" id="wave-in">
+<div id="overlay">
+  <div id="overlay-hint" style="font-size:.68rem;color:#9cf;text-align:center;margin-bottom:4px;line-height:1.35;max-width:92vw"></div>
+  <canvas id="preview" style="cursor:crosshair;touch-action:none"></canvas>
+  <input type="text" id="name-in" placeholder="Назва фігури">
+  <label id="tex-wrap" style="display:inline-flex;align-items:center;gap:5px;font-size:.7rem;color:#fe9"><input type="checkbox" id="ch-tex"> 🧩 Текстура всередині</label>
+  <span id="tex-amt-wrap" class="slider-wrap" style="display:none"><span>Деталі</span><input type="range" id="tex-amt" min="1" max="10" step="1" value="5" style="width:110px"></span>
+  <label id="detail-wrap"><input type="checkbox" id="ch-detail" checked=""> очі та рот</label>
+  <div class="row">
+    <button class="btn accent" id="btn-auto">🎯 Авто</button>
+    <button class="btn accent" id="btn-face-ov">🙂 Обличчя</button>
+    <button class="btn accent" id="btn-manual">✏️ Точки</button>
+    <button class="btn" id="btn-undo-pt">↩</button>
+    <button class="btn" id="btn-clear-pts">Очистити</button>
+    <button class="btn ok" id="btn-use">✓ Використати</button>
+    <button class="btn danger" id="btn-cancel">Скасувати</button>
+  </div>
+</div>
+<div id="toast"></div>
+<div id="install-screen">
+  <button class="btn btn-lang" style="position:absolute;top:calc(12px + env(safe-area-inset-top));right:14px">🌐 EN</button>
+  <img id="inst-icon" alt="">
+  <h1>Фото → Фігура → Хвиля</h1>
+  <p>Встанови ярлик на головний екран — програма відкриватиметься одним дотиком, на весь екран і без рядка адреси.</p>
+  <button class="btn ok big" id="btn-inst-do">📲 Встановити на головний екран</button>
+  <div id="inst-guide"></div>
+  <div id="gh-panel">
+    <b>🚀 Опублікувати на GitHub Pages</b>
+    <span>Програма відкрита як файл, а ярлик ставиться тільки з сайту. Я сам створю сайт у твоєму GitHub. Потрібно один раз:</span>
+    <span>1. Мати акаунт GitHub і створити токен (галочка <b>public_repo</b> вже стоїть):</span>
+    <button class="btn" id="btn-gh-token">🔑 Створити токен на GitHub</button>
+    <span>2. Скопіювати токен і вставити сюди:</span>
+    <input type="password" id="gh-token" placeholder="ghp_…" autocomplete="off" spellcheck="false">
+    <div class="row2"><span>Назва сайту:</span><input type="text" id="gh-repo" style="flex:1;min-width:120px" value="shape-wave" spellcheck="false"></div>
+    <label class="row2"><input type="checkbox" id="gh-remember"> запам'ятати токен на цьому телефоні (для оновлень)</label>
+    <button class="btn ok big" id="btn-gh-go">🚀 Завантажити на GitHub</button>
+    <div id="gh-log"></div>
+    <div id="gh-done">
+      <span>Сайт програми:</span>
+      <a id="gh-url" target="_blank" rel="noopener"></a>
+      <button class="btn ok big" id="btn-gh-open">🌐 Відкрити сайт → там 📲 Встановити</button>
+    </div>
+  </div>
+  <button class="btn big" id="btn-inst-open">▶ Відкрити програму</button>
+  <label id="inst-skip-wrap"><input type="checkbox" id="ch-inst-skip"> більше не показувати</label>
+</div>
+<script>
+/* Власний код програми — щоб завантажити його на GitHub прямо з телефона */
+const APP_SRC=(()=>{ try{
+  const c=document.documentElement.cloneNode(true);
+  ["mf-link","ati-link","fav-link"].forEach(id=>{ const e=c.querySelector("#"+id); if(e) e.removeAttribute("href"); });
+  return "<!DOCTYPE html>\n"+c.outerHTML;
+}catch(e){ return ""; } })();
+(function(){
+"use strict";
+const F_MIN=100,F_MAX=1200,TRACE_LEN=400,DB_KEY="geo_shapes_db_v1";
+const SOUND_MODES=[
+  {name:"Sine",type:"sine"},{name:"Triangle",type:"triangle"},{name:"Square",type:"square"},
+  {name:"Sawtooth",type:"sawtooth"},{name:"Piano",type:"piano"},{name:"Cat Meow",type:"meow"},
+  {name:"Bell",type:"bell"},{name:"Organ",type:"organ"},{name:"Soft Pad",type:"pad"},{name:"Chirp",type:"chirp"}
+];
+
+let playLeft=0,powerOn=false,rotateOn=true,soundMode=0,speed=1,volume=.18,thresh=100;
+let t=0,rot=0,pitchHz=346;
+let trace=new Float32Array(TRACE_LEN),traceIdx=0;
+let audioCtx,mainOsc,osc2,osc3,gainNode,gain2,gain3,filterNode,panNode=null;
+let current=null; // {name, points:[{x,y}], color, id, thumb?}
+let pendingImg=null, nextMode="auto";
+let db=[];
+
+const mainC=document.getElementById("main"), scopeC=document.getElementById("scope"), prevC=document.getElementById("preview");
+const mctx=mainC.getContext("2d"), sctx=scopeC.getContext("2d"), pctx=prevC.getContext("2d",{willReadFrequently:true});
+const $=id=>document.getElementById(id);
+
+function toast(msg,ms){
+  const el=$("toast");
+  el.textContent=msg; el.classList.add("show");
+  clearTimeout(toast._t);
+  toast._t=setTimeout(()=>el.classList.remove("show"),ms||2400);
+}
+
+window.addEventListener("error",e=>{ try{ toast("Помилка: "+(e.message||e),5000); }catch(_){} });
+function resize(){
+  const dpr=Math.min(window.devicePixelRatio||1,2);
+  [[$("main-area"),mainC,mctx],[$("wave-strip"),scopeC,sctx]].forEach(([wrap,c,ctx])=>{
+    const w=Math.max(1,wrap.clientWidth), h=Math.max(1,wrap.clientHeight);
+    c.width=Math.floor(w*dpr); c.height=Math.floor(h*dpr);
+    c.style.width=w+"px"; c.style.height=h+"px";
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  });
+}
+window.addEventListener("resize",resize);
+if(window.ResizeObserver){ try{ const ro=new ResizeObserver(()=>resize()); ro.observe($("main-area")); ro.observe($("wave-strip")); }catch(e){} }
+
+/* ================= Audio ================= */
+function buildAudio(){
+  if(audioCtx) return;
+  audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+  mainOsc=audioCtx.createOscillator(); osc2=audioCtx.createOscillator(); osc3=audioCtx.createOscillator();
+  gainNode=audioCtx.createGain(); gain2=audioCtx.createGain(); gain3=audioCtx.createGain();
+  filterNode=audioCtx.createBiquadFilter();
+  mainOsc.connect(gainNode); osc2.connect(gain2); osc3.connect(gain3);
+  gainNode.connect(filterNode); gain2.connect(filterNode); gain3.connect(filterNode);
+  /* x фігури → стерео-панорама (y → висота тону) */
+  if(audioCtx.createStereoPanner){ panNode=audioCtx.createStereoPanner(); filterNode.connect(panNode); panNode.connect(audioCtx.destination); }
+  else filterNode.connect(audioCtx.destination);
+  mainOsc.start(); osc2.start(); osc3.start(); applySound();
+}
+function applySound(){
+  if(!audioCtx) return;
+  const m=SOUND_MODES[soundMode], g=(powerOn||playLeft>0)?volume:0;
+  mainOsc.type="sine"; osc2.type="sine"; osc3.type="sine";
+  gainNode.gain.value=g; gain2.gain.value=0; gain3.gain.value=0;
+  filterNode.type="lowpass"; filterNode.frequency.value=5000; filterNode.Q.value=1;
+  switch(m.type){
+    case"triangle": mainOsc.type="triangle"; gainNode.gain.value=g*.9; break;
+    case"square": mainOsc.type="square"; gainNode.gain.value=g*.35; filterNode.frequency.value=2000; break;
+    case"sawtooth": mainOsc.type="sawtooth"; gainNode.gain.value=g*.3; filterNode.frequency.value=1800; break;
+    case"piano": gainNode.gain.value=g*.55; gain2.gain.value=g*.28; gain3.gain.value=g*.12; filterNode.frequency.value=3500; break;
+    case"meow": mainOsc.type="sawtooth"; osc2.type="sawtooth"; gainNode.gain.value=g*.22; gain2.gain.value=g*.18;
+      filterNode.type="bandpass"; filterNode.frequency.value=900; filterNode.Q.value=4; break;
+    case"bell": gainNode.gain.value=g*.4; gain2.gain.value=g*.25; gain3.gain.value=g*.15; filterNode.frequency.value=6000; break;
+    case"organ": osc3.type="triangle"; gainNode.gain.value=g*.35; gain2.gain.value=g*.3; gain3.gain.value=g*.2; filterNode.frequency.value=4000; break;
+    case"pad": osc2.type="triangle"; gainNode.gain.value=g*.4; gain2.gain.value=g*.25; filterNode.frequency.value=1200; break;
+    case"chirp": osc2.type="square"; gainNode.gain.value=g*.4; gain2.gain.value=g*.08; filterNode.frequency.value=3000; break;
+  }
+}
+function setPower(on){
+  powerOn=on;
+  const b=$("btn-power");
+  if(on){ buildAudio(); if(audioCtx.state==="suspended") audioCtx.resume(); b.textContent="⏻ ON"; b.classList.add("on"); }
+  else { if(audioCtx&&audioCtx.state==="running") audioCtx.suspend(); b.textContent="⏻ Безперервно"; b.classList.remove("on"); }
+  applySound();
+}
+function suspendIfIdle(){
+  setTimeout(()=>{ if(audioCtx&&!powerOn&&playLeft<=0&&audioCtx.state==="running") audioCtx.suspend(); },120);
+}
+function hardMute(){
+  /* повна тиша: при виході з вкладки/застосунку, згортанні екрана тощо */
+  playLeft=0;
+  if(powerOn){ powerOn=false; const b=$("btn-power"); if(b){ b.textContent="⏻ Безперервно"; b.classList.remove("on"); } }
+  if(audioCtx){
+    try{ gainNode.gain.value=0; gain2.gain.value=0; gain3.gain.value=0; }catch(e){}
+    try{ if(audioCtx.state==="running") audioCtx.suspend(); }catch(e){}
+  }
+}
+document.addEventListener("visibilitychange",()=>{ if(document.hidden) hardMute(); });
+window.addEventListener("pagehide",hardMute);
+/* window.blur більше не глушить звук: на телефоні він спрацьовував при відкритті вибору фото/камери */
+function playShape(n){
+  /* звук лише під час проходу по фігурі: n повних обходів контуру, далі тиша */
+  playLeft=n||1; t=0;
+  buildAudio();
+  if(audioCtx.state==="suspended") audioCtx.resume();
+  applySound();
+}
+function setPitch(y,x){
+  const u=Math.max(0,Math.min(1,(y+1)/2));
+  const f=F_MIN*Math.pow(F_MAX/F_MIN,u);
+  if(!audioCtx||!(powerOn||playLeft>0)) return f;
+  const now=audioCtx.currentTime, mt=SOUND_MODES[soundMode].type;
+  if(panNode) panNode.pan.setTargetAtTime(Math.max(-1,Math.min(1,(x||0)*0.9)),now,.02);
+  mainOsc.frequency.setTargetAtTime(f,now,.012);
+  if(mt==="piano"){osc2.frequency.setTargetAtTime(f*2,now,.012);osc3.frequency.setTargetAtTime(f*3,now,.012);}
+  else if(mt==="meow"){osc2.frequency.setTargetAtTime(f*1.15,now,.02);filterNode.frequency.setTargetAtTime(600+u*900,now,.05);}
+  else if(mt==="bell"){osc2.frequency.setTargetAtTime(f*2.76,now,.01);osc3.frequency.setTargetAtTime(f*5.4,now,.01);}
+  else if(mt==="organ"){osc2.frequency.setTargetAtTime(f*2,now,.015);osc3.frequency.setTargetAtTime(f*3,now,.015);}
+  else if(mt==="pad"){osc2.frequency.setTargetAtTime(f*1.005,now,.03);}
+  else if(mt==="chirp"){osc2.frequency.setTargetAtTime(f*2,now,.01);}
+  return f;
+}
+
+/*PURE-START*/
+/* ================= Хвиля-файл (стерео WAV): L = x(t), R = y(t) =================
+   Контур повторюється з частотою WAVE_F0 (441 відлік на період при 44.1 кГц).
+   Декодер складає (усереднює) всі періоди → стійкий до шуму, зміни частоти дискретизації
+   і зсуву початку. Початок/обрізання файлу лише зсуває стартову точку замкненого контуру. */
+const WAVE_F0=100, WAVE_SR=44100, WAVE_PERIODS=150, WAVE_AMP=0.88;
+
+function resampleClosed(pts, n){
+  if(pts.length<2) return pts.slice();
+  const seg=[]; let total=0;
+  for(let i=0;i<pts.length;i++){
+    const a=pts[i], b=pts[(i+1)%pts.length];
+    const l=Math.hypot(b.x-a.x,b.y-a.y);
+    seg.push(l); total+=l;
+  }
+  if(total<1e-9) return pts.slice();
+  const out=[]; const step=total/n;
+  let si=0, acc=0;
+  out.push({x:pts[0].x,y:pts[0].y});
+  for(let k=1;k<n;k++){
+    const target=k*step;
+    while(si<seg.length-1 && acc+seg[si]<target){ acc+=seg[si]; si++; }
+    const a=pts[si%pts.length], b=pts[(si+1)%pts.length];
+    const tt=seg[si]<1e-12?0:Math.min(1,Math.max(0,(target-acc)/seg[si]));
+    out.push({x:a.x+(b.x-a.x)*tt, y:a.y+(b.y-a.y)*tt});
+  }
+  return out;
+}
+
+function buildWaveBytes(points, meta, opt){
+  opt=opt||{}; const f0=opt.f0||WAVE_F0, periods=opt.periods||WAVE_PERIODS;
+  const sr=WAVE_SR, P=Math.round(sr/f0);
+  const ring=points.length===P?points:resampleClosed(points,P);
+  let minX=1e9,maxX=-1e9,minY=1e9,maxY=-1e9;
+  ring.forEach(p=>{minX=Math.min(minX,p.x);maxX=Math.max(maxX,p.x);minY=Math.min(minY,p.y);maxY=Math.max(maxY,p.y);});
+  const cx=(minX+maxX)/2, cy=(minY+maxY)/2, g=WAVE_AMP/(Math.max(maxX-minX,maxY-minY)/2||1);
+  const total=P*periods, dataLen=total*4;
+  const metaBytes=new TextEncoder().encode(JSON.stringify(meta||{}));
+  const pad=metaBytes.length&1;
+  const size=12+24+8+metaBytes.length+pad+8+dataLen;
+  const buf=new ArrayBuffer(size), dv=new DataView(buf), u8=new Uint8Array(buf);
+  let o=0;
+  const str=s=>{for(let i=0;i<4;i++) dv.setUint8(o++,s.charCodeAt(i));};
+  str("RIFF"); dv.setUint32(o,size-8,true); o+=4; str("WAVE");
+  str("fmt "); dv.setUint32(o,16,true); o+=4;
+  dv.setUint16(o,1,true); o+=2; dv.setUint16(o,2,true); o+=2;
+  dv.setUint32(o,sr,true); o+=4; dv.setUint32(o,sr*4,true); o+=4;
+  dv.setUint16(o,4,true); o+=2; dv.setUint16(o,16,true); o+=2;
+  str("gSHP"); dv.setUint32(o,metaBytes.length,true); o+=4; u8.set(metaBytes,o); o+=metaBytes.length+pad;
+  str("data"); dv.setUint32(o,dataLen,true); o+=4;
+  const cl=v=>Math.max(-1,Math.min(1,v));
+  for(let i=0;i<total;i++){
+    const p=ring[i%P];
+    dv.setInt16(o,Math.round(cl((p.x-cx)*g)*32767),true); o+=2;
+    dv.setInt16(o,Math.round(cl((p.y-cy)*g)*32767),true); o+=2;
+  }
+  return buf;
+}
+
+function parseWavMeta(ab){
+  try{
+    const dv=new DataView(ab);
+    if(dv.byteLength<12||dv.getUint32(0)!==0x52494646) return null;
+    let o=12;
+    while(o+8<=dv.byteLength){
+      const id=dv.getUint32(o), len=dv.getUint32(o+4,true);
+      if(id===0x67534850){
+        const l=Math.min(len,dv.byteLength-o-8);
+        return JSON.parse(new TextDecoder().decode(new Uint8Array(ab,o+8,l)));
+      }
+      o+=8+len+(len&1);
+    }
+  }catch(e){}
+  return null;
+}
+
+function parsePcmWav(ab){
+  try{
+    const dv=new DataView(ab);
+    if(dv.getUint32(0)!==0x52494646||dv.getUint32(8)!==0x57415645) return null;
+    let o=12,fmt=null,dOff=-1,dLen=0;
+    while(o+8<=dv.byteLength){
+      const id=dv.getUint32(o), len=dv.getUint32(o+4,true);
+      if(id===0x666d7420){ fmt={tag:dv.getUint16(o+8,true),ch:dv.getUint16(o+10,true),sr:dv.getUint32(o+12,true),bits:dv.getUint16(o+22,true)}; }
+      else if(id===0x64617461){ dOff=o+8; dLen=Math.min(len,dv.byteLength-dOff); break; }
+      o+=8+len+(len&1);
+    }
+    if(!fmt||dOff<0||fmt.ch!==2||fmt.tag!==1||fmt.bits!==16) return null;
+    const n=Math.floor(dLen/4), L=new Float32Array(n), R=new Float32Array(n);
+    for(let i=0;i<n;i++){ L[i]=dv.getInt16(dOff+i*4,true)/32768; R[i]=dv.getInt16(dOff+i*4+2,true)/32768; }
+    return {L,R,sr:fmt.sr};
+  }catch(e){ return null; }
+}
+
+function decodeWave(L,R,sr,f0,nOrig){
+  const Pf=sr/(f0||WAVE_F0);
+  const nb=nOrig?Math.max(32,Math.min(4000,nOrig)):Math.max(32,Math.min(4000,Math.floor(Pf)));
+  const n=Math.min(L.length,R.length);
+  const skip=Math.min(Math.floor(2*Pf),Math.floor(n/4));
+  const a=skip, b=n-skip;
+  if(b-a<Pf*8) return null;
+  const sx=new Float64Array(nb), sy=new Float64Array(nb), c=new Uint32Array(nb);
+  let tot=0;
+  for(let i=a;i<b;i++){
+    const k=Math.min(nb-1,Math.floor(((i/Pf)%1)*nb+1e-6));
+    sx[k]+=L[i]; sy[k]+=R[i]; c[k]++; tot+=L[i]*L[i]+R[i]*R[i];
+  }
+  if(tot/(b-a)<1e-6) return null;
+  const X=new Float64Array(nb), Y=new Float64Array(nb), have=new Uint8Array(nb);
+  let nh=0;
+  for(let k=0;k<nb;k++) if(c[k]){ X[k]=sx[k]/c[k]; Y[k]=sy[k]/c[k]; have[k]=1; nh++; }
+  if(nh<nb*0.5) return null;
+  if(nh<nb){
+    for(let k=0;k<nb;k++){
+      if(have[k]) continue;
+      let p=1; while(!have[(k-p+nb)%nb]) p++;
+      let q=1; while(!have[(k+q)%nb]) q++;
+      const kp=(k-p+nb)%nb, kq=(k+q)%nb, tt=p/(p+q);
+      X[k]=X[kp]+(X[kq]-X[kp])*tt; Y[k]=Y[kp]+(Y[kq]-Y[kp])*tt;
+    }
+  }
+  let res=0;
+  for(let i=a;i<b;i++){
+    const k=Math.min(nb-1,Math.floor(((i/Pf)%1)*nb+1e-6));
+    const dx=L[i]-X[k], dy=R[i]-Y[k]; res+=dx*dx+dy*dy;
+  }
+  const quality=1-res/tot;
+  if(quality<0.5) return null;
+  let minX=1e9,maxX=-1e9,minY=1e9,maxY=-1e9;
+  for(let k=0;k<nb;k++){minX=Math.min(minX,X[k]);maxX=Math.max(maxX,X[k]);minY=Math.min(minY,Y[k]);maxY=Math.max(maxY,Y[k]);}
+  const scale=1.85/(Math.max(maxX-minX,maxY-minY)||1), mx=(minX+maxX)/2, my=(minY+maxY)/2;
+  const pts=[]; for(let k=0;k<nb;k++) pts.push({x:(X[k]-mx)*scale,y:(Y[k]-my)*scale});
+  const out=(nb>1000?pts:resampleClosed(pts,Math.min(nb,4000))).map(p=>({x:+p.x.toFixed(4),y:+p.y.toFixed(4)}));
+  return {points:out,quality};
+}
+/*PURE-END*/
+
+/* ================= Зображення: Lab, k-means, сегментація ================= */
+const _gam=new Float32Array(256);
+for(let i=0;i<256;i++){ const c=i/255; _gam[i]=c<=0.04045?c/12.92:Math.pow((c+0.055)/1.055,2.4); }
+
+function rgbToLab(d,N){
+  const out=new Float32Array(N*3), e=216/24389, k=24389/27;
+  const f=v=>v>e?Math.cbrt(v):(k*v+16)/116;
+  for(let p=0,i=0;p<N;p++,i+=4){
+    const r=_gam[d[i]], g=_gam[d[i+1]], b=_gam[d[i+2]];
+    const fx=f((0.4124*r+0.3576*g+0.1805*b)/0.95047), fy=f(0.2126*r+0.7152*g+0.0722*b), fz=f((0.0193*r+0.1192*g+0.9505*b)/1.08883);
+    out[p*3]=116*fy-16; out[p*3+1]=500*(fx-fy); out[p*3+2]=200*(fy-fz);
+  }
+  return out;
+}
+function blurLab(src,w,h,r){
+  const tmp=new Float32Array(src.length), out=new Float32Array(src.length), cnt=2*r+1;
+  for(let y=0;y<h;y++) for(let x=0;x<w;x++) for(let ch=0;ch<3;ch++){
+    let s=0; for(let k=-r;k<=r;k++){ const xx=Math.min(w-1,Math.max(0,x+k)); s+=src[(y*w+xx)*3+ch]; }
+    tmp[(y*w+x)*3+ch]=s/cnt;
+  }
+  for(let y=0;y<h;y++) for(let x=0;x<w;x++) for(let ch=0;ch<3;ch++){
+    let s=0; for(let k=-r;k<=r;k++){ const yy=Math.min(h-1,Math.max(0,y+k)); s+=tmp[(yy*w+x)*3+ch]; }
+    out[(y*w+x)*3+ch]=s/cnt;
+  }
+  return out;
+}
+function kmeans(lab,idxs,k,iters){
+  const n=idxs.length; if(!n) return [];
+  const step=Math.max(1,Math.floor(n/3000)), S=[];
+  for(let i=0;i<n;i+=step){ const p=idxs[i]*3; S.push(lab[p],lab[p+1],lab[p+2]); }
+  const m=S.length/3; k=Math.min(k,m);
+  const order=[]; for(let i=0;i<m;i++) order.push(i);
+  order.sort((a,b)=>S[a*3]-S[b*3]);
+  const C=[]; for(let j=0;j<k;j++){ const o=order[Math.floor((j+0.5)/k*m)]; C.push([S[o*3],S[o*3+1],S[o*3+2]]); }
+  for(let it=0;it<iters;it++){
+    const sum=C.map(()=>[0,0,0,0]);
+    for(let i=0;i<m;i++){
+      let bj=0,bd=1e18;
+      for(let j=0;j<k;j++){ const dx=S[i*3]-C[j][0],dy=S[i*3+1]-C[j][1],dz=S[i*3+2]-C[j][2],d=dx*dx+dy*dy+dz*dz; if(d<bd){bd=d;bj=j;} }
+      const s=sum[bj]; s[0]+=S[i*3]; s[1]+=S[i*3+1]; s[2]+=S[i*3+2]; s[3]++;
+    }
+    for(let j=0;j<k;j++) if(sum[j][3]>0) C[j]=[sum[j][0]/sum[j][3],sum[j][1]/sum[j][3],sum[j][2]/sum[j][3]];
+  }
+  return C;
+}
+function minDist2(lab,p,C){
+  let best=1e18; const L=lab[p],A=lab[p+1],B=lab[p+2];
+  for(let j=0;j<C.length;j++){ const c=C[j],d=(L-c[0])*(L-c[0])+(A-c[1])*(A-c[1])+(B-c[2])*(B-c[2]); if(d<best) best=d; }
+  return best;
+}
+function assignMask(lab,N,Cf,Cb,bias,hardFg){
+  const out=new Uint8Array(N), b2=bias*bias;
+  for(let i=0;i<N;i++){
+    if(hardFg&&hardFg[i]){ out[i]=1; continue; }
+    const p=i*3;
+    out[i]=minDist2(lab,p,Cf)<minDist2(lab,p,Cb)*b2?1:0;
+  }
+  return out;
+}
+function otsu(vals,N){
+  const bins=128; let mx=0;
+  for(let i=0;i<N;i++) if(vals[i]>mx) mx=vals[i];
+  if(mx<=0) return 0;
+  const hist=new Float64Array(bins);
+  for(let i=0;i<N;i++) hist[Math.min(bins-1,(vals[i]/mx*bins)|0)]++;
+  let sumAll=0; for(let b=0;b<bins;b++) sumAll+=b*hist[b];
+  let wB=0,sumB=0,best=-1,thr=0;
+  for(let b=0;b<bins;b++){
+    wB+=hist[b]; if(!wB) continue;
+    const wF=N-wB; if(!wF) break;
+    sumB+=b*hist[b];
+    const mB=sumB/wB, mF=(sumAll-sumB)/wF, v=wB*wF*(mB-mF)*(mB-mF);
+    if(v>best){ best=v; thr=b; }
+  }
+  return (thr+1)/bins*mx;
+}
+function morph(src,w,h,dilate){
+  const out=new Uint8Array(w*h);
+  for(let y=1;y<h-1;y++){
+    for(let x=1;x<w-1;x++){
+      let v=dilate?0:1;
+      for(let dy=-1;dy<=1;dy++) for(let dx=-1;dx<=1;dx++){
+        const s=src[(y+dy)*w+(x+dx)];
+        if(dilate){ if(s) v=1; } else { if(!s) v=0; }
+      }
+      out[y*w+x]=v;
+    }
+  }
+  return out;
+}
+function majority(m,w,h){
+  const out=new Uint8Array(w*h);
+  for(let y=1;y<h-1;y++) for(let x=1;x<w-1;x++){
+    const i=y*w+x;
+    const s=m[i-w-1]+m[i-w]+m[i-w+1]+m[i-1]+m[i]+m[i+1]+m[i+w-1]+m[i+w]+m[i+w+1];
+    out[i]=s>=5?1:0;
+  }
+  return out;
+}
+function fillHoles(m,w,h){
+  const N=w*h, seen=new Uint8Array(N), st=[];
+  const push=i=>{ if(!m[i]&&!seen[i]){ seen[i]=1; st.push(i); } };
+  for(let x=0;x<w;x++){ push(x); push((h-1)*w+x); }
+  for(let y=0;y<h;y++){ push(y*w); push(y*w+w-1); }
+  while(st.length){
+    const p=st.pop(), y=(p/w)|0, x=p-y*w;
+    if(x>0) push(p-1); if(x<w-1) push(p+1); if(y>0) push(p-w); if(y<h-1) push(p+w);
+  }
+  const out=new Uint8Array(N);
+  for(let i=0;i<N;i++) out[i]=(m[i]||!seen[i])?1:0;
+  return out;
+}
+function labelComps(m,w,h){
+  const N=w*h, labels=new Int32Array(N), comps=[], st=[];
+  for(let i0=0;i0<N;i0++){
+    if(!m[i0]||labels[i0]) continue;
+    const id=comps.length+1;
+    let count=0,sx=0,sy=0,minX=w,maxX=0,minY=h,maxY=0;
+    st.length=0; st.push(i0); labels[i0]=id;
+    while(st.length){
+      const p=st.pop(), py=(p/w)|0, px=p-py*w;
+      count++; sx+=px; sy+=py;
+      if(px<minX)minX=px; if(px>maxX)maxX=px; if(py<minY)minY=py; if(py>maxY)maxY=py;
+      if(px>0&&m[p-1]&&!labels[p-1]){ labels[p-1]=id; st.push(p-1); }
+      if(px<w-1&&m[p+1]&&!labels[p+1]){ labels[p+1]=id; st.push(p+1); }
+      if(py>0&&m[p-w]&&!labels[p-w]){ labels[p-w]=id; st.push(p-w); }
+      if(py<h-1&&m[p+w]&&!labels[p+w]){ labels[p+w]=id; st.push(p+w); }
+    }
+    comps.push({id,count,sx,sy,minX,maxX,minY,maxY});
+  }
+  return {labels,comps};
+}
+/* Moore-обхід зовнішнього контуру бінарної маски */
+function traceOuter(mask,w,h){
+  let sx=-1,sy=-1;
+  outer: for(let y=0;y<h;y++) for(let x=0;x<w;x++) if(mask[y*w+x]){ sx=x; sy=y; break outer; }
+  if(sx<0) return [];
+  const nx=[-1,-1,0,1,1,1,0,-1], ny=[0,-1,-1,-1,0,1,1,1];
+  const dirOf=(dx,dy)=>{ for(let k=0;k<8;k++) if(nx[k]===dx&&ny[k]===dy) return k; return 0; };
+  const path=[]; let cx=sx, cy=sy, bdir=0, guard=0;
+  do{
+    path.push({x:cx,y:cy});
+    let found=false;
+    for(let k=1;k<=8;k++){
+      const d=(bdir+k)%8, x=cx+nx[d], y=cy+ny[d];
+      if(x>=0&&y>=0&&x<w&&y<h&&mask[y*w+x]){
+        const pd=(d+7)%8;
+        bdir=dirOf(cx+nx[pd]-x, cy+ny[pd]-y);
+        cx=x; cy=y; found=true; break;
+      }
+    }
+    if(!found) break;
+    guard++;
+  }while(!(cx===sx&&cy===sy)&&guard<w*h*4);
+  return path;
+}
+function smoothClosed(p,r,passes){
+  let cur=p; const n=p.length;
+  for(let ps=0;ps<passes;ps++){
+    const out=new Array(n);
+    for(let i=0;i<n;i++){
+      let sx=0,sy=0;
+      for(let k=-r;k<=r;k++){ const q=cur[(i+k+n*4)%n]; sx+=q.x; sy+=q.y; }
+      out[i]={x:sx/(2*r+1),y:sy/(2*r+1)};
+    }
+    cur=out;
+  }
+  return cur;
+}
+function maskToContour(mask,w,h,n){
+  const path=traceOuter(mask,w,h);
+  if(path.length<12) return null;
+  const sm=smoothClosed(path,Math.max(2,Math.round(path.length/150)),2);
+  return resampleClosed(sm,n);
+}
+function circlePx(){
+  const w=_w||200,h=_h||200,r=Math.min(w,h)*0.3,pts=[];
+  for(let i=0;i<64;i++){ const a=i/64*Math.PI*2; pts.push({x:w/2+Math.cos(a)*r,y:h/2+Math.sin(a)*r}); }
+  return pts;
+}
+
+let _w=0,_h=0,_imgData=null,_lab=null,_D=null,texOn=false,texRoute=null,texKey="",texBusy=false;
+function prepareImage(img){
+  const maxSide=560;
+  const iw=img.naturalWidth||img.width, ih=img.naturalHeight||img.height;
+  const sc=Math.min(1,maxSide/Math.max(iw,ih));
+  const w=Math.max(64,Math.round(iw*sc)), h=Math.max(64,Math.round(ih*sc));
+  _w=w; _h=h; prevC.width=w; prevC.height=h;
+  pctx.fillStyle="#888"; pctx.fillRect(0,0,w,h);
+  pctx.drawImage(img,0,0,w,h);
+  _imgData=pctx.getImageData(0,0,w,h);
+  _lab=blurLab(rgbToLab(_imgData.data,w*h),w,h,2);
+  _D=null; texRoute=null; texKey="";
+}
+
+/* Покращена сегментація об'єкта: модель кольору фону/об'єкта (k-means у Lab)
+   + ітеративне уточнення (спрощений GrabCut) + згладжування + вибір головного об'єкта.
+   seed={x,y} — тап по об'єкту (необов'язково). */
+function segmentObject(seed){
+  const w=_w,h=_h,N=w*h,lab=_lab,minWH=Math.min(w,h);
+  const bias=1.3-(thresh-20)/160*0.7;
+  const margin=Math.max(3,Math.round(minWH*0.05));
+  const ring=[];
+  for(let y=0;y<h;y++) for(let x=0;x<w;x++) if(x<margin||y<margin||x>=w-margin||y>=h-margin) ring.push(y*w+x);
+  let mask=new Uint8Array(N), hardFg=null;
+  if(seed){
+    const sx=Math.max(0,Math.min(w-1,Math.round(seed.x))), sy=Math.max(0,Math.min(h-1,Math.round(seed.y)));
+    const r=Math.max(3,Math.round(minWH*0.035)), fgI=[]; hardFg=new Uint8Array(N);
+    for(let dy=-r;dy<=r;dy++) for(let dx=-r;dx<=r;dx++){
+      const x=sx+dx,y=sy+dy;
+      if(dx*dx+dy*dy>r*r||x<0||y<0||x>=w||y>=h) continue;
+      const i=y*w+x; hardFg[i]=1; fgI.push(i);
+    }
+    mask=assignMask(lab,N,kmeans(lab,fgI,2,4),kmeans(lab,ring,5,5),bias,hardFg);
+  } else {
+    const Cb=kmeans(lab,ring,4,6), sal=new Float32Array(N);
+    const cx=w/2,cy=h/2,inv=1/(2*Math.pow(minWH*0.45,2));
+    for(let y=0;y<h;y++) for(let x=0;x<w;x++){
+      const i=y*w+x, pr=Math.exp(-((x-cx)*(x-cx)+(y-cy)*(y-cy))*inv);
+      sal[i]=Math.sqrt(minDist2(lab,i*3,Cb))*(0.55+0.45*pr);
+    }
+    let thr=otsu(sal,N), cnt=0;
+    for(let i=0;i<N;i++){ mask[i]=sal[i]>thr?1:0; cnt+=mask[i]; }
+    if(cnt<N*0.01||cnt>N*0.7){
+      const sorted=Float32Array.from(sal).sort(); thr=sorted[Math.floor(N*0.8)];
+      for(let i=0;i<N;i++) mask[i]=sal[i]>thr?1:0;
+    }
+  }
+  for(let it=0;it<4;it++){
+    const dil=morph(morph(mask,w,h,true),w,h,true), fgI=[], bgI=[];
+    for(let i=0;i<N;i++){ if(mask[i]) fgI.push(i); else if(!dil[i]) bgI.push(i); }
+    if(fgI.length<30) break;
+    const Cf=kmeans(lab,fgI,4,5), Cb=kmeans(lab,bgI.length>50?bgI:ring,6,5);
+    mask=majority(majority(assignMask(lab,N,Cf,Cb,bias,hardFg),w,h),w,h);
+  }
+  let m=fillHoles(mask,w,h);
+  m=morph(morph(m,w,h,false),w,h,true);
+  const {labels,comps}=labelComps(m,w,h);
+  if(!comps.length) return null;
+  let best=null;
+  if(seed){
+    const si=Math.max(0,Math.min(h-1,Math.round(seed.y)))*w+Math.max(0,Math.min(w-1,Math.round(seed.x)));
+    best=comps.find(c=>c.id===labels[si])||null;
+    if(!best){
+      let bd=1e18;
+      comps.forEach(c=>{ if(c.count<N*0.003) return; const d=Math.hypot(c.sx/c.count-seed.x,c.sy/c.count-seed.y); if(d<bd){bd=d;best=c;} });
+    }
+  } else {
+    let bs=-1;
+    comps.forEach(c=>{
+      if(c.count<N*0.004||c.count>N*0.75) return;
+      const dist=Math.hypot(c.sx/c.count-w/2,c.sy/c.count-h/2)/(Math.hypot(w,h)/2);
+      const touch=(c.minX<=1?1:0)+(c.minY<=1?1:0)+(c.maxX>=w-2?1:0)+(c.maxY>=h-2?1:0);
+      const s=c.count*(1.3-dist)*(1-0.18*touch);
+      if(s>bs){ bs=s; best=c; }
+    });
+    if(!best) comps.forEach(c=>{ if(!best||c.count>best.count) best=c; });
+  }
+  if(!best||best.count<N*0.002) return null;
+  let cm=new Uint8Array(N);
+  for(let i=0;i<N;i++) if(labels[i]===best.id) cm[i]=1;
+  cm=fillHoles(cm,w,h);
+  return maskToContour(cm,w,h,140);
+}
+
+/* ================= Обличчя ================= */
+const FACE_OVAL=[10,338,297,332,284,251,389,356,454,323,361,288,397,365,379,378,400,377,152,148,176,149,150,136,172,58,132,93,234,127,162,21,54,103,67,109];
+const EYE_A=[263,249,390,373,374,380,381,382,362,398,384,385,386,387,388,466];
+const EYE_B=[33,7,163,144,145,153,154,155,133,173,157,158,159,160,161,246];
+const LIPS=[61,146,91,181,84,17,314,405,321,375,291,409,270,269,267,0,37,39,40,185];
+const MP_VER="0.10.14";
+let faceLM=null, faceLoading=null;
+
+function dynImport(u){ return new Function("u","return import(u)")(u); }
+function withTimeout(p,ms){ return Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error("timeout")),ms))]); }
+async function getFaceLandmarker(){
+  if(faceLM) return faceLM;
+  if(!faceLoading){
+    faceLoading=(async()=>{
+      const base="https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@"+MP_VER;
+      const mod=await dynImport(base+"/vision_bundle.mjs");
+      const fs=await mod.FilesetResolver.forVisionTasks(base+"/wasm");
+      const opt=del=>({baseOptions:{modelAssetPath:"https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task",delegate:del},runningMode:"IMAGE",numFaces:1});
+      try{ faceLM=await mod.FaceLandmarker.createFromOptions(fs,opt("GPU")); }
+      catch(e){ faceLM=await mod.FaceLandmarker.createFromOptions(fs,opt("CPU")); }
+      return faceLM;
+    })();
+    faceLoading.catch(()=>{ faceLoading=null; });
+  }
+  return faceLoading;
+}
+async function detectLandmarks(){
+  const lm=await getFaceLandmarker();
+  const iw=pendingImg.naturalWidth||pendingImg.width, ih=pendingImg.naturalHeight||pendingImg.height;
+  const s=Math.min(1,800/Math.max(iw,ih));
+  const c=document.createElement("canvas"); c.width=Math.round(iw*s); c.height=Math.round(ih*s);
+  c.getContext("2d").drawImage(pendingImg,0,0,c.width,c.height);
+  const res=lm.detect(c);
+  return (res&&res.faceLandmarks&&res.faceLandmarks[0])||null;
+}
+function nearestIdx(ring,q){
+  let bi=0,bd=1e18;
+  ring.forEach((p,i)=>{ const d=(p.x-q.x)*(p.x-q.x)+(p.y-q.y)*(p.y-q.y); if(d<bd){bd=d;bi=i;} });
+  return bi;
+}
+function rotateRing(r,q){ const i=nearestIdx(r,q); return r.slice(i).concat(r.slice(0,i)); }
+function centroid(r){ let x=0,y=0; r.forEach(p=>{x+=p.x;y+=p.y;}); return {x:x/r.length,y:y/r.length}; }
+/* Один замкнений шлях: овал обличчя → око → око → губи → назад (з'єднувальні лінії) */
+function faceRoute(lm,detail){
+  const P=i=>({x:lm[i].x*_w,y:lm[i].y*_h});
+  const oval0=FACE_OVAL.map(P);
+  if(!detail) return resampleClosed(oval0,160);
+  const eB=EYE_B.map(P), eA=EYE_A.map(P), lips=LIPS.map(P);
+  const oval=rotateRing(oval0,centroid(eB));
+  let route=oval.slice();
+  [eB,eA,lips].forEach(ring=>{
+    const r=rotateRing(ring,route[route.length-1]);
+    route=route.concat(r); route.push(r[0]);
+  });
+  return resampleClosed(route,320);
+}
+/* Запасний варіант без інтернету: контур за кольором шкіри */
+function skinFaceContour(){
+  const w=_w,h=_h,N=w*h,d=_imgData.data;
+  let m=new Uint8Array(N);
+  for(let p=0,i=0;p<N;p++,i+=4){
+    const R=d[i],G=d[i+1],B=d[i+2];
+    const Y=0.299*R+0.587*G+0.114*B, Cb=128-0.168736*R-0.331264*G+0.5*B, Cr=128+0.5*R-0.418688*G-0.081312*B;
+    m[p]=(Y>45&&Cb>=77&&Cb<=127&&Cr>=133&&Cr<=173)?1:0;
+  }
+  m=morph(morph(m,w,h,true),w,h,false);
+  m=morph(morph(m,w,h,false),w,h,true);
+  m=fillHoles(m,w,h);
+  const {labels,comps}=labelComps(m,w,h);
+  let best=null,bs=-1;
+  comps.forEach(c=>{
+    if(c.count<N*0.01) return;
+    const bw=c.maxX-c.minX+1,bh=c.maxY-c.minY+1;
+    const dist=Math.hypot(c.sx/c.count-w/2,c.sy/c.count-h/2)/(Math.hypot(w,h)/2);
+    const ar=Math.exp(-Math.abs(Math.log((bh/bw)/1.3)));
+    const s=c.count*(1.3-dist)*ar;
+    if(s>bs){bs=s;best=c;}
+  });
+  if(!best) return null;
+  let cm=new Uint8Array(N);
+  for(let i=0;i<N;i++) if(labels[i]===best.id) cm[i]=1;
+  const bw=best.maxX-best.minX+1,bh=best.maxY-best.minY+1;
+  if(bh>1.4*bw){ const cut=best.minY+Math.round(1.3*bw); for(let y=cut;y<h;y++) for(let x=0;x<w;x++) cm[y*w+x]=0; }
+  cm=fillHoles(cm,w,h);
+  return maskToContour(cm,w,h,160);
+}
+
+
+/* ================= Внутрішня текстура ================= */
+function boxBlur1(src,w,h,r){
+  const tmp=new Float32Array(src.length), out=new Float32Array(src.length), cnt=2*r+1;
+  for(let y=0;y<h;y++) for(let x=0;x<w;x++){
+    let s=0; for(let k=-r;k<=r;k++){ const xx=Math.min(w-1,Math.max(0,x+k)); s+=src[y*w+xx]; }
+    tmp[y*w+x]=s/cnt;
+  }
+  for(let y=0;y<h;y++) for(let x=0;x<w;x++){
+    let s=0; for(let k=-r;k<=r;k++){ const yy=Math.min(h-1,Math.max(0,y+k)); s+=tmp[yy*w+x]; }
+    out[y*w+x]=s/cnt;
+  }
+  return out;
+}
+/* карта локального контрасту: тонкі лінії/рельєф (і світлі, і темні) */
+function ensureD(){
+  if(_D) return _D;
+  const w=_w,h=_h,N=w*h, lab=rgbToLab(_imgData.data,N), L=new Float32Array(N);
+  for(let i=0;i<N;i++) L[i]=lab[i*3];
+  const fine=boxBlur1(L,w,h,1), wide=boxBlur1(L,w,h,Math.max(3,Math.round(Math.min(w,h)*0.012))), D=new Float32Array(N);
+  for(let i=0;i<N;i++) D[i]=Math.abs(fine[i]-wide[i]);
+  _D=D; return D;
+}
+function polyMask(poly,w,h){
+  const c=document.createElement("canvas"); c.width=w; c.height=h;
+  const x=c.getContext("2d"); x.fillStyle="#fff"; x.beginPath();
+  poly.forEach((p,i)=>{ if(i===0) x.moveTo(p.x,p.y); else x.lineTo(p.x,p.y); });
+  x.closePath(); x.fill();
+  const d=x.getImageData(0,0,w,h).data, m=new Uint8Array(w*h);
+  for(let i=0;i<w*h;i++) m[i]=d[i*4+3]>128?1:0;
+  return m;
+}
+/* Zhang–Suen: стоншення до скелета (лінії шириною 1 піксель) */
+function thinZS(img,w,h){
+  const rm=[]; let changed=true, it=0;
+  while(changed&&it++<40){
+    changed=false;
+    for(let step=0;step<2;step++){
+      rm.length=0;
+      for(let y=1;y<h-1;y++) for(let x=1;x<w-1;x++){
+        const i=y*w+x; if(!img[i]) continue;
+        const p2=img[i-w],p3=img[i-w+1],p4=img[i+1],p5=img[i+w+1],p6=img[i+w],p7=img[i+w-1],p8=img[i-1],p9=img[i-w-1];
+        const B=p2+p3+p4+p5+p6+p7+p8+p9; if(B<2||B>6) continue;
+        const A=(!p2&&p3?1:0)+(!p3&&p4?1:0)+(!p4&&p5?1:0)+(!p5&&p6?1:0)+(!p6&&p7?1:0)+(!p7&&p8?1:0)+(!p8&&p9?1:0)+(!p9&&p2?1:0);
+        if(A!==1) continue;
+        if(step===0){ if(p2*p4*p6!==0||p4*p6*p8!==0) continue; }
+        else { if(p2*p4*p8!==0||p2*p6*p8!==0) continue; }
+        rm.push(i);
+      }
+      if(rm.length){ changed=true; for(let k=0;k<rm.length;k++) img[rm[k]]=0; }
+    }
+  }
+}
+function pruneEnds(sk,w,h,n){
+  for(let it=0;it<n;it++){
+    const rm=[];
+    for(let y=1;y<h-1;y++) for(let x=1;x<w-1;x++){
+      const i=y*w+x; if(!sk[i]) continue;
+      const c=sk[i-1]+sk[i+1]+sk[i-w]+sk[i+w]+sk[i-w-1]+sk[i-w+1]+sk[i+w-1]+sk[i+w+1];
+      if(c<=1) rm.push(i);
+    }
+    if(!rm.length) break;
+    rm.forEach(i=>sk[i]=0);
+  }
+}
+function walkComp(s,sk,vis,w){
+  const offs=[-1,1,-w,w,-w-1,-w+1,w-1,w+1], out=[s], st=[s], nx=[0]; vis[s]=1;
+  while(st.length){
+    const i=st[st.length-1]; let k=nx[nx.length-1], moved=false;
+    while(k<8){
+      const j=i+offs[k++];
+      if(sk[j]&&!vis[j]){ vis[j]=1; nx[nx.length-1]=k; st.push(j); nx.push(0); out.push(j); moved=true; break; }
+    }
+    if(!moved){ st.pop(); nx.pop(); if(st.length) out.push(st[st.length-1]); }
+  }
+  return out;
+}
+const TEX_POINTS=3675, TEX_F0=12, TEX_BUDGET=5200;
+/* Один замкнений шлях: контур + «заходи» по лініях текстури всередині (як і в режимі обличчя) */
+function buildTextureRoute(poly,detail){
+  const w=_w,h=_h,N=w*h;
+  let er=polyMask(poly,w,h);
+  const rr=Math.max(2,Math.round(Math.min(w,h)*0.012));
+  for(let k=0;k<rr;k++) er=morph(er,w,h,false);
+  const D=ensureD(), vals=[];
+  for(let i=0;i<N;i++) if(er[i]) vals.push(D[i]);
+  if(vals.length<300) return null;
+  const sorted=Float32Array.from(vals).sort();
+  let q=0.05+detail*0.025, sk=null;
+  const gThr=sorted[Math.floor(sorted.length*0.35)], tile=Math.max(16,Math.round(Math.min(w,h)/12));
+  for(let tries=0;tries<7;tries++){
+    /* поріг у кожній плитці окремо — лінії рівномірно по всьому об'єкту, а не лише в найконтрастніших місцях */
+    let bin=new Uint8Array(N);
+    for(let ty=0;ty<h;ty+=tile) for(let tx=0;tx<w;tx+=tile){
+      const tv=[], ids=[];
+      for(let y=ty;y<Math.min(h,ty+tile);y++) for(let x=tx;x<Math.min(w,tx+tile);x++){ const i=y*w+x; if(er[i]){ tv.push(D[i]); ids.push(i); } }
+      if(tv.length<20) continue;
+      const ts=Float32Array.from(tv).sort(), thr=Math.max(gThr,ts[Math.min(ts.length-1,Math.floor(ts.length*(1-q)))]);
+      for(let k=0;k<ids.length;k++) if(D[ids[k]]>=thr) bin[ids[k]]=1;
+    }
+    bin=morph(morph(morph(morph(bin,w,h,true),w,h,true),w,h,false),w,h,false);
+    thinZS(bin,w,h); pruneEnds(bin,w,h,2);
+    let cnt=0; for(let i=0;i<N;i++) cnt+=bin[i];
+    sk=bin; if(cnt<=TEX_BUDGET) break;
+    q*=0.8;
+  }
+  const seen=new Uint8Array(N), comps=[], offs=[-1,1,-w,w,-w-1,-w+1,w-1,w+1];
+  for(let i0=0;i0<N;i0++){
+    if(!sk[i0]||seen[i0]) continue;
+    const list=[i0], st=[i0]; seen[i0]=1;
+    while(st.length){
+      const p=st.pop();
+      for(let k=0;k<8;k++){ const j=p+offs[k]; if(sk[j]&&!seen[j]){ seen[j]=1; st.push(j); list.push(j); } }
+    }
+    if(list.length>=45) comps.push(list);
+  }
+  const cont=resampleClosed(poly,Math.max(120,Math.min(320,poly.length)));
+  if(!comps.length) return {route:resampleClosed(cont,TEX_POINTS),nTex:0,comps:0};
+  let bi=0,bd=1e18;
+  comps.forEach(l=>{ for(let a=0;a<l.length;a+=2){ const px=l[a]%w, py=(l[a]/w)|0;
+    for(let c=0;c<cont.length;c++){ const d=(cont[c].x-px)*(cont[c].x-px)+(cont[c].y-py)*(cont[c].y-py); if(d<bd){bd=d;bi=c;} } } });
+  const contRot=cont.slice(bi).concat(cont.slice(0,bi));
+  const pieces=[contRot.concat([contRot[0]])], vis=new Uint8Array(N);
+  let cur=contRot[0], remaining=comps.slice(), nTex=0;
+  while(remaining.length){
+    let bc=0,bs=0,bdd=1e18;
+    remaining.forEach((l,ci)=>{ for(let a=0;a<l.length;a++){ const px=l[a]%w, py=(l[a]/w)|0, d=(px-cur.x)*(px-cur.x)+(py-cur.y)*(py-cur.y); if(d<bdd){bdd=d;bc=ci;bs=l[a];} } });
+    remaining.splice(bc,1);
+    const walk=walkComp(bs,sk,vis,w).map(idx=>({x:idx%w,y:(idx/w)|0}));
+    pieces.push(walk); nTex+=walk.length;
+    cur={x:bs%w,y:(bs/w)|0};
+  }
+  /* Кожен шматок дискретизуємо рівномірно; перехід між шматками — рівно один крок (стрибок).
+     Декодер/екран бачать великий крок як «підняте перо» і не малюють лінію. */
+  const lens=pieces.map(pl=>{ let L=0; for(let i=1;i<pl.length;i++) L+=Math.hypot(pl[i].x-pl[i-1].x,pl[i].y-pl[i-1].y); return L; });
+  const totalLen=lens.reduce((a,b)=>a+b,0), step=totalLen/Math.max(1,TEX_POINTS-pieces.length);
+  const counts=lens.map(L=>Math.max(2,Math.round(L/step)));
+  let sum=counts.reduce((a,b)=>a+b,0), big=0;
+  counts.forEach((c,i)=>{ if(c>counts[big]) big=i; });
+  counts[big]+=TEX_POINTS-sum;
+  const out=[];
+  pieces.forEach((pl,i)=>{ resampleOpen(pl,counts[i]).forEach(p=>out.push(p)); });
+  return {route:out,nTex,comps:comps.length};
+}
+function resampleOpen(p,n){
+  const L=[0]; for(let i=1;i<p.length;i++) L.push(L[i-1]+Math.hypot(p[i].x-p[i-1].x,p[i].y-p[i-1].y));
+  const tot=L[L.length-1], out=[]; let j=0;
+  for(let k=0;k<n;k++){
+    const tg=n>1?tot*k/(n-1):0;
+    while(j<L.length-2&&L[j+1]<tg) j++;
+    const seg=L[j+1]-L[j], tt=seg<1e-12?0:Math.min(1,Math.max(0,(tg-L[j])/seg));
+    out.push({x:p[j].x+(p[j+1].x-p[j].x)*tt, y:p[j].y+(p[j+1].y-p[j].y)*tt});
+  }
+  if(out.length>=5){ /* лише згладжуємо всередині шматка */
+    const sm=out.map(q=>({x:q.x,y:q.y}));
+    for(let i=1;i<out.length-1;i++){ sm[i].x=(out[i-1].x+out[i].x+out[i+1].x)/3; sm[i].y=(out[i-1].y+out[i].y+out[i+1].y)/3; }
+    return sm;
+  }
+  return out;
+}
+/* позначки «стрибків» для складних (текстурних) фігур: великий крок між сусідніми точками */
+function jumpFlags(pts){
+  const n=pts.length; if(n<1000) return null;
+  let mnx=1e9,mxx=-1e9,mny=1e9,mxy=-1e9;
+  const d=new Float32Array(n);
+  for(let i=0;i<n;i++){
+    const a=pts[i], b=pts[(i+1)%n];
+    d[i]=Math.hypot(b.x-a.x,b.y-a.y);
+    if(a.x<mnx)mnx=a.x; if(a.x>mxx)mxx=a.x; if(a.y<mny)mny=a.y; if(a.y>mxy)mxy=a.y;
+  }
+  const med=Float32Array.from(d).sort()[n>>1], thr=Math.max(0.027*Math.max(mxx-mnx,mxy-mny),8*med);
+  const f=new Uint8Array(n); let any=0;
+  for(let i=0;i<n;i++){ if(d[i]>thr){ f[i]=1; any=1; } }
+  return any?f:null;
+}
+function getJF(c){ if(c._jfp!==c.points){ c._jf=jumpFlags(c.points); c._jfp=c.points; } return c._jf; }
+function basePoly(){
+  if(mode==="manual") return manualPts.length>=3?manualPts:null;
+  return contourPx&&contourPx.length>=3?contourPx:null;
+}
+function ensureTex(){
+  const poly=basePoly();
+  if(!poly||!_imgData){ texRoute=null; return; }
+  const detail=+$("tex-amt").value; let hs=0;
+  poly.forEach((p,i)=>{ hs+=p.x*(i+1)+p.y*(i+3); });
+  const key=detail+"|"+poly.length+"|"+hs.toFixed(2);
+  if(key===texKey||texBusy) return;
+  texBusy=true; toast("Аналіз текстури…",1500);
+  setTimeout(()=>{
+    try{ const r=buildTextureRoute(poly,detail); texRoute=r&&r.route?r.route:null; if(r) toast("Текстура: "+r.comps+" ліній",1800); }
+    catch(e){ console.warn(e); texRoute=null; toast("Не вдалося виділити текстуру"); }
+    texKey=key; texBusy=false; renderPreview();
+  },30);
+}
+
+/* ================= Попередній перегляд / режими ================= */
+let mode="auto", contourPx=null, manualPts=[], dragIdx=-1, procToken=0, lastSeed=null, reTimer=null;
+const HINTS={
+  auto:"<b>Авто:</b> торкнись предмета, щоб уточнити виділення · «Чутл.» змінює деталізацію · ✏️ Точки — підправити вручну",
+  face:"<b>Обличчя:</b> контур + очі/рот (потрібен інтернет для першого запуску моделі; без нього — грубий контур за кольором шкіри) · ✏️ Точки — підправити",
+  manual:"<b>Ручний контур:</b> тягни точки або став нові по краю предмета → ✓ Використати"
+};
+const HINTS_EN={
+  auto:"<b>Auto:</b> tap the object to refine the selection · «Sens.» changes detail · ✏️ Points — fix by hand",
+  face:"<b>Face:</b> contour + eyes/mouth (internet needed on first run to load the model; without it — rough skin-colour contour) · ✏️ Points — fix",
+  manual:"<b>Manual contour:</b> drag points or add new ones along the object's edge → ✓ Use"
+};
+function setMode(m){
+  mode=m;
+  [["auto","btn-auto"],["face","btn-face-ov"],["manual","btn-manual"]].forEach(([k,id])=>$(id).classList.toggle("active",k===m));
+  $("overlay-hint").innerHTML=(LANG==="en"?HINTS_EN:HINTS)[m];
+  $("detail-wrap").style.display=m==="face"?"inline-flex":"none";
+}
+
+function loadImageFile(file,startMode){
+  if(!file) return;
+  const url=URL.createObjectURL(file), img=new Image();
+  img.onload=()=>{
+    URL.revokeObjectURL(url);
+    pendingImg=img;
+    let nm=file.name.replace(/\.[^.]+$/,"").slice(0,40); if(!nm||/^[\d_\-\s]+$/.test(nm)) nm=(startMode==="face"?"Обличчя":"Фігура"); $("name-in").value=nm;
+    prepareImage(img);
+    manualPts=[]; contourPx=null; lastSeed=null; dragIdx=-1;
+    $("overlay").classList.add("show");
+    if(startMode==="face") runFace(); else runAuto(null);
+  };
+  img.onerror=()=>toast("Не вдалося завантажити зображення");
+  img.src=url;
+}
+
+function runAuto(seed){
+  setMode("auto"); lastSeed=seed||null;
+  const tok=++procToken; toast("Аналіз зображення…");
+  setTimeout(()=>{
+    if(tok!==procToken) return;
+    let px=null;
+    try{ px=segmentObject(seed); }catch(e){ console.warn(e); }
+    if(!px){ px=circlePx(); toast("Не вдалося виділити — торкнись предмета або ✏️ Точки",3200); }
+    contourPx=px; renderPreview();
+  },30);
+}
+async function runFace(){
+  setMode("face");
+  const tok=++procToken, detail=$("ch-detail").checked;
+  toast("Шукаю обличчя…",3000);
+  let px=null, msg="";
+  try{
+    const lm=await withTimeout(detectLandmarks(),30000);
+    if(tok!==procToken) return;
+    if(lm){ px=faceRoute(lm,detail); msg="Обличчя знайдено · "+px.length+" точок"; }
+    else msg="Модель не знайшла обличчя — показано контур за кольором шкіри";
+  }catch(e){ console.warn("face",e); msg="Модель недоступна (немає інтернету) — грубий контур за кольором шкіри"; }
+  if(tok!==procToken) return;
+  if(!px){
+    try{ px=skinFaceContour(); }catch(e){ console.warn(e); }
+    if(!px){ px=circlePx(); msg="Обличчя не знайдено — використай ✏️ Точки"; }
+  }
+  toast(msg,3200);
+  contourPx=px; renderPreview();
+}
+
+function renderPreview(){
+  if(!_imgData) return;
+  if(texOn&&dragIdx<0) ensureTex();
+  pctx.putImageData(_imgData,0,0);
+  const w=_w, lw=Math.max(2,w/110);
+  if(texOn&&texRoute){
+    pctx.strokeStyle="rgba(255,225,70,.95)"; pctx.lineWidth=Math.max(1,w/260); pctx.lineJoin="round";
+    const jf=jumpFlags(texRoute); pctx.beginPath();
+    for(let i=0;i<texRoute.length;i++){ const p=texRoute[i]; if(i===0||(jf&&jf[i-1])) pctx.moveTo(p.x,p.y); else pctx.lineTo(p.x,p.y); }
+    if(!(jf&&jf[texRoute.length-1])) pctx.lineTo(texRoute[0].x,texRoute[0].y);
+    pctx.stroke();
+  }
+  if(mode==="manual"){
+    if(manualPts.length){
+      pctx.strokeStyle="#00e5ff"; pctx.lineWidth=lw;
+      pctx.beginPath();
+      manualPts.forEach((p,i)=>{ if(i===0) pctx.moveTo(p.x,p.y); else pctx.lineTo(p.x,p.y); });
+      if(manualPts.length>=3){ pctx.closePath(); pctx.fillStyle="rgba(0,229,255,0.12)"; pctx.fill(); }
+      pctx.stroke();
+      manualPts.forEach((p,i)=>{
+        pctx.beginPath(); pctx.arc(p.x,p.y,Math.max(5,w/40),0,Math.PI*2);
+        pctx.fillStyle=i===dragIdx?"#fe6":"#fff"; pctx.strokeStyle="#0af"; pctx.lineWidth=2;
+        pctx.fill(); pctx.stroke();
+        pctx.fillStyle="#012"; pctx.font="bold 10px sans-serif"; pctx.textAlign="center"; pctx.textBaseline="middle";
+        pctx.fillText(String(i+1),p.x,p.y);
+      });
+    }
+    $("info-badge").textContent=manualPts.length+" pts";
+  } else if(contourPx&&contourPx.length>2){
+    pctx.strokeStyle="#00e5ff"; pctx.lineWidth=lw; pctx.lineJoin="round";
+    pctx.beginPath();
+    contourPx.forEach((p,i)=>{ if(i===0) pctx.moveTo(p.x,p.y); else pctx.lineTo(p.x,p.y); });
+    pctx.closePath();
+    if(mode==="auto"){ pctx.fillStyle="rgba(0,229,255,0.15)"; pctx.fill(); }
+    pctx.stroke();
+    if(lastSeed&&mode==="auto"){ pctx.beginPath(); pctx.arc(lastSeed.x,lastSeed.y,Math.max(4,w/60),0,Math.PI*2); pctx.fillStyle="#fe6"; pctx.fill(); }
+    $("info-badge").textContent=contourPx.length+" pts";
+  }
+}
+
+function previewCoords(e){
+  const rect=prevC.getBoundingClientRect();
+  const tch=e.touches?e.touches[0]:(e.changedTouches?e.changedTouches[0]:e);
+  return {x:(tch.clientX-rect.left)*((_w||prevC.width)/Math.max(1,rect.width)), y:(tch.clientY-rect.top)*((_h||prevC.height)/Math.max(1,rect.height))};
+}
+function nearestManualPt(x,y,maxDist){
+  let best=-1,bd=maxDist*maxDist;
+  for(let i=0;i<manualPts.length;i++){ const dx=manualPts[i].x-x,dy=manualPts[i].y-y,d=dx*dx+dy*dy; if(d<bd){bd=d;best=i;} }
+  return best;
+}
+function onPreviewDown(e){
+  e.preventDefault();
+  if(!_w) return;
+  const p=previewCoords(e);
+  if(mode==="manual"){
+    const hit=nearestManualPt(p.x,p.y,Math.max(14,_w/18));
+    if(hit>=0) dragIdx=hit;
+    else { manualPts.push({x:p.x,y:p.y}); dragIdx=manualPts.length-1; }
+    renderPreview();
+  } else if(mode==="auto"){
+    runAuto(p);
+  }
+}
+function onPreviewMove(e){
+  if(dragIdx<0) return;
+  e.preventDefault();
+  const p=previewCoords(e);
+  manualPts[dragIdx].x=p.x; manualPts[dragIdx].y=p.y;
+  renderPreview();
+}
+function onPreviewUp(e){
+  if(dragIdx<0) return;
+  e.preventDefault(); dragIdx=-1; renderPreview();
+}
+prevC.addEventListener("mousedown",onPreviewDown);
+prevC.addEventListener("mousemove",onPreviewMove);
+prevC.addEventListener("mouseup",onPreviewUp);
+prevC.addEventListener("mouseleave",onPreviewUp);
+prevC.addEventListener("touchstart",onPreviewDown,{passive:false});
+prevC.addEventListener("touchmove",onPreviewMove,{passive:false});
+prevC.addEventListener("touchend",onPreviewUp,{passive:false});
+
+$("btn-auto").onclick=()=>{ if(pendingImg) runAuto(null); };
+$("btn-face-ov").onclick=()=>{ if(pendingImg) runFace(); };
+$("ch-detail").onchange=()=>{ if(pendingImg&&mode==="face") runFace(); };
+$("btn-manual").onclick=()=>{
+  if(mode==="manual") return;
+  procToken++;
+  if(!manualPts.length&&contourPx&&contourPx.length>=3) manualPts=resampleClosed(contourPx,18);
+  setMode("manual"); renderPreview();
+  toast("Тягни точки або додай нові");
+};
+$("btn-undo-pt").onclick=()=>{ if(mode==="manual"&&manualPts.length){ manualPts.pop(); renderPreview(); } };
+$("btn-clear-pts").onclick=()=>{ manualPts=[]; if(mode!=="manual") contourPx=null; renderPreview(); };
+$("btn-cancel").onclick=()=>{ procToken++; $("overlay").classList.remove("show"); };
+
+function normalizePx(px,dg){
+  let minX=1e9,maxX=-1e9,minY=1e9,maxY=-1e9;
+  px.forEach(p=>{minX=Math.min(minX,p.x);maxX=Math.max(maxX,p.x);minY=Math.min(minY,p.y);maxY=Math.max(maxY,p.y);});
+  const scale=1.85/(Math.max(maxX-minX,maxY-minY)||1), mx=(minX+maxX)/2, my=(minY+maxY)/2;
+  return px.map(p=>({x:+((p.x-mx)*scale).toFixed(dg||4), y:+(-(p.y-my)*scale).toFixed(dg||4)}));
+}
+function makeThumb(px){
+  try{
+    let minX=1e9,maxX=-1e9,minY=1e9,maxY=-1e9;
+    px.forEach(p=>{minX=Math.min(minX,p.x);maxX=Math.max(maxX,p.x);minY=Math.min(minY,p.y);maxY=Math.max(maxY,p.y);});
+    const s=Math.max(maxX-minX,maxY-minY)*1.2+10, cx=(minX+maxX)/2, cy=(minY+maxY)/2;
+    const c=document.createElement("canvas"); c.width=c.height=72;
+    c.getContext("2d").drawImage(prevC,cx-s/2,cy-s/2,s,s,0,0,72,72);
+    return c.toDataURL("image/jpeg",0.6);
+  }catch(e){ return null; }
+}
+function usePending(){
+  let px;
+  if(mode==="manual"){
+    if(manualPts.length<3){ toast("Постав мінімум 3 точки по краю предмета"); return; }
+    px=resampleClosed(manualPts,Math.max(60,Math.min(140,manualPts.length*8)));
+  } else px=contourPx;
+  if(!px||px.length<3){ toast("Спочатку виділи фігуру"); return; }
+  let usedTex=false;
+  if(texOn){
+    try{ const r=buildTextureRoute(px,+$("tex-amt").value); if(r&&r.route&&r.nTex>0){ px=r.route; usedTex=true; } }
+    catch(e){ console.warn(e); }
+  }
+  procToken++;
+  const thumb=makeThumb(mode==="manual"?manualPts:contourPx);
+  const name=$("name-in").value.trim()||"Фігура";
+  const hue=(Math.random()*360)|0;
+  current={
+    id:"s_"+Date.now()+"_"+Math.random().toString(36).slice(2,7),
+    name, points:normalizePx(px,usedTex?3:4), color:"hsl("+hue+",80%,65%)", created:Date.now(), thumb
+  };
+  $("overlay").classList.remove("show");
+  showCurrentInfo(); playShape(1);
+  toast(usedTex?"Фігуру з текстурою застосовано ·"+current.points.length+" точок":"Фігуру застосовано — можна зберегти в базу або відправити хвилею");
+}
+function showCurrentInfo(){
+  $("shape-title").textContent=current.name;
+  $("info-badge").textContent=current.points.length+" pts";
+  $("st-name").textContent=current.name;
+}
+
+/* ================= База (localStorage) ================= */
+function loadDB(){
+  try{ const raw=localStorage.getItem(DB_KEY); db=raw?JSON.parse(raw):[]; if(!Array.isArray(db)) db=[]; }
+  catch(e){ db=[]; }
+  renderDB();
+}
+function saveDB(){
+  /* при переповненні сховища прибираємо найстаріші фігури (кінець списку), поки запис не вдасться */
+  let dropped=0;
+  while(true){
+    try{ localStorage.setItem(DB_KEY,JSON.stringify(db)); break; }
+    catch(e){
+      if(db.length>1){ db.pop(); dropped++; continue; }
+      toast("Сховище переповнене — фігуру не збережено",3200); break;
+    }
+  }
+  $("st-db").textContent=String(db.length);
+  if(dropped) toast("Сховище переповнене — видалено найстаріших: "+dropped,3200);
+}
+let dbSelect=false, dbSel=new Set(), delArmTimer=0;
+function disarmDel(){ clearTimeout(delArmTimer); const b=$("btn-db-del"); b.classList.remove("armed"); b.textContent="🗑 Видалити"; }
+function updateSelBar(){
+  $("db-sel-count").textContent="Вибрано: "+dbSel.size+" з "+db.length;
+  $("btn-db-all").textContent=(dbSel.size===db.length&&db.length)?"☐ Жодного":"☑ Усі";
+  disarmDel();
+}
+function setDbSelect(on){
+  dbSelect=!!on&&db.length>0; dbSel.clear();
+  document.body.classList.toggle("db-select",dbSelect);
+  renderDB(); resize();
+}
+function renderDB(){
+  const list=$("db-list"); list.innerHTML="";
+  db.forEach((s,i)=>{ if(!s.id) s.id="x_"+i+"_"+Math.random().toString(36).slice(2,7); }); /* старі/імпортовані записи без id */
+  $("st-db").textContent=String(db.length);
+  if(db.length&&!dbSelect){
+    const tool=document.createElement("div"); tool.className="db-tool";
+    tool.innerHTML="<b>☑</b>Вибрати"; tool.onclick=()=>setDbSelect(true);
+    list.appendChild(tool);
+  }
+  db.forEach((s,i)=>{
+    const item=document.createElement("div");
+    item.className="db-item"+(!dbSelect&&current&&current.id===s.id?" active":"")+(dbSelect&&dbSel.has(s.id)?" sel":"");
+    const chk=document.createElement("div"); chk.className="chk"; chk.textContent=dbSel.has(s.id)?"✓":""; item.appendChild(chk);
+    if(s.thumb){ const img=document.createElement("img"); img.src=s.thumb; item.appendChild(img); }
+    else {
+      const c=document.createElement("canvas"); c.width=48; c.height=48;
+      const ctx=c.getContext("2d"); ctx.strokeStyle=s.color||"#8cf"; ctx.lineWidth=1.5; ctx.beginPath();
+      (s.points||[]).forEach((p,j)=>{ const px=24+p.x*20,py=24-p.y*20; if(j===0) ctx.moveTo(px,py); else ctx.lineTo(px,py); });
+      ctx.closePath(); ctx.stroke(); item.appendChild(c);
+    }
+    const lab=document.createElement("div"); lab.className="lab"; lab.textContent=s.name||("#"+(i+1)); item.appendChild(lab);
+    const del=document.createElement("button"); del.className="del"; del.textContent="×";
+    del.onclick=ev=>{ ev.stopPropagation(); db.splice(i,1); saveDB(); renderDB(); toast("Видалено"); };
+    item.appendChild(del);
+    item.onclick=()=>{
+      if(dbSelect){ if(dbSel.has(s.id)) dbSel.delete(s.id); else dbSel.add(s.id); renderDB(); updateSelBar(); return; }
+      current={id:s.id,name:s.name,points:s.points.slice(),color:s.color,thumb:s.thumb,created:s.created};
+      showCurrentInfo(); renderDB(); playShape(1);
+    };
+    list.appendChild(item);
+  });
+}
+function saveCurrent(silent){
+  if(!current||!current.points||current.points.length<3){ toast("Немає фігури для збереження"); return; }
+  const idx=db.findIndex(s=>s.id===current.id);
+  const entry={id:current.id,name:current.name,points:current.points,color:current.color,thumb:current.thumb||null,created:current.created||Date.now()};
+  if(idx>=0) db[idx]=entry; else db.unshift(entry);
+  while(db.length>40) db.pop();
+  saveDB(); renderDB();
+  if(!silent) toast("Збережено в базу ("+db.length+")");
+}
+function exportDB(){
+  const blob=new Blob([JSON.stringify({version:1,shapes:db},null,2)],{type:"application/json"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="geo_shapes_db_"+new Date().toISOString().slice(0,10)+".json";
+  a.click(); URL.revokeObjectURL(a.href);
+  toast("Експортовано "+db.length+" фігур");
+}
+function importDB(file){
+  const reader=new FileReader();
+  reader.onload=()=>{
+    try{
+      const data=JSON.parse(reader.result);
+      const shapes=Array.isArray(data)?data:(data.shapes||[]);
+      let n=0;
+      shapes.forEach(s=>{
+        if(s&&s.points&&s.points.length>=3){ if(!s.id) s.id="imp_"+Date.now()+"_"+n; db.unshift(s); n++; }
+      });
+      while(db.length>40) db.pop();
+      saveDB(); renderDB(); toast("Імпортовано "+n+" фігур");
+    }catch(e){ toast("Помилка імпорту JSON"); }
+  };
+  reader.readAsText(file);
+}
+
+/* ================= Хвиля: збереження / надсилання / вставка ================= */
+function downloadFile(file){
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(file); a.download=file.name;
+  document.body.appendChild(a); a.click();
+  setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },1500);
+  toast("Файл хвилі збережено: "+file.name+" · у месенджер — лише як файл/документ",4000);
+}
+function exportWave(){
+  if(!current||!current.points||current.points.length<3){ toast("Немає фігури для хвилі"); return; }
+  const hi=current.points.length>450, f0=hi?12:100;
+  const buf=buildWaveBytes(current.points,{app:"photo-shape-wave",v:2,f0,n:Math.round(WAVE_SR/f0),name:(current.name||"").slice(0,60),color:current.color||""},{f0,periods:hi?40:150});
+  const safe=(current.name||"shape").replace(/[^\p{L}\p{N}_-]+/gu,"_").slice(0,40)||"shape";
+  const file=new File([buf],"wave_"+safe+".wav",{type:"audio/wav"});
+  if(navigator.canShare&&navigator.canShare({files:[file]})){
+    navigator.share({files:[file],title:"Хвиля-фігура: "+current.name})
+      .then(()=>toast("Хвилю передано. У месенджері надсилай як файл/документ — інакше звук перекодується й фігура зламається",4500))
+      .catch(err=>{ if(err&&err.name==="AbortError") return; downloadFile(file); });
+  } else downloadFile(file);
+}
+async function importWave(file){
+  try{
+    const ab=await file.arrayBuffer();
+    const meta=parseWavMeta(ab)||{};
+    let pcm=parsePcmWav(ab);
+    if(!pcm){
+      const AC=window.AudioContext||window.webkitAudioContext;
+      let ac; try{ ac=new AC({sampleRate:44100}); }catch(e){ ac=new AC(); }
+      const buf=await new Promise((res,rej)=>ac.decodeAudioData(ab.slice(0),res,rej));
+      try{ ac.close(); }catch(e){}
+      if(buf.numberOfChannels<2){ toast("Потрібен стерео-файл хвилі (L=x, R=y)",3200); return; }
+      pcm={L:buf.getChannelData(0),R:buf.getChannelData(1),sr:buf.sampleRate};
+    }
+    let r=null; const cands=(meta.f0?[meta.f0]:[]).concat([100,12]);
+    for(const f of cands){ r=decodeWave(pcm.L,pcm.R,pcm.sr,f,f===meta.f0?meta.n:0); if(r) break; }
+    if(!r){ toast("У цьому файлі не знайдено хвилю-фігуру",3200); return; }
+    const okColor=typeof meta.color==="string"&&/^(hsl\(\d{1,3},\s*\d{1,3}%,\s*\d{1,3}%\)|#[0-9a-fA-F]{3,8})$/.test(meta.color);
+    const name=(typeof meta.name==="string"&&meta.name.trim())?meta.name.trim().slice(0,60):(file.name.replace(/\.[^.]+$/,"").slice(0,40)||"Хвиля");
+    current={
+      id:"w_"+Date.now()+"_"+Math.random().toString(36).slice(2,6),
+      name, points:r.points, color:okColor?meta.color:"hsl("+((Math.random()*360)|0)+",80%,65%)", created:Date.now()
+    };
+    showCurrentInfo(); t=0;
+    saveCurrent(true);
+    toast("Фігуру з хвилі відновлено й додано в базу ("+Math.round(r.quality*100)+"% збіг)",3500);
+  }catch(e){ console.warn(e); toast("Не вдалося прочитати файл хвилі",3200); }
+}
+
+/* ================= Малювання пальцем (кілька штрихів) ================= */
+let prevCurrent=null, powerBeforeDraw=false, drawMode=false, strokes=[], curStroke=null, drawing=false;
+function strokeCount(){ return strokes.filter(k=>k.length>=2).length; }
+function updateDrawInfo(){
+  const n=strokeCount();
+  $("info-badge").textContent=n+" штрих.";
+  $("shape-title").textContent=n?("Намальовано штрихів: "+n+" · натисни ▶ Старт"):"Порожній екран · малюй";
+}
+function enterFS(){
+  try{
+    const el=document.documentElement, rq=el.requestFullscreen||el.webkitRequestFullscreen;
+    if(rq&&!(document.fullscreenElement||document.webkitFullscreenElement)){ const p=rq.call(el); if(p&&p.catch) p.catch(()=>{}); }
+  }catch(e){}
+}
+function exitFS(){
+  try{
+    const ex=document.exitFullscreen||document.webkitExitFullscreen;
+    if(ex&&(document.fullscreenElement||document.webkitFullscreenElement)){ const p=ex.call(document); if(p&&p.catch) p.catch(()=>{}); }
+  }catch(e){}
+}
+function setDrawMode(on){
+  const was=drawMode;
+  drawMode=!!on;
+  document.body.classList.toggle("draw-mode",drawMode);
+  const b=$("btn-draw");
+  b.classList.toggle("active",drawMode); b.textContent="✏️ Малювати";
+  strokes=[]; curStroke=null; drawing=false;
+  if(drawMode){
+    if(!was) prevCurrent=current;
+    if(!was) powerBeforeDraw=powerOn; hardMute(); /* повна тиша під час малювання — без гулу */
+    current=null;
+    $("st-name").textContent="малювання";
+    updateDrawInfo();
+    $("hint").textContent="Малюй (палець можна відривати) → ▶ Старт";
+    resize();
+  } else {
+    resize();
+    $("hint").textContent="Фото / Обличчя / Малювати → фігура → хвиля + звук";
+    if(!current){ $("shape-title").textContent="Немає фігури"; $("st-name").textContent="немає фігури"; $("info-badge").textContent="0 pts"; }
+  }
+}
+function mainCoords(e){
+  const rect=mainC.getBoundingClientRect();
+  const tch=e.touches&&e.touches[0]?e.touches[0]:(e.changedTouches&&e.changedTouches[0]?e.changedTouches[0]:e);
+  return {x:tch.clientX-rect.left,y:tch.clientY-rect.top};
+}
+function onMainDown(e){
+  if(!drawMode) return;
+  e.preventDefault(); drawing=true;
+  curStroke=[mainCoords(e)]; strokes.push(curStroke);
+}
+function onMainMove(e){
+  if(!drawMode||!drawing||!curStroke) return;
+  e.preventDefault();
+  const c=mainCoords(e), lp=curStroke[curStroke.length-1];
+  if(Math.hypot(c.x-lp.x,c.y-lp.y)<2) return;
+  curStroke.push(c);
+}
+function onMainUp(e){
+  if(!drawMode||!drawing) return;
+  e.preventDefault(); drawing=false;
+  if(curStroke&&curStroke.length<3){ const i=strokes.indexOf(curStroke); if(i>=0) strokes.splice(i,1); }
+  curStroke=null; updateDrawInfo();
+}
+function drawAllStrokes(ctx){
+  ctx.lineCap="round"; ctx.lineJoin="round";
+  strokes.forEach(st=>{
+    if(st.length<2) return;
+    ctx.beginPath(); st.forEach((p,i)=>{ if(i===0) ctx.moveTo(p.x,p.y); else ctx.lineTo(p.x,p.y); });
+    ctx.strokeStyle="rgba(255,200,80,0.35)"; ctx.lineWidth=8; ctx.stroke();
+    ctx.strokeStyle="#ffe566"; ctx.lineWidth=3.5; ctx.shadowColor="#fc6"; ctx.shadowBlur=10; ctx.stroke(); ctx.shadowBlur=0;
+  });
+  if(drawing&&curStroke&&curStroke.length){
+    const lp=curStroke[curStroke.length-1];
+    ctx.beginPath(); ctx.arc(lp.x,lp.y,6,0,Math.PI*2); ctx.fillStyle="#fff"; ctx.shadowColor="#fff"; ctx.shadowBlur=8; ctx.fill(); ctx.shadowBlur=0;
+  }
+}
+/* Кожен штрих лишається окремою лінією: між штрихами «перо піднімається» (стрибок у хвилі),
+   тому текст і малюнок не склеюються довгими лініями й залишаються читабельними. */
+function startDrawn(){
+  const list=strokes.filter(k=>k.length>=2);
+  /* порожній екран + Старт = вихід з режиму малювання (єдина кнопка служить і виходом) */
+  if(!list.length){ setDrawMode(false); if(powerBeforeDraw){ powerBeforeDraw=false; setPower(true); } current=prevCurrent; if(current) showCurrentInfo(); else demoShape(); toast("Нічого не намальовано — повернення на основний екран"); return; }
+  let minX=1e9,maxX=-1e9,minY=1e9,maxY=-1e9;
+  list.forEach(k=>k.forEach(q=>{minX=Math.min(minX,q.x);maxX=Math.max(maxX,q.x);minY=Math.min(minY,q.y);maxY=Math.max(maxY,q.y);}));
+  const span=Math.max(maxX-minX,maxY-minY);
+  if(span<20){ toast("Малюнок надто малий"); return; }
+  const lens=list.map(k=>{ let L=0; for(let i=1;i<k.length;i++) L+=Math.hypot(k[i].x-k[i-1].x,k[i].y-k[i-1].y); return L; });
+  const total=lens.reduce((x,y)=>x+y,0), step=total/Math.max(1,TEX_POINTS-list.length);
+  const counts=lens.map(L=>Math.max(2,Math.round(L/step)));
+  let big=0; counts.forEach((c,i)=>{ if(c>counts[big]) big=i; });
+  counts[big]+=TEX_POINTS-counts.reduce((x,y)=>x+y,0);
+  const sc=1.85/span, mx=(minX+maxX)/2, my=(minY+maxY)/2, pts=[];
+  list.forEach((k,i)=>{ resampleOpen(k,counts[i]).forEach(q=>pts.push({x:+((q.x-mx)*sc).toFixed(3),y:+(-(q.y-my)*sc).toFixed(3)})); });
+  const hue=(Math.random()*360)|0;
+  current={id:"draw_"+Date.now()+"_"+Math.random().toString(36).slice(2,6),name:"Малюнок "+(d=>String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0"))(new Date()),points:pts,color:"hsl("+hue+",85%,65%)",created:Date.now()};
+  setDrawMode(false);
+  showCurrentInfo(); t=0;
+  playShape(2);
+  if(powerBeforeDraw){ powerBeforeDraw=false; setPower(true); }
+  toast("Малюнок перетворено на хвилю · "+list.length+" штрих. · 💾 Зберегти або 🌊⬆ Хвиля");
+}
+
+/* ================= Малювання сцени ================= */
+function samplePoint(pts,u){
+  if(!pts||pts.length<2) return {x:0,y:0};
+  u=((u%1)+1)%1; if(!isFinite(u)) u=0;
+  const n=pts.length, f=u*n, i=Math.floor(f)%n, tt=f-Math.floor(f);
+  const a=pts[i], b=pts[(i+1)%n];
+  return {x:a.x+(b.x-a.x)*tt,y:a.y+(b.y-a.y)*tt};
+}
+function drawMain(){
+  const w=mainC.clientWidth||1, h=mainC.clientHeight||1;
+  const cx=w/2, cy=h/2, scale=Math.min(w,h)*0.38;
+  mctx.clearRect(0,0,w,h);
+  mctx.strokeStyle="rgba(60,90,140,.25)"; mctx.lineWidth=1;
+  mctx.beginPath(); mctx.moveTo(0,cy); mctx.lineTo(w,cy); mctx.moveTo(cx,0); mctx.lineTo(cx,h); mctx.stroke();
+  if(drawMode&&strokes.length){ drawAllStrokes(mctx); return 0; }
+  if(!current||!current.points||current.points.length<2){
+    mctx.textAlign="center"; mctx.fillStyle="rgba(140,180,220,.45)"; mctx.font="15px system-ui";
+    if(drawMode){
+      mctx.fillText(T("✏️ Малюй тут пальцем"),cx,cy-8);
+      mctx.font="12px system-ui"; mctx.fillStyle="rgba(140,180,220,.35)";
+      mctx.fillText(T("Палець можна відривати · потім ▶ Старт"),cx,cy+14);
+    } else mctx.fillText(T("📷 Фото, 🙂 Обличчя, ✏️ Малювати або 🌊⬇ Хвиля"),cx,cy);
+    return 0;
+  }
+  const pts=current.points, col=current.color||"#8cf";
+  const rp=p=>{ let x=p.x,y=p.y; if(rotateOn){ const c=Math.cos(rot),s=Math.sin(rot); const xr=x*c-y*s; y=x*s+y*c; x=xr; } return {x,y}; };
+  const jf=getJF(current);
+  mctx.beginPath();
+  for(let i=0;i<pts.length;i++){ const q=rp(pts[i]), px=cx+q.x*scale, py=cy-q.y*scale; if(i===0||(jf&&jf[i-1])) mctx.moveTo(px,py); else mctx.lineTo(px,py); }
+  if(!(jf&&jf[pts.length-1])){ const q=rp(pts[0]); mctx.lineTo(cx+q.x*scale,cy-q.y*scale); }
+  mctx.strokeStyle=col; mctx.globalAlpha=.5; mctx.lineWidth=2.2; mctx.shadowColor=col; mctx.shadowBlur=6; mctx.stroke();
+  mctx.globalAlpha=1; mctx.shadowBlur=0;
+  const trail=40; mctx.beginPath();
+  let prevIdx=-1; const pn=pts.length;
+  for(let i=0;i<=trail;i++){
+    const u=((t-(1-i/trail)*0.12)%1+1)%1, q=rp(samplePoint(pts,u)), px=cx+q.x*scale, py=cy-q.y*scale, idx=Math.floor(u*pn)%pn;
+    let brk=(i===0);
+    if(!brk&&jf){ for(let k=prevIdx,g=0;k!==idx&&g<pn;k=(k+1)%pn,g++){ if(jf[k]){ brk=true; break; } } if(!brk&&jf[idx]) brk=true; }
+    if(brk) mctx.moveTo(px,py); else mctx.lineTo(px,py);
+    prevIdx=idx;
+  }
+  mctx.strokeStyle=col; mctx.lineWidth=3.2; mctx.shadowColor=col; mctx.shadowBlur=12; mctx.stroke(); mctx.shadowBlur=0;
+  const sp=samplePoint(pts,t%1), mq=rp(sp), px=cx+mq.x*scale, py=cy-mq.y*scale;
+  mctx.beginPath(); mctx.setLineDash([4,5]); mctx.moveTo(cx,cy); mctx.lineTo(px,py);
+  mctx.strokeStyle="rgba(180,220,255,.3)"; mctx.lineWidth=1; mctx.stroke(); mctx.setLineDash([]);
+  const grd=mctx.createRadialGradient(px,py,0,px,py,12);
+  grd.addColorStop(0,"#fff"); grd.addColorStop(.4,col); grd.addColorStop(1,"rgba(0,0,0,0)");
+  mctx.beginPath(); mctx.arc(px,py,12,0,Math.PI*2); mctx.fillStyle=grd; mctx.fill();
+  mctx.beginPath(); mctx.arc(px,py,3.5,0,Math.PI*2); mctx.fillStyle="#fff"; mctx.shadowColor="#fff"; mctx.shadowBlur=8; mctx.fill(); mctx.shadowBlur=0;
+  /* звук і хвиля беруться з НЕповернутої фігури: обертання лише візуальне, тон не «пливе» */
+  return {x:sp.x,y:sp.y};
+}
+function drawWave(){
+  const wrap=$("wave-strip"), w=wrap.clientWidth||300, h=wrap.clientHeight||56, cy=h/2, amp=h*.4;
+  sctx.clearRect(0,0,w,h);
+  sctx.strokeStyle="rgba(50,90,150,.3)"; sctx.lineWidth=1;
+  sctx.beginPath(); sctx.moveTo(0,cy); sctx.lineTo(w,cy); sctx.stroke();
+  sctx.beginPath();
+  for(let i=0;i<TRACE_LEN;i++){
+    const idx=(traceIdx-1-i+TRACE_LEN*2)%TRACE_LEN, y=trace[idx], px=(i/(TRACE_LEN-1))*w, py=cy-y*amp;
+    if(i===0) sctx.moveTo(px,py); else sctx.lineTo(px,py);
+  }
+  sctx.strokeStyle="rgba(0,255,220,.35)"; sctx.lineWidth=4; sctx.shadowColor="#0ff"; sctx.shadowBlur=10; sctx.stroke();
+  sctx.strokeStyle="rgba(80,255,240,.95)"; sctx.lineWidth=2; sctx.shadowBlur=4; sctx.stroke();
+  sctx.strokeStyle="#fff"; sctx.lineWidth=1; sctx.shadowBlur=0; sctx.stroke();
+}
+
+/* ================= UI ================= */
+$("btn-play").onclick=()=>{ if(current) playShape(1); else toast("Немає фігури"); };
+$("btn-power").onclick=()=>setPower(!powerOn);
+$("btn-photo").onclick=()=>{ setDrawMode(false); nextMode="auto"; };
+$("btn-face-photo").onclick=()=>{ setDrawMode(false); nextMode="face"; };
+$("btn-cam").onclick=()=>{ setDrawMode(false); nextMode="auto"; };
+$("file-in").onchange=e=>{ if(e.target.files[0]) loadImageFile(e.target.files[0],nextMode); e.target.value=""; };
+$("cam-in").onchange=e=>{ if(e.target.files[0]) loadImageFile(e.target.files[0],nextMode); e.target.value=""; };
+$("btn-draw").onclick=()=>{ if(dbSelect) setDbSelect(false); setDrawMode(true); };
+$("btn-db-cancel").onclick=()=>setDbSelect(false);
+$("btn-db-all").onclick=()=>{
+  if(dbSel.size===db.length) dbSel.clear(); else db.forEach(s=>dbSel.add(s.id));
+  renderDB(); updateSelBar();
+};
+$("btn-db-del").onclick=()=>{
+  const b=$("btn-db-del");
+  if(!dbSel.size){ toast("Торкнись малюнків, щоб вибрати їх"); return; }
+  const all=dbSel.size===db.length;
+  if(!b.classList.contains("armed")){
+    /* перше натискання лише «зводить» кнопку — без спливаючих вікон */
+    b.classList.add("armed"); b.textContent=all?"Точно всі ("+dbSel.size+")?":"Точно "+dbSel.size+"?";
+    clearTimeout(delArmTimer); delArmTimer=setTimeout(disarmDel,3500); return;
+  }
+  const n=dbSel.size;
+  db=db.filter(s=>!dbSel.has(s.id));
+  saveDB(); setDbSelect(false);
+  toast(all?"Видалено всі малюнки ("+n+")":"Видалено: "+n);
+};
+$("btn-draw-go").onclick=startDrawn;
+["touchstart","mousedown"].forEach(ev=>$("btn-draw-go").addEventListener(ev,e=>e.stopPropagation(),{passive:true}));
+/* якщо користувач вийшов із системного повного екрана жестом «назад» — лишаємось у режимі, але без помилок */
+document.addEventListener("fullscreenchange",()=>resize());
+$("ch-tex").onchange=e=>{ texOn=e.target.checked; $("tex-amt-wrap").style.display=texOn?"inline-flex":"none"; if(pendingImg) renderPreview(); };
+let texTimer=null;
+$("tex-amt").oninput=()=>{ clearTimeout(texTimer); texTimer=setTimeout(()=>{ if(pendingImg&&texOn) renderPreview(); },300); };
+$("btn-use").onclick=usePending;
+$("btn-save").onclick=()=>saveCurrent(false);
+$("btn-wave-out").onclick=exportWave;
+async function importAny(file){
+  /* розпізнаємо тип за вмістом: обидві кнопки приймають і хвилю (WAV), і JSON */
+  try{
+    const h=new Uint8Array(await file.slice(0,4).arrayBuffer());
+    const isRiff=h[0]===0x52&&h[1]===0x49&&h[2]===0x46&&h[3]===0x46;
+    const isJson=h[0]===0x7B||h[0]===0x5B||h[0]===0xEF||h[0]===0x20||h[0]===0x0A;
+    if(isRiff) return importWave(file);
+    if(isJson) return importDB(file);
+    return importWave(file);
+  }catch(e){ toast("Не вдалося відкрити файл"); }
+}
+$("wave-in").onchange=e=>{ if(e.target.files[0]) importAny(e.target.files[0]); e.target.value=""; };
+$("btn-export").onclick=exportDB;
+$("import-in").onchange=e=>{ if(e.target.files[0]) importAny(e.target.files[0]); e.target.value=""; };
+$("btn-sound").onclick=function(){ soundMode=(soundMode+1)%SOUND_MODES.length; this.textContent=SOUND_MODES[soundMode].name; applySound(); };
+$("btn-rotate").onclick=function(){ rotateOn=!rotateOn; this.textContent=rotateOn?"Rotate ON":"Rotate OFF"; this.classList.toggle("active",rotateOn); };
+$("thresh").oninput=e=>{
+  thresh=+e.target.value;
+  if(pendingImg&&$("overlay").classList.contains("show")&&mode==="auto"){ clearTimeout(reTimer); reTimer=setTimeout(()=>runAuto(lastSeed),250); }
+};
+$("speed").oninput=e=>speed=+e.target.value;
+$("vol").oninput=e=>{ volume=+e.target.value; applySound(); };
+window.addEventListener("keydown",e=>{
+  if(e.code==="Space"){
+    const tg=e.target&&e.target.tagName;
+    if(tg==="INPUT"||tg==="TEXTAREA") return;
+    e.preventDefault(); setPower(!powerOn);
+  }
+});
+mainC.addEventListener("mousedown",onMainDown);
+mainC.addEventListener("mousemove",onMainMove);
+mainC.addEventListener("mouseup",onMainUp);
+mainC.addEventListener("mouseleave",onMainUp);
+mainC.addEventListener("touchstart",onMainDown,{passive:false});
+mainC.addEventListener("touchmove",onMainMove,{passive:false});
+mainC.addEventListener("touchend",onMainUp,{passive:false});
+
+function demoShape(){
+  const pts=[];
+  for(let i=0;i<120;i++){
+    const a=i/120*Math.PI*2;
+    pts.push({x:+(16*Math.pow(Math.sin(a),3)/18).toFixed(4),y:+((13*Math.cos(a)-5*Math.cos(2*a)-2*Math.cos(3*a)-Math.cos(4*a))/18).toFixed(4)});
+  }
+  current={id:"demo",name:"Демо • Серце",points:pts,color:"#f68",created:Date.now()};
+  showCurrentInfo();
+}
+
+
+/* ================= Ярлик на головний екран (PWA) ================= */
+const INST_KEY="shape_wave_install_skip";
+let deferredPrompt=null;
+const isStandalone=()=>(window.matchMedia&&matchMedia("(display-mode: standalone)").matches)||navigator.standalone===true;
+const isIOS=()=>/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+if(window.__APP_ICON) $("inst-icon").src=window.__APP_ICON; else $("inst-icon").style.display="none";
+window.addEventListener("beforeinstallprompt",e=>{ e.preventDefault(); deferredPrompt=e; });
+window.addEventListener("appinstalled",()=>{
+  deferredPrompt=null; try{ localStorage.setItem(INST_KEY,"1"); }catch(e){}
+  $("install-screen").classList.remove("show"); toast("Ярлик додано на головний екран ✓",3500);
+});
+function showGuide(html){ const g=$("inst-guide"); g.innerHTML=html; g.classList.add("show"); }
+async function doInstall(){
+  if(isStandalone()){ showGuide(L("✓ Програма вже відкрита з ярлика.","✓ The app is already open from the shortcut.")); return; }
+  if(deferredPrompt){
+    deferredPrompt.prompt();
+    try{ const r=await deferredPrompt.userChoice; if(r&&r.outcome==="accepted") toast("Встановлюю ярлик…"); }catch(e){}
+    deferredPrompt=null; return;
+  }
+  if(location.protocol==="file:"||location.protocol==="content:"||!/^https?:$/.test(location.protocol)){
+    showGhPanel(); return;
+  }
+  if(isIOS()){
+    if(LANG==="en"){ showGuide("<b>iPhone / iPad (Safari):</b><ol><li>Tap <b>Share</b> ⬆︎ at the bottom of the screen</li><li>Scroll and choose <b>«Add to Home Screen»</b></li><li>Tap <b>«Add»</b></li></ol>If this isn't open in Safari, open the link in Safari first."); return; }
+    showGuide("<b>iPhone / iPad (Safari):</b><ol><li>Натисни <b>Поділитися</b> ⬆︎ внизу екрана</li><li>Прокрути й вибери <b>«На початковий екран»</b></li><li>Натисни <b>«Додати»</b></li></ol>Якщо відкрито не в Safari — спершу відкрий це посилання в Safari.");
+    return;
+  }
+  if(LANG==="en"){ showGuide("<b>Android (Chrome):</b><ol><li>Tap <b>⋮</b> at the top right</li><li>Choose <b>«Add to Home screen»</b> or <b>«Install app»</b></li><li>Confirm</li></ol>If the item is missing, reload the page and wait a few seconds."); return; }
+  showGuide("<b>Android (Chrome):</b><ol><li>Натисни <b>⋮</b> угорі праворуч</li><li>Вибери <b>«Додати на головний екран»</b> або <b>«Встановити застосунок»</b></li><li>Підтверди</li></ol>Якщо пункту немає — онови сторінку й зачекай кілька секунд.");
+}
+function showInstallScreen(force){
+  $("gh-panel").classList.remove("show");
+  let skip=false; try{ skip=localStorage.getItem(INST_KEY)==="1"; }catch(e){}
+  if(!force&&(isStandalone()||skip)) return;
+  $("inst-guide").classList.remove("show");
+  $("ch-inst-skip").checked=skip;
+  $("install-screen").classList.add("show");
+}
+$("btn-inst-do").onclick=doInstall;
+$("btn-inst-open").onclick=()=>{
+  try{ if($("ch-inst-skip").checked) localStorage.setItem(INST_KEY,"1"); else localStorage.removeItem(INST_KEY); }catch(e){}
+  $("install-screen").classList.remove("show");
+};
+$("btn-install").onclick=()=>showInstallScreen(true);
+showInstallScreen(false);
+/* ================= Публікація на GitHub Pages (одна кнопка) ================= */
+const GH_KEY="shape_wave_gh";
+const SW_SRC=`const CACHE="shape-wave-"+"__VER__";
+self.addEventListener("install",e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(["./","./index.html"])).then(()=>self.skipWaiting()));});
+self.addEventListener("activate",e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==CACHE).map(x=>caches.delete(x)))).then(()=>self.clients.claim()));});
+self.addEventListener("fetch",e=>{const u=new URL(e.request.url);if(e.request.method!=="GET"||u.origin!==self.location.origin)return;
+e.respondWith(fetch(e.request).then(r=>{if(r&&r.ok){const c=r.clone();caches.open(CACHE).then(x=>x.put(e.request,c));}return r;}).catch(()=>caches.match(e.request,{ignoreSearch:true}).then(m=>m||caches.match("./index.html"))));});`;
+if("serviceWorker" in navigator&&location.protocol==="https:"&&/github\.io$/.test(location.hostname)){
+  window.addEventListener("load",()=>{ navigator.serviceWorker.register("sw.js").catch(()=>{}); });
+}
+function ghLoad(){ try{ return JSON.parse(localStorage.getItem(GH_KEY)||"{}")||{}; }catch(e){ return {}; } }
+function ghSave(o){ try{ localStorage.setItem(GH_KEY,JSON.stringify(o)); }catch(e){} }
+function b64utf8(str){ const b=new TextEncoder().encode(str); let s=""; for(let i=0;i<b.length;i+=0x8000) s+=String.fromCharCode.apply(null,b.subarray(i,i+0x8000)); return btoa(s); }
+async function appSource(){
+  if(/^https?:$/.test(location.protocol)){ try{ const r=await fetch(location.href.split("#")[0],{cache:"no-store"}); if(r.ok) return await r.text(); }catch(e){} }
+  return APP_SRC;
+}
+function ghLog(msg,cls){ const d=document.createElement("div"); d.textContent=msg; if(cls) d.className=cls; $("gh-log").appendChild(d); $("gh-log").scrollTop=1e6; }
+async function gh(token,method,path,body){
+  const r=await fetch("https://api.github.com"+path,{method,headers:{"Accept":"application/vnd.github+json","Authorization":"Bearer "+token,"X-GitHub-Api-Version":"2022-11-28",...(body?{"Content-Type":"application/json"}:{})},body:body?JSON.stringify(body):undefined});
+  let j=null; try{ j=await r.json(); }catch(e){}
+  return {status:r.status,ok:r.ok,json:j};
+}
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+async function ghPutFile(token,owner,repo,branch,path,text,msg){
+  const cur=await gh(token,"GET",`/repos/${owner}/${repo}/contents/${path}?ref=${encodeURIComponent(branch)}`);
+  const body={message:msg,content:b64utf8(text),branch};
+  if(cur.ok&&cur.json&&cur.json.sha) body.sha=cur.json.sha;
+  for(let i=0;i<4;i++){
+    const r=await gh(token,"PUT",`/repos/${owner}/${repo}/contents/${path}`,body);
+    if(r.ok) return true;
+    if(r.status===409||r.status===404){ await sleep(1500); continue; }
+    throw new Error((r.json&&r.json.message)||("HTTP "+r.status));
+  }
+  throw new Error("upload "+path);
+}
+let ghBusy=false;
+async function ghPublish(){
+  if(ghBusy) return;
+  const token=$("gh-token").value.trim(), repo=($("gh-repo").value.trim()||"shape-wave").replace(/[^A-Za-z0-9._-]/g,"-");
+  if(!token){ toast(L("Встав токен GitHub","Paste your GitHub token")); $("gh-token").focus(); return; }
+  ghBusy=true; $("btn-gh-go").disabled=true; $("gh-log").innerHTML=""; $("gh-done").style.display="none";
+  try{
+    ghLog(L("Перевіряю токен…","Checking token…"));
+    const me=await gh(token,"GET","/user");
+    if(!me.ok) throw new Error(me.status===401?L("Токен недійсний або прострочений","Token is invalid or expired"):((me.json&&me.json.message)||"HTTP "+me.status));
+    const owner=me.json.login; ghLog("✓ "+owner);
+    let rp=await gh(token,"GET",`/repos/${owner}/${repo}`);
+    if(rp.status===404){
+      ghLog(L("Створюю репозиторій ","Creating repository ")+repo+"…");
+      rp=await gh(token,"POST","/user/repos",{name:repo,description:"Photo → Shape → Wave",auto_init:true,private:false,has_issues:false,has_wiki:false});
+      if(!rp.ok) throw new Error((rp.json&&rp.json.message)||"HTTP "+rp.status);
+      await sleep(2000);
+    } else if(!rp.ok) throw new Error((rp.json&&rp.json.message)||"HTTP "+rp.status);
+    else ghLog(L("Репозиторій уже є — оновлюю","Repository exists — updating"));
+    const branch=(rp.json&&rp.json.default_branch)||"main";
+    ghLog(L("Завантажую програму…","Uploading the app…"));
+    const src=await appSource(), ver=Date.now().toString(36);
+    await ghPutFile(token,owner,repo,branch,"index.html",src,"Update app");
+    await ghPutFile(token,owner,repo,branch,"sw.js",SW_SRC.replace("__VER__",ver),"Update service worker");
+    ghLog("✓ index.html, sw.js");
+    ghLog(L("Вмикаю GitHub Pages…","Enabling GitHub Pages…"));
+    let pg=await gh(token,"GET",`/repos/${owner}/${repo}/pages`);
+    if(pg.status===404){
+      for(let i=0;i<5;i++){
+        pg=await gh(token,"POST",`/repos/${owner}/${repo}/pages`,{source:{branch,path:"/"}});
+        if(pg.ok||pg.status===409) break;
+        await sleep(2000);
+      }
+      if(!(pg.ok||pg.status===409)) throw new Error("Pages: "+((pg.json&&pg.json.message)||"HTTP "+pg.status));
+    }
+    const url=`https://${owner.toLowerCase()}.github.io/${repo}/`;
+    ghLog(L("Чекаю публікації (зазвичай 30–90 с)…","Waiting for publishing (usually 30–90 s)…"));
+    let built=false;
+    for(let i=0;i<60&&!built;i++){
+      await sleep(4000);
+      const b=await gh(token,"GET",`/repos/${owner}/${repo}/pages/builds/latest`);
+      const st=b.ok&&b.json?b.json.status:"";
+      if(st==="built") built=true;
+      else if(st==="errored") throw new Error(L("GitHub не зміг опублікувати сторінку","GitHub failed to publish the page"));
+      else if(i%3===2) ghLog("… "+(st||L("очікування","waiting")));
+    }
+    const store={owner,repo,url}; if($("gh-remember").checked) store.token=token;
+    ghSave(store);
+    ghLog(built?L("✓ Опубліковано!","✓ Published!"):L("Публікація ще триває — посилання запрацює за хвилину-дві","Still publishing — the link will work in a minute or two"),"ok");
+    showGhDone(url);
+  }catch(e){
+    console.warn("gh",e); ghLog("✖ "+(e&&e.message||e),"err");
+  }finally{ ghBusy=false; $("btn-gh-go").disabled=false; }
+}
+function showGhDone(url){
+  $("gh-url").textContent=url; $("gh-url").href=url; $("gh-done").style.display="flex";
+}
+function showGhPanel(){
+  const st=ghLoad();
+  $("inst-guide").classList.remove("show");
+  $("gh-repo").value=st.repo||"shape-wave";
+  if(st.token){ $("gh-token").value=st.token; $("gh-remember").checked=true; }
+  $("gh-log").innerHTML=""; $("gh-done").style.display="none";
+  if(st.url) showGhDone(st.url);
+  $("gh-panel").classList.add("show");
+}
+$("btn-gh-go").onclick=ghPublish;
+$("btn-gh-open").onclick=()=>{ const u=$("gh-url").href; if(u) location.href=u; };
+$("btn-gh-token").onclick=()=>{ window.open("https://github.com/settings/tokens/new?scopes=public_repo&description=Shape%20Wave%20publisher","_blank"); };
+$("gh-remember").onchange=()=>{ if(!$("gh-remember").checked){ const st=ghLoad(); delete st.token; ghSave(st); } };
+
+/* ================= Мова інтерфейсу: UA / EN ================= */
+const LANG_KEY="shape_wave_lang";
+let LANG=(()=>{ try{ const v=localStorage.getItem(LANG_KEY); if(v==="uk"||v==="en") return v; }catch(e){}
+  const n=(navigator.language||"uk").toLowerCase(); return (n.startsWith("uk")||n.startsWith("ru"))?"uk":"en"; })();
+const L=(uk,en)=>LANG==="en"?en:uk;
+const I18N_EXACT={
+"Додай фото фігури":"Add a photo of a shape",
+"Фото / Обличчя / Малювати → фігура → хвиля + звук":"Photo / Face / Draw → shape → wave + sound",
+"Малюй (палець можна відривати) → ▶ Старт":"Draw (you can lift your finger) → ▶ Start",
+"▶ Старт":"▶ Start",
+"Вибрано: 0":"Selected: 0",
+"☑ Усі":"☑ All","☐ Жодного":"☐ None","🗑 Видалити":"🗑 Delete",
+"⏻ Безперервно":"⏻ Continuous",
+"📷 Фото":"📷 Photo","🙂 Обличчя":"🙂 Face","✏️ Малювати":"✏️ Draw","💾 Зберегти":"💾 Save",
+"Ярлик на головний екран":"Home screen shortcut",
+"🌊⬆ Хвиля":"🌊⬆ Wave","🌊⬇ Хвиля":"🌊⬇ Wave","🔊 Звук":"🔊 Sound",
+"Чутл.":"Sens.","Нижче = більше деталей / шуму":"Lower = more detail / noise",
+"немає фігури":"no shape","· база:":"· library:","малювання":"drawing",
+"Назва фігури":"Shape name","🧩 Текстура всередині":"🧩 Inner texture","Деталі":"Detail",
+"очі та рот":"eyes and mouth","🎯 Авто":"🎯 Auto","✏️ Точки":"✏️ Points","Очистити":"Clear",
+"✓ Використати":"✓ Use","Скасувати":"Cancel",
+"Фото → Фігура → Хвиля":"Photo → Shape → Wave",
+"Встанови ярлик на головний екран — програма відкриватиметься одним дотиком, на весь екран і без рядка адреси.":"Add a shortcut to your home screen — the app will open with one tap, full screen, without the address bar.",
+"📲 Встановити на головний екран":"📲 Add to home screen",
+"▶ Відкрити програму":"▶ Open the app","більше не показувати":"don't show again",
+"Немає фігури":"No shape","Порожній екран · малюй":"Empty screen · draw",
+"Демо • Серце":"Demo • Heart",
+"Аналіз зображення…":"Analyzing image…","Аналіз текстури…":"Analyzing texture…","Шукаю обличчя…":"Looking for a face…",
+"Не вдалося виділити текстуру":"Could not extract texture",
+"Не вдалося виділити — торкнись предмета або ✏️ Точки":"Could not select — tap the object or use ✏️ Points",
+"Не вдалося відкрити файл":"Could not open the file","Не вдалося завантажити зображення":"Could not load the image",
+"Не вдалося прочитати файл хвилі":"Could not read the wave file",
+"Немає фігури для збереження":"No shape to save","Немає фігури для хвилі":"No shape for a wave",
+"Нічого не намальовано — повернення на основний екран":"Nothing drawn — back to the main screen",
+"Модель не знайшла обличчя — показано контур за кольором шкіри":"The model found no face — showing a skin-colour contour",
+"Модель недоступна (немає інтернету) — грубий контур за кольором шкіри":"Model unavailable (no internet) — rough skin-colour contour",
+"Обличчя не знайдено — використай ✏️ Точки":"No face found — use ✏️ Points",
+"Помилка імпорту JSON":"JSON import error",
+"Постав мінімум 3 точки по краю предмета":"Place at least 3 points along the object's edge",
+"Потрібен стерео-файл хвилі (L=x, R=y)":"A stereo wave file is needed (L=x, R=y)",
+"Спочатку виділи фігуру":"Select a shape first",
+"Сховище переповнене — фігуру не збережено":"Storage is full — shape not saved",
+"Торкнись малюнків, щоб вибрати їх":"Tap drawings to select them",
+"Тягни точки або додай нові":"Drag points or add new ones",
+"У цьому файлі не знайдено хвилю-фігуру":"No shape wave found in this file",
+"Фігуру застосовано — можна зберегти в базу або відправити хвилею":"Shape applied — save it to the library or send it as a wave",
+"Хвилю передано. У месенджері надсилай як файл/документ — інакше звук перекодується й фігура зламається":"Wave shared. In messengers send it as a file/document — otherwise the audio is re-encoded and the shape breaks",
+"Ярлик додано на головний екран ✓":"Shortcut added to home screen ✓","Встановлюю ярлик…":"Installing shortcut…",
+"Малюнок надто малий":"Drawing is too small","Видалено":"Deleted",
+"✏️ Малюй тут пальцем":"✏️ Draw here with your finger",
+"Палець можна відривати · потім ▶ Старт":"You can lift your finger · then ▶ Start",
+"📷 Фото, 🙂 Обличчя, ✏️ Малювати або 🌊⬇ Хвиля":"📷 Photo, 🙂 Face, ✏️ Draw or 🌊⬇ Wave",
+"Вибрати":"Select",
+"🚀 Опублікувати на GitHub Pages":"🚀 Publish to GitHub Pages",
+"Програма відкрита як файл, а ярлик ставиться тільки з сайту. Я сам створю сайт у твоєму GitHub. Потрібно один раз:":"The app is open as a file, and a shortcut can only be added from a website. It will create the site in your GitHub for you. One-time setup:",
+"1. Мати акаунт GitHub і створити токен (галочка":"1. Have a GitHub account and create a token (the",
+"вже стоїть):":"box is already ticked):",
+"🔑 Створити токен на GitHub":"🔑 Create a token on GitHub",
+"2. Скопіювати токен і вставити сюди:":"2. Copy the token and paste it here:",
+"Назва сайту:":"Site name:",
+"запам'ятати токен на цьому телефоні (для оновлень)":"remember the token on this phone (for updates)",
+"🚀 Завантажити на GitHub":"🚀 Upload to GitHub",
+"Сайт програми:":"App website:",
+"🌐 Відкрити сайт → там 📲 Встановити":"🌐 Open the site → then 📲 Install"
+};
+const I18N_RX=[
+[/^Малюнок (\d{1,2}:\d{2})$/,"Drawing $1"],
+[/^Вибрано: (\d+) з (\d+)$/,"Selected: $1 of $2"],
+[/^Точно всі \((\d+)\)\?$/,"Really all ($1)?"],[/^Точно (\d+)\?$/,"Really $1?"],
+[/^(\d+) штрих\.$/,"$1 strokes"],
+[/^Намальовано штрихів: (\d+) · натисни ▶ Старт$/,"Strokes drawn: $1 · tap ▶ Start"],
+[/^Збережено в базу \((\d+)\)$/,"Saved to library ($1)"],
+[/^Експортовано (\d+) фігур$/,"Exported $1 shapes"],[/^Імпортовано (\d+) фігур$/,"Imported $1 shapes"],
+[/^Видалено всі малюнки \((\d+)\)$/,"Deleted all drawings ($1)"],[/^Видалено: (\d+)$/,"Deleted: $1"],
+[/^Сховище переповнене — видалено найстаріших: (\d+)$/,"Storage full — oldest removed: $1"],
+[/^Текстура: (\d+) ліній$/,"Texture: $1 lines"],
+[/^Обличчя знайдено · (\d+) точок$/,"Face found · $1 points"],
+[/^Фігуру з текстурою застосовано ·\s*(\d+) точок$/,"Shape with texture applied · $1 points"],
+[/^Фігуру з хвилі відновлено й додано в базу \((\d+)% збіг\)$/,"Shape restored from wave and added to library ($1% match)"],
+[/^Малюнок перетворено на хвилю · (\d+) штрих\. · 💾 Зберегти або 🌊⬆ Хвиля$/,"Drawing turned into a wave · $1 strokes · 💾 Save or 🌊⬆ Wave"],
+[/^Файл хвилі збережено: (.+) · у месенджер — лише як файл\/документ$/,"Wave file saved: $1 · send to messengers only as a file/document"],
+[/^Помилка: (.*)$/,"Error: $1"]
+];
+const CYR=/[А-Яа-яЇїІіЄєҐґ]/;
+function trEN(s){
+  const m=s.match(/^(\s*)([\s\S]*?)(\s*)$/), core=m[2];
+  if(!core||!CYR.test(core)) return null;
+  if(I18N_EXACT[core]!=null) return m[1]+I18N_EXACT[core]+m[3];
+  for(const [rx,rep] of I18N_RX){ if(rx.test(core)) return m[1]+core.replace(rx,(...a)=>{ let r=rep; for(let i=1;i<a.length-2;i++) r=r.replace("$"+i,trEN(String(a[i]))?.trim()??a[i]); return r; })+m[3]; }
+  return null;
+}
+const T=s=>{ if(LANG!=="en") return s; const r=trEN(String(s)); return r==null?s:r; };
+const _orig=new WeakMap(), _set=new WeakMap();
+function i18nText(n){
+  if(LANG==="en"){
+    const v=n.nodeValue; if(_set.get(n)===v) return;
+    const r=trEN(v); if(r!=null){ _orig.set(n,v); _set.set(n,r); n.nodeValue=r; }
+  } else if(_orig.has(n)&&_set.get(n)===n.nodeValue){ n.nodeValue=_orig.get(n); _set.delete(n); _orig.delete(n); }
+}
+function i18nAttrs(el){
+  if(el.nodeType!==1) return;
+  if(!el.__i18n) el.__i18n={};
+  ["title","placeholder"].forEach(a=>{
+    if(!el.hasAttribute(a)) return;
+    const v=el.getAttribute(a), st=el.__i18n[a];
+    if(LANG==="en"){ if(st&&st.en===v) return; const r=trEN(v); if(r!=null){ el.__i18n[a]={uk:v,en:r}; el.setAttribute(a,r); } }
+    else if(st&&st.en===v){ el.setAttribute(a,st.uk); delete el.__i18n[a]; }
+  });
+}
+function i18nWalk(root){
+  if(root.nodeType===3){ i18nText(root); return; }
+  if(root.nodeType!==1||root.tagName==="SCRIPT"||root.tagName==="STYLE") return;
+  i18nAttrs(root);
+  const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT|NodeFilter.SHOW_ELEMENT);
+  let n; while((n=w.nextNode())){ if(n.nodeType===3) i18nText(n); else i18nAttrs(n); }
+}
+let i18nBusy=false;
+const i18nObs=new MutationObserver(muts=>{
+  if(i18nBusy) return; i18nBusy=true;
+  try{ muts.forEach(m=>{
+    if(m.type==="characterData") i18nText(m.target);
+    else if(m.type==="attributes") i18nAttrs(m.target);
+    else m.addedNodes.forEach(i18nWalk);
+  }); } finally { i18nBusy=false; }
+});
+i18nObs.observe(document.body,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:["title","placeholder"]});
+function setLang(l){
+  LANG=l==="en"?"en":"uk";
+  try{ localStorage.setItem(LANG_KEY,LANG); }catch(e){}
+  document.documentElement.lang=LANG==="en"?"en":"uk";
+  i18nBusy=true; try{ i18nWalk(document.body); } finally { i18nBusy=false; }
+  document.querySelectorAll(".btn-lang").forEach(b=>b.textContent=LANG==="en"?"🌐 UA":"🌐 EN");
+  try{ setMode(mode); }catch(e){}
+  if($("inst-guide").classList.contains("show")) $("inst-guide").classList.remove("show");
+}
+document.querySelectorAll(".btn-lang").forEach(b=>b.onclick=()=>setLang(LANG==="en"?"uk":"en"));
+setLang(LANG);
+
+setMode("auto");
+resize(); loadDB(); demoShape();
+for(let i=0;i<TRACE_LEN;i++) trace[i]=Math.sin(i/TRACE_LEN*Math.PI*4)*0.4;
+
+let lastT=performance.now(), once=false;
+function frame(now){
+  if(!once){ resize(); once=true; }
+  const dt=Math.max(0,Math.min((now-lastT)/1000,.05)); lastT=now;
+  const t0=t; t=(t+dt*speed*0.25)%1;
+  if(t<t0&&playLeft>0){ playLeft--; if(playLeft<=0){ playLeft=0; applySound(); suspendIfIdle(); } }
+  if(rotateOn) rot+=dt*0.4;
+  let y=0,x=0;
+  try{ const r=drawMain(); if(r&&typeof r==="object"){ x=r.x; y=r.y; } }catch(e){ console.warn(e); }
+  y=Math.max(-1,Math.min(1,isFinite(y)?y:0)); x=Math.max(-1,Math.min(1,isFinite(x)?x:0));
+  pitchHz=setPitch(y,x);
+  trace[traceIdx]=y; traceIdx=(traceIdx+1)%TRACE_LEN;
+  drawWave();
+  $("st-pitch").textContent=Math.round(pitchHz)+" Hz";
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+})();
+</script></body></html>
