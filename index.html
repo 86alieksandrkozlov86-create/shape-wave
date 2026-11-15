@@ -2,7 +2,7 @@
 <html lang="uk"><head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>Фото → Фігура → Хвиля v17</title>
+<title>Фото → Фігура → Хвиля v20</title>
 <link rel="manifest" id="mf-link">
 <meta name="theme-color" content="#060a14">
 <meta name="mobile-web-app-capable" content="yes">
@@ -104,7 +104,7 @@ label.btn{display:inline-block}
 #overlay .row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
 #overlay input[type=text]{background:#122;border:1px solid #456;color:#def;padding:6px 10px;border-radius:8px;font-size:.85rem;width:min(260px,80vw);-webkit-user-select:text;user-select:text}
 #detail-wrap{display:none;align-items:center;gap:5px;font-size:.7rem;color:#bde}
-#toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:rgba(20,60,40,.95);color:#cfe;padding:8px 14px;border-radius:10px;font-size:.75rem;z-index:60;display:none;border:1px solid #5a8;max-width:88vw;text-align:center}
+#toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:rgba(20,60,40,.95);color:#cfe;padding:8px 14px;border-radius:10px;font-size:.75rem;z-index:97;display:none;border:1px solid #5a8;max-width:88vw;text-align:center}
 #toast.show{display:block}
 body.draw-mode #hint{color:#fec}
 body.draw-mode #main-area{cursor:crosshair}
@@ -147,6 +147,43 @@ body.draw-mode #btn-draw-go{display:block}
 #upd-box{display:none;position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:95;width:min(92vw,380px);background:#0e1f3e;border:1px solid #5cf;border-radius:14px;padding:14px;color:#def;font-size:.86rem;line-height:1.45;box-shadow:0 8px 30px rgba(0,0,0,.6),0 0 18px rgba(80,200,255,.25)}
 #upd-box.show{display:block}
 #upd-box .row2{display:flex;gap:8px;justify-content:flex-end;margin-top:10px}
+#music-view{display:none;position:fixed;inset:0;z-index:66;background:#050913;flex-direction:column}
+#music-view.show{display:flex}
+#mu-top{flex:0 0 auto;display:flex;flex-wrap:wrap;gap:5px;align-items:center;justify-content:center;padding:calc(6px + env(safe-area-inset-top)) 6px 6px;background:#0a1225;border-bottom:1px solid rgba(60,120,200,.35)}
+#mu-top .btn{font-size:.76rem;padding:7px 10px}
+#mu-play{min-width:48px;font-size:1rem!important}
+#mu-bpm{width:84px!important}
+#mu-bpm-v{min-width:24px;color:#cde;font-weight:700}
+#mu-pop{display:none;position:absolute;left:6px;right:6px;z-index:5;flex-wrap:wrap;gap:6px;justify-content:center;padding:10px;background:rgba(8,14,30,.97);border:1px solid rgba(100,170,255,.45);border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.6)}
+#mu-pop.show{display:flex}
+#mu-pop .btn{font-size:.8rem;padding:8px 11px}
+#mu-stage{flex:1 1 0;position:relative;min-height:0}
+#mu-canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:crosshair}
+#mu-title{position:absolute;top:5px;right:8px;font-size:.66rem;font-weight:700;color:#9ef;background:rgba(10,18,35,.8);padding:3px 8px;border-radius:6px;pointer-events:none;border:1px solid rgba(100,180,255,.3);max-width:60%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#mu-hint{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:88%;text-align:center;font-size:.8rem;line-height:1.7;color:rgba(170,200,255,.6);pointer-events:none}
+#mu-list{flex:0 0 auto;display:flex;gap:6px;overflow-x:auto;padding:6px 8px calc(6px + env(safe-area-inset-bottom));background:#0a1228;border-top:1px solid rgba(80,140,220,.25);-webkit-overflow-scrolling:touch}
+.mu-item{flex:0 0 auto;width:78px;text-align:center;cursor:pointer;border-radius:8px;padding:3px;border:2px solid transparent;background:rgba(15,30,60,.75);position:relative}
+.mu-item.active{border-color:#5cf;box-shadow:0 0 10px rgba(60,180,255,.4)}
+.mu-item canvas{display:block;width:70px;height:34px;margin:0 auto 2px;border-radius:4px}
+.mu-item .lab{font-size:.5rem;color:#9ab;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mu-item .del{position:absolute;top:-4px;right:-4px;width:18px;height:18px;border-radius:50%;background:#c33;color:#fff;font-size:11px;line-height:18px;text-align:center;border:none;cursor:pointer}
+.mu-new{width:54px;border:1px dashed rgba(120,170,230,.5);color:#9cf;font-size:.62rem;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.mu-new b{font-size:1.1rem}
+.fx-panel{display:none;position:fixed;inset:0;z-index:68;background:rgba(4,8,18,.97);flex-direction:column;align-items:center;gap:8px;padding:calc(10px + env(safe-area-inset-top)) 10px calc(12px + env(safe-area-inset-bottom));overflow-y:auto}
+.fx-panel.show{display:flex}
+.fx-head{width:100%;max-width:560px;display:flex;align-items:center;justify-content:space-between;gap:8px;color:#cfe;font-size:.9rem}
+.fx-head b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fx-row{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;max-width:560px;width:100%}
+.fx-panel textarea{width:100%;max-width:560px;min-height:130px;flex:0 0 auto;background:#0a1428;border:1px solid #2a4a7a;border-radius:10px;color:#def;padding:8px;font:12px/1.45 ui-monospace,Menlo,Consolas,monospace;-webkit-user-select:text;user-select:text;resize:vertical;white-space:pre;overflow:auto}
+.fx-panel canvas{width:100%;max-width:560px;height:min(36vh,280px);flex:0 0 auto;border:1px solid rgba(80,160,255,.35);border-radius:10px;background:#060c1a}
+#fx-err{min-height:1.2em;font-size:.72rem;color:#9e9;max-width:560px;width:100%}
+#fx-info{font-size:.72rem;color:#9cf;text-align:center}
+.fx-help{font-size:.62rem;color:#89a;max-width:560px;line-height:1.55}
+#fx-ex .btn{font-size:.68rem;padding:5px 9px}
+#fx-n{width:min(220px,55vw)!important}
+#btn-draw-fx,#btn-draw-undo{display:none;position:absolute;bottom:calc(18px + env(safe-area-inset-bottom));z-index:5;font-size:.95rem;padding:12px 16px;border-radius:24px;background:rgba(20,40,90,.95);border:2px solid #7cf;color:#dff;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent}
+#btn-draw-fx{left:12px}#btn-draw-undo{right:12px}
+body.draw-mode #btn-draw-fx,body.draw-mode #btn-draw-undo{display:block}
 </style>
 </head>
 <body>
@@ -161,6 +198,8 @@ body.draw-mode #btn-draw-go{display:block}
     <canvas id="main"></canvas>
     <div id="hint">Фото / Обличчя / Малювати → фігура → хвиля + звук</div>
     <button id="btn-draw-go">▶ Старт</button>
+    <button id="btn-draw-fx" title="Додати криву за формулою">ƒ(x)</button>
+    <button id="btn-draw-undo" title="Скасувати останній штрих">↩</button>
   </div>
   <div id="db-wrap">
     <div id="db-bar">
@@ -178,6 +217,8 @@ body.draw-mode #btn-draw-go{display:block}
     <button class="btn accent" id="btn-cam">📸</button>
     <button class="btn" id="btn-perm" title="Дозволи: камера й галерея">🔐</button>
     <button class="btn accent" id="btn-draw">✏️ Малювати</button>
+    <button class="btn accent" id="btn-music">🎼 Музика</button>
+    <button class="btn accent" id="btn-fx" title="Математична формула поточної фігури">📐 Формула</button>
     <button class="btn ok" id="btn-save">💾 Зберегти</button>
     <button class="btn" id="btn-install" title="Ярлик на головний екран">📲</button>
     <button class="btn btn-lang" id="btn-lang">🌐 EN</button>
@@ -219,6 +260,48 @@ body.draw-mode #btn-draw-go{display:block}
     <button class="btn danger" id="btn-cancel">Скасувати</button>
   </div>
 </div>
+<div id="music-view">
+  <div id="mu-top">
+    <button class="btn" id="mu-play">▶</button>
+    <button class="btn" id="mu-stop">⏹</button>
+    <button class="btn" id="mu-inst">🎹 Піаніно</button>
+    <button class="btn" id="mu-scale">🎼 Пентатоніка</button>
+    <div class="slider-wrap"><span>♩</span><input type="range" id="mu-bpm" min="50" max="200" step="2" value="100" title="Темп (ударів за хвилину)"><span id="mu-bpm-v">100</span></div>
+    <button class="btn on" id="mu-loop" title="Повтор по колу">🔁</button>
+    <button class="btn on" id="mu-rev" title="Луна (реверберація)">🌫 Луна</button>
+    <button class="btn" id="mu-undo" title="Скасувати останній штрих">↩</button>
+    <button class="btn danger" id="mu-clear" title="Стерти все">🗑</button>
+    <button class="btn ok" id="mu-save" title="Зберегти мелодію">💾</button>
+    <button class="btn wave" id="mu-wav" title="Записати мелодію у звуковий файл">🎵⬆ WAV</button>
+    <button class="btn danger" id="mu-close" title="Закрити">✖</button>
+  </div>
+  <div id="mu-pop"></div>
+  <div id="mu-stage">
+    <canvas id="mu-canvas"></canvas>
+    <div id="mu-title"></div>
+    <div id="mu-hint">🎼 Малюй музику пальцем<br>← час · ↑ висота ноти<br>лінія — мелодія · крапка — нота · риска ↕ — акорд<br>кілька пальців — кілька голосів · колір — інструмент</div>
+  </div>
+  <div id="mu-list"></div>
+</div>
+<div id="fx-edit" class="fx-panel">
+  <div class="fx-head"><b>ƒ Фігура з формули</b><button class="btn danger" id="fx-e-close">✖</button></div>
+  <div id="fx-ex" class="fx-row"></div>
+  <textarea id="fx-src" spellcheck="false" autocomplete="off" autocapitalize="off"></textarea>
+  <div id="fx-err"></div>
+  <canvas id="fx-prev"></canvas>
+  <div class="fx-row"><button class="btn ok" id="fx-go">✓ Зробити фігурою</button></div>
+  <div class="fx-help"><b>Як писати:</b> x(t) = … і y(t) = … — параметрична крива · r(t) = … — полярна · y = … — графік (змінна x) · межі: t = 0 .. 2pi або x = -5 .. 5 · нова крива — з порожнього рядка · # коментар<br>Дії: + - * / ^ ( ) · множення можна не писати: 2t, 3sin(t), sin 2t · функції: sin cos tan cot asin acos atan sinh cosh tanh exp ln lg sqrt abs sign floor min max pow mod · сталі: pi, e</div>
+</div>
+<div id="fx-an" class="fx-panel">
+  <div class="fx-head"><b id="fx-an-title">📐</b><button class="btn danger" id="fx-an-close">✖</button></div>
+  <canvas id="fx-an-c"></canvas>
+  <div class="fx-row"><button class="btn" id="fx-tab-ex">Точна</button><button class="btn" id="fx-tab-sm">✨</button><button class="btn" id="fx-tab-fr">Ряд Фур'є</button></div>
+  <div class="slider-wrap" id="fx-n-wrap"><span>Гармонік</span><input type="range" id="fx-n" min="1" max="80" step="1" value="10"><b id="fx-n-v">10</b></div>
+  <div id="fx-info"></div>
+  <textarea id="fx-out" readonly="" spellcheck="false"></textarea>
+  <div class="fx-row"><button class="btn" id="fx-copy">📋 Копіювати</button><button class="btn accent" id="fx-edit-btn">✏️ Редагувати</button><button class="btn ok" id="fx-apply">✓ Замінити фігуру</button></div>
+  <div class="fx-help">Сіра лінія — фігура, жовта/зелена — її формула. Більше гармонік — точніше, але довша формула. «✏️ Редагувати» — змінити числа у формулі й побачити нову фігуру.</div>
+</div>
 <div id="toast"></div>
 <div id="upd-box"><div id="upd-text"></div>
   <div class="row2"><button class="btn" id="btn-upd-later">Пізніше</button><button class="btn ok" id="btn-upd-go">🔄 Оновити</button></div>
@@ -238,7 +321,7 @@ body.draw-mode #btn-draw-go{display:block}
 <div id="install-screen">
   <button class="btn btn-lang" style="position:absolute;top:calc(12px + env(safe-area-inset-top));right:14px">🌐 EN</button>
   <img id="inst-icon" alt="">
-  <h1>Фото → Фігура → Хвиля</h1>
+  <h1 id="inst-title">ZenWay</h1>
   <p>Встанови ярлик на головний екран — програма відкриватиметься одним дотиком, на весь екран і без рядка адреси.</p>
   <button class="btn ok big" id="btn-inst-do">📲 Встановити на головний екран</button>
   <div id="inst-guide"></div>
@@ -282,7 +365,8 @@ const APP_SRC=(()=>{ try{
 }catch(e){ return ""; } })();
 /* Адреса сайту програми. Порожньо = файл ще не прив'язаний. Заповнюється автоматично після публікації на GitHub */
 const BOUND_SITE=/*BOUND*/"https://86alieksandrkozlov86-create.github.io/shape-wave/";
-const APP_VER=17;   /* номер версії: якщо файл новіший за сайт — власнику пропонується оновити сайт */
+const APP_VER=20;   /* номер версії: якщо файл новіший за сайт — власнику пропонується оновити сайт */
+try{ document.getElementById("inst-title").textContent="ZenWay (v"+APP_VER+")"; }catch(e){}
 (function(){
 "use strict";
 const F_MIN=100,F_MAX=1200,TRACE_LEN=400,DB_KEY="geo_shapes_db_v1";
@@ -1506,7 +1590,7 @@ function renderDB(){
     item.appendChild(del);
     item.onclick=()=>{
       if(dbSelect){ if(dbSel.has(s.id)) dbSel.delete(s.id); else dbSel.add(s.id); renderDB(); updateSelBar(); return; }
-      current={id:s.id,name:s.name,points:s.points.slice(),color:s.color,thumb:s.thumb,created:s.created};
+      current={id:s.id,name:s.name,points:s.points.slice(),color:s.color,thumb:s.thumb,created:s.created,formula:typeof s.formula==="string"?s.formula:undefined};
       showCurrentInfo(); renderDB(); playShape(1);
     };
     list.appendChild(item);
@@ -1515,19 +1599,19 @@ function renderDB(){
 function saveCurrent(silent){
   if(!current||!current.points||current.points.length<3){ toast("Немає фігури для збереження"); return; }
   const idx=db.findIndex(s=>s.id===current.id);
-  const entry={id:current.id,name:current.name,points:current.points,color:current.color,thumb:current.thumb||null,created:current.created||Date.now()};
+  const entry={id:current.id,name:current.name,points:current.points,color:current.color,thumb:current.thumb||null,created:current.created||Date.now(),formula:current.formula||undefined};
   if(idx>=0) db[idx]=entry; else db.unshift(entry);
   while(db.length>40) db.pop();
   saveDB(); renderDB();
   if(!silent) toast("Збережено в базу ("+db.length+")");
 }
 function exportDB(){
-  const blob=new Blob([JSON.stringify({version:1,shapes:db},null,2)],{type:"application/json"});
+  const blob=new Blob([JSON.stringify({version:1,shapes:db,music:mdb},null,2)],{type:"application/json"});
   const a=document.createElement("a");
   a.href=URL.createObjectURL(blob);
   a.download="geo_shapes_db_"+new Date().toISOString().slice(0,10)+".json";
   a.click(); URL.revokeObjectURL(a.href);
-  toast("Експортовано "+db.length+" фігур");
+  toast("Експортовано "+db.length+" фігур"+(mdb.length?L(" · мелодій: "," · melodies: ")+mdb.length:""));
 }
 function importDB(file){
   const reader=new FileReader();
@@ -1540,7 +1624,13 @@ function importDB(file){
         if(s&&s.points&&s.points.length>=3){ if(!s.id) s.id="imp_"+Date.now()+"_"+n; db.unshift(s); n++; }
       });
       while(db.length>40) db.pop();
-      saveDB(); renderDB(); toast("Імпортовано "+n+" фігур");
+      let nm=0;
+      if(data&&Array.isArray(data.music)){
+        data.music.forEach(c=>{ if(!c||!Array.isArray(c.strokes)) return; const m=muSanitize(c); if(!m.strokes.length) return;
+          if(!m.id) m.id="mi_"+Date.now()+"_"+nm; if(mdb.some(z=>z.id===m.id)) return; mdb.unshift(m); nm++; });
+        while(mdb.length>30) mdb.pop(); if(nm) muSaveDB();
+      }
+      saveDB(); renderDB(); toast(nm?L("Імпортовано фігур: "+n+" · мелодій: "+nm,"Imported shapes: "+n+" · melodies: "+nm):"Імпортовано "+n+" фігур");
     }catch(e){ toast("Помилка імпорту JSON"); }
   };
   reader.readAsText(file);
@@ -1557,7 +1647,7 @@ function downloadFile(file){
 function exportWave(){
   if(!current||!current.points||current.points.length<3){ toast("Немає фігури для хвилі"); return; }
   const hi=current.points.length>450, f0=hi?12:100;
-  const buf=buildWaveBytes(current.points,{app:"photo-shape-wave",v:2,f0,n:Math.round(WAVE_SR/f0),name:(current.name||"").slice(0,60),color:current.color||""},{f0,periods:hi?40:150});
+  const buf=buildWaveBytes(current.points,{app:"photo-shape-wave",v:2,f0,n:Math.round(WAVE_SR/f0),name:(current.name||"").slice(0,60),color:current.color||"",formula:current.formula?current.formula.slice(0,6000):undefined},{f0,periods:hi?40:150});
   const safe=(current.name||"shape").replace(/[^\p{L}\p{N}_-]+/gu,"_").slice(0,40)||"shape";
   const file=new File([buf],"wave_"+safe+".wav",{type:"audio/wav"});
   if(navigator.canShare&&navigator.canShare({files:[file]})){
@@ -1569,6 +1659,8 @@ function exportWave(){
 async function importWave(file){
   try{
     const ab=await file.arrayBuffer();
+    const mus=parseWavChunk(ab,0x674D5553);   /* «gMUS» — у файлі намальована мелодія */
+    if(mus&&mus.kind==="music"&&mus.comp){ openMusic(mus.comp); toast(L("Мелодію відкрито з файлу · ▶ грати · 💾 зберегти","Melody opened from the file · ▶ play · 💾 save"),3500); return; }
     const meta=parseWavMeta(ab)||{};
     let pcm=parsePcmWav(ab);
     if(!pcm){
@@ -1586,7 +1678,7 @@ async function importWave(file){
     const name=(typeof meta.name==="string"&&meta.name.trim())?meta.name.trim().slice(0,60):(file.name.replace(/\.[^.]+$/,"").slice(0,40)||"Хвиля");
     current={
       id:"w_"+Date.now()+"_"+Math.random().toString(36).slice(2,6),
-      name, points:r.points, color:okColor?meta.color:"hsl("+((Math.random()*360)|0)+",80%,65%)", created:Date.now()
+      name, points:r.points, color:okColor?meta.color:"hsl("+((Math.random()*360)|0)+",80%,65%)", created:Date.now(), formula:typeof meta.formula==="string"?meta.formula.slice(0,6000):undefined
     };
     showCurrentInfo(); t=0;
     saveCurrent(true);
@@ -1620,7 +1712,7 @@ function setDrawMode(on){
   document.body.classList.toggle("draw-mode",drawMode);
   const b=$("btn-draw");
   b.classList.toggle("active",drawMode); b.textContent="✏️ Малювати";
-  strokes=[]; curStroke=null; drawing=false;
+  strokes=[]; curStroke=null; drawing=false; fxDrawFrame=null; fxDrawTexts=[]; fxDrawExact=true;
   if(drawMode){
     if(!was) prevCurrent=current;
     if(!was) powerBeforeDraw=powerOn; hardMute(); /* повна тиша під час малювання — без гулу */
@@ -1663,8 +1755,8 @@ function drawAllStrokes(ctx){
   strokes.forEach(st=>{
     if(st.length<2) return;
     ctx.beginPath(); st.forEach((p,i)=>{ if(i===0) ctx.moveTo(p.x,p.y); else ctx.lineTo(p.x,p.y); });
-    ctx.strokeStyle="rgba(255,200,80,0.35)"; ctx.lineWidth=8; ctx.stroke();
-    ctx.strokeStyle="#ffe566"; ctx.lineWidth=3.5; ctx.shadowColor="#fc6"; ctx.shadowBlur=10; ctx.stroke(); ctx.shadowBlur=0;
+    ctx.strokeStyle=st.fx?"rgba(80,220,255,0.3)":"rgba(255,200,80,0.35)"; ctx.lineWidth=8; ctx.stroke();
+    ctx.strokeStyle=st.fx?"#8ff":"#ffe566"; ctx.lineWidth=3.5; ctx.shadowColor=st.fx?"#6ef":"#fc6"; ctx.shadowBlur=10; ctx.stroke(); ctx.shadowBlur=0;
   });
   if(drawing&&curStroke&&curStroke.length){
     const lp=curStroke[curStroke.length-1];
@@ -1690,6 +1782,7 @@ function startDrawn(){
   list.forEach((k,i)=>{ resampleOpen(k,counts[i]).forEach(q=>pts.push({x:+((q.x-mx)*sc).toFixed(3),y:+(-(q.y-my)*sc).toFixed(3)})); });
   const hue=(Math.random()*360)|0;
   current={id:"draw_"+Date.now()+"_"+Math.random().toString(36).slice(2,6),name:"Малюнок "+(d=>String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0"))(new Date()),points:pts,color:"hsl("+hue+",85%,65%)",created:Date.now()};
+  if(fxDrawTexts.length&&fxDrawExact&&list.every(k=>k.fx)) current.formula=fxDrawTexts.join("\n\n");
   setDrawMode(false);
   showCurrentInfo(); t=0;
   playShape(2);
@@ -1763,6 +1856,1179 @@ function drawWave(){
   sctx.strokeStyle="rgba(80,255,240,.95)"; sctx.lineWidth=2; sctx.shadowBlur=4; sctx.stroke();
   sctx.strokeStyle="#fff"; sctx.lineWidth=1; sctx.shadowBlur=0; sctx.stroke();
 }
+
+/* ================= 🎼 Малювання музики =================
+   Полотно = «піано-рол»: ← час (4 такти по 4 долі, по колу) →, ↑ висота (ноти вибраного ладу).
+   Лінія — мелодія (голос іде за пальцем) · крапка — коротка нота · вертикальна риска — акорд (арпеджіо).
+   Кожен штрих має свій інструмент (свій колір). Ударні: низ — бочка, середина — малий, верх — тарілка.
+   Той самий звуковий рушій грає наживо (AudioContext) і записує WAV (OfflineAudioContext). */
+const MU_KEY="shape_wave_music_v1", MU_DRAFT="shape_wave_music_draft", MU_BEATS=16, MU_LOW=48, MU_OCT=3, MU_MAXV=16;
+const MU_INST=[
+  {k:"piano",  ic:"🎹",uk:"Піаніно",  en:"Piano",  hue:205,perc:true, a:.004,d:.55,hold:1.8},
+  {k:"bell",   ic:"🔔",uk:"Дзвіночок",en:"Bell",   hue:50, perc:true, a:.002,d:1.0,hold:2.8},
+  {k:"organ",  ic:"🎛",uk:"Орган",    en:"Organ",  hue:275,perc:false,a:.015,s:1,  r:.08,hold:.3},
+  {k:"pad",    ic:"☁️",uk:"Пед",      en:"Pad",    hue:180,perc:false,a:.28, s:.85,r:.55,hold:.6},
+  {k:"flute",  ic:"🎶",uk:"Флейта",   en:"Flute",  hue:135,perc:false,a:.07, s:.9, r:.12,hold:.35},
+  {k:"strings",ic:"🎻",uk:"Струнні",  en:"Strings",hue:28, perc:false,a:.12, s:.85,r:.28,hold:.45},
+  {k:"bass",   ic:"🎸",uk:"Бас",      en:"Bass",   hue:325,perc:true, a:.006,d:.5, hold:1.4},
+  {k:"meow",   ic:"🐱",uk:"Нявк",     en:"Meow",   hue:300,perc:false,a:.05, s:.8, r:.15,hold:.4},
+  {k:"chirp",  ic:"🐦",uk:"Щебет",    en:"Chirp",  hue:95, perc:true, a:.003,d:.09,hold:.45},
+  {k:"drums",  ic:"🥁",uk:"Ударні",   en:"Drums",  hue:0,  perc:true, drum:true}
+];
+const MU_PARTIALS={ /* [форма, множник частоти, гучність, розстроювання в центах] */
+  piano:[["triangle",1,.55],["sine",2,.25],["sine",3,.12],["sine",4,.06]],
+  bell:[["sine",1,.5],["sine",2.76,.28],["sine",5.4,.16],["sine",8.93,.08]],
+  organ:[["sine",1,.4],["sine",2,.3],["sine",3,.18],["sine",4,.1],["sine",8,.04]],
+  pad:[["sawtooth",1,.3],["sawtooth",1,.3,9],["triangle",.5,.25]],
+  flute:[["sine",1,.62],["triangle",2,.07]],
+  strings:[["sawtooth",1,.3],["sawtooth",1,.3,-7],["sawtooth",2,.06,4]],
+  bass:[["triangle",.5,.7],["square",.5,.12],["sine",1,.15]],
+  meow:[["sawtooth",1,.32],["sawtooth",1.15,.22]],
+  chirp:[["sine",1,.55],["square",2,.06]]
+};
+const MU_SCALES=[
+  {uk:"Пентатоніка",en:"Pentatonic",st:[0,2,4,7,9]},
+  {uk:"Мажор",en:"Major",st:[0,2,4,5,7,9,11]},
+  {uk:"Мінор",en:"Minor",st:[0,2,3,5,7,8,10]},
+  {uk:"Блюз",en:"Blues",st:[0,3,5,6,7,10]},
+  {uk:"Хроматика",en:"Chromatic",st:[0,1,2,3,4,5,6,7,8,9,10,11]},
+  {uk:"Вільно (глісандо)",en:"Free (glide)",st:null}
+];
+const NOTE_N=["C","C♯","D","D♯","E","F","F♯","G","G♯","A","A♯","B"];
+const hzOf=m=>440*Math.pow(2,(m-69)/12);
+const _muRowsCache={};
+function muRows(sc){
+  if(_muRowsCache[sc]) return _muRowsCache[sc];
+  const st=MU_SCALES[sc].st||MU_SCALES[0].st, out=[];
+  for(let m=MU_LOW;m<=MU_LOW+12*MU_OCT;m++) if(st.indexOf((m-MU_LOW)%12)>=0) out.push(m);
+  return (_muRowsCache[sc]=out);
+}
+
+let muOpen=false, muComp=null, muEv={hits:[],pieces:[]}, muInst=0, mdb=[], muDirty=false, muBusy=false;
+let muBus=null, muPlay=false, muStartT=0, muPausePos=0, muSchedUntil=0, muLoop=true, muRaf=0, muPowerBefore=false;
+const muVoices=new Map(), muLive=new Map(); let muFlash=[];
+const muC=$("mu-canvas"), muX=muC.getContext("2d");
+
+/* ---------- сховище ---------- */
+function muNew(){ return {id:null,name:"",bpm:100,scale:0,rev:1,strokes:[]}; }
+function muSanitize(c){
+  c=c||{};
+  return {
+    id:typeof c.id==="string"?c.id.slice(0,60):null, name:typeof c.name==="string"?c.name.slice(0,60):"",
+    created:+c.created||undefined, bpm:Math.max(50,Math.min(200,+c.bpm||100)),
+    scale:Math.max(0,Math.min(MU_SCALES.length-1,c.scale|0)), rev:c.rev===0?0:1,
+    strokes:(Array.isArray(c.strokes)?c.strokes:[]).filter(s=>s&&Array.isArray(s.p)).map(s=>({
+      inst:Math.max(0,Math.min(MU_INST.length-1,s.inst|0)),
+      p:s.p.filter(q=>Array.isArray(q)&&isFinite(q[0])&&isFinite(q[1])).slice(0,3000).map(q=>[Math.max(0,Math.min(1,+q[0])),Math.max(0,Math.min(1,+q[1]))])
+    })).filter(s=>s.p.length).slice(0,400)
+  };
+}
+function muLoadDB(){
+  try{ const r=JSON.parse(localStorage.getItem(MU_KEY)||"[]"); mdb=Array.isArray(r)?r.filter(c=>c&&Array.isArray(c.strokes)).map(muSanitize):[]; }catch(e){ mdb=[]; }
+}
+function muSaveDB(){
+  while(true){
+    try{ localStorage.setItem(MU_KEY,JSON.stringify(mdb)); return true; }
+    catch(e){ if(mdb.length>1){ mdb.pop(); continue; } return false; }
+  }
+}
+function muSaveDraft(){ try{ if(muComp) localStorage.setItem(MU_DRAFT,JSON.stringify(muComp)); }catch(e){} }
+function muLoadDraft(){ try{ const c=JSON.parse(localStorage.getItem(MU_DRAFT)||"null"); if(c&&Array.isArray(c.strokes)) return muSanitize(c); }catch(e){} return muNew(); }
+muLoadDB();
+
+/* ---------- звуковий рушій (працює і наживо, і офлайн) ---------- */
+function muHold(p,t){ if(p.cancelAndHoldAtTime) p.cancelAndHoldAtTime(t); else { p.cancelScheduledValues(t); p.setValueAtTime(p.value,t); } }
+function makeVoice(ctx,dest,ins,t,f){
+  const k=ins.k, g=ctx.createGain(), pk=.26;
+  g.gain.setValueAtTime(0,t); g.connect(dest);
+  let filt=null;
+  if(k==="pad"||k==="strings"||k==="bass"||k==="piano"){
+    filt=ctx.createBiquadFilter(); filt.type="lowpass"; filt.Q.value=.7;
+    filt.frequency.value={pad:1500,strings:2600,bass:900,piano:3800}[k];
+  } else if(k==="meow"){
+    filt=ctx.createBiquadFilter(); filt.type="bandpass"; filt.Q.value=3.5;
+    filt.frequency.setValueAtTime(Math.min(4000,f*2.2+300),t);
+  }
+  if(filt) filt.connect(g);
+  const inN=filt||g;
+  let lfo=null, lfoG=null;
+  if(k==="flute"||k==="strings"||k==="meow"){ /* вібрато, що наростає */
+    lfo=ctx.createOscillator(); lfo.frequency.value=k==="strings"?5.6:5;
+    lfoG=ctx.createGain(); lfoG.gain.setValueAtTime(0,t); lfoG.gain.linearRampToValueAtTime(k==="flute"?9:(k==="strings"?14:22),t+.4);
+    lfo.connect(lfoG); lfo.start(t);
+  }
+  const scoop=k==="meow"?.82:(k==="chirp"?.7:1), scTau=k==="meow"?.06:.015;
+  const oscs=(MU_PARTIALS[k]||[["sine",1,.6]]).map(([ty,mul,gg,det])=>{
+    const o=ctx.createOscillator(), og=ctx.createGain(); o.type=ty;
+    o.frequency.setValueAtTime(f*mul*scoop,t); if(scoop!==1) o.frequency.setTargetAtTime(f*mul,t,scTau);
+    if(det) o.detune.value=det;
+    og.gain.value=gg; o.connect(og); og.connect(inN);
+    if(lfoG) lfoG.connect(o.detune);
+    o.start(t); return {o,mul};
+  });
+  g.gain.linearRampToValueAtTime(pk,t+ins.a);
+  if(ins.perc) g.gain.setTargetAtTime(0,t+ins.a,ins.d); else g.gain.setTargetAtTime(pk*ins.s,t+ins.a,.15);
+  let alive=true;
+  return {
+    idx:-1,
+    setFreq(nf,tt,tau){ if(!alive) return; oscs.forEach(z=>z.o.frequency.setTargetAtTime(nf*z.mul,tt,tau||.015));
+      if(k==="meow"&&filt) filt.frequency.setTargetAtTime(Math.min(4000,nf*2.2+300),tt,.05); },
+    retrig(tt){ if(!alive) return; muHold(g.gain,tt);
+      g.gain.linearRampToValueAtTime(pk*.12,tt+.007); g.gain.linearRampToValueAtTime(pk,tt+.013); g.gain.setTargetAtTime(0,tt+.013,ins.d); },
+    release(tt){ if(!alive) return; alive=false; muHold(g.gain,tt);
+      const rel=ins.perc?.1:ins.r; g.gain.setTargetAtTime(0,tt,rel/3);
+      const st=tt+rel*3+.05;
+      oscs.forEach(z=>{ try{ z.o.stop(st); }catch(e){} }); if(lfo){ try{ lfo.stop(st); }catch(e){} }
+      oscs[0].o.onended=()=>{ try{ g.disconnect(); }catch(e){} };
+    }
+  };
+}
+const _muNoise=new WeakMap();
+function muNoise(ctx){
+  let b=_muNoise.get(ctx);
+  if(!b){ b=ctx.createBuffer(1,ctx.sampleRate,ctx.sampleRate); const d=b.getChannelData(0); for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1; _muNoise.set(ctx,b); }
+  return b;
+}
+function drumHit(ctx,dest,type,t,vel){
+  vel=vel||1;
+  const env=(g,peak,dec)=>{ g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(peak*vel,t+.002); g.gain.exponentialRampToValueAtTime(.0008,t+dec); };
+  if(type===0){ /* бочка */
+    const o=ctx.createOscillator(), g=ctx.createGain(); o.type="sine";
+    o.frequency.setValueAtTime(155,t); o.frequency.exponentialRampToValueAtTime(42,t+.13);
+    env(g,.95,.45); o.connect(g); g.connect(dest); o.start(t); o.stop(t+.5);
+  } else if(type===1){ /* малий барабан */
+    const n=ctx.createBufferSource(), hp=ctx.createBiquadFilter(), g=ctx.createGain();
+    n.buffer=muNoise(ctx); hp.type="highpass"; hp.frequency.value=1200;
+    env(g,.5,.2); n.connect(hp); hp.connect(g); g.connect(dest); n.start(t,Math.random()*.5); n.stop(t+.25);
+    const o=ctx.createOscillator(), og=ctx.createGain(); o.type="triangle";
+    o.frequency.setValueAtTime(230,t); o.frequency.exponentialRampToValueAtTime(140,t+.08);
+    env(og,.35,.12); o.connect(og); og.connect(dest); o.start(t); o.stop(t+.15);
+  } else { /* тарілка */
+    const n=ctx.createBufferSource(), hp=ctx.createBiquadFilter(), g=ctx.createGain();
+    n.buffer=muNoise(ctx); hp.type="highpass"; hp.frequency.value=7000;
+    env(g,.28,.07); n.connect(hp); hp.connect(g); g.connect(dest); n.start(t,Math.random()*.5); n.stop(t+.1);
+  }
+}
+/* шина: вхід → (сухо + луна) → компресор → гучність → вихід */
+function muMakeBus(ctx,dest){
+  const inp=ctx.createGain(), comp=ctx.createDynamicsCompressor(), master=ctx.createGain(), conv=ctx.createConvolver(), wet=ctx.createGain();
+  comp.threshold.value=-14; comp.knee.value=10; comp.ratio.value=4; comp.attack.value=.004; comp.release.value=.2;
+  const sr=ctx.sampleRate, len=Math.floor(sr*2.2), ir=ctx.createBuffer(2,len,sr);
+  for(let c=0;c<2;c++){ const d=ir.getChannelData(c);
+    for(let i=0;i<len;i++){ const tt=i/sr; d[i]=(Math.random()*2-1)*Math.pow(1-i/len,2)*Math.exp(-tt*1.7)*(tt<.012?tt/.012:1); } }
+  conv.buffer=ir; wet.gain.value=muComp&&muComp.rev?.3:0;
+  inp.connect(comp); inp.connect(conv); conv.connect(wet); wet.connect(comp); comp.connect(master); master.connect(dest);
+  master.gain.value=muMasterGain();
+  return {ctx,inp,wet,master};
+}
+function muMasterGain(){ return Math.max(0,Math.min(1.6,volume*4)); }
+function muEnsureBus(){
+  buildAudio();
+  if(!muBus||muBus.ctx!==audioCtx) muBus=muMakeBus(audioCtx,audioCtx.destination);
+  if(audioCtx.state==="suspended") audioCtx.resume();
+  return muBus;
+}
+
+/* ---------- малюнок → музичні події ---------- */
+const MU_W=()=>muC.clientWidth||1, MU_H=()=>muC.clientHeight||1;
+function muNoteAt(y){
+  const sc=MU_SCALES[muComp.scale], u=Math.max(0,Math.min(1,1-y));
+  if(!sc.st) return {m:MU_LOW+u*12*MU_OCT,idx:-1};
+  const rows=muRows(muComp.scale), i=Math.max(0,Math.min(rows.length-1,Math.floor(u*rows.length)));
+  return {m:rows[i],idx:i};
+}
+function drumAt(y){ const u=1-y; return u<1/3?0:(u<2/3?1:2); }
+function muQ(x){ return MU_SCALES[muComp.scale].st?Math.min(1-1e-6,Math.round(x*MU_BEATS*4)/(MU_BEATS*4)):x; }
+function pieceY(pc,x){
+  const xs=pc.xs, ys=pc.ys; let lo=0, hi=xs.length-1;
+  if(x<=xs[0]) return ys[0]; if(x>=xs[hi]) return ys[hi];
+  while(hi-lo>1){ const m=(lo+hi)>>1; if(xs[m]<=x) lo=m; else hi=m; }
+  return ys[lo]+(ys[hi]-ys[lo])*((x-xs[lo])/((xs[hi]-xs[lo])||1));
+}
+function muEvents(){
+  const hits=[], pieces=[], W=MU_W(), H=MU_H();
+  muComp.strokes.forEach((s,si)=>{
+    const ins=MU_INST[s.inst], p=s.p;
+    let mnx=1,mxx=0,mny=1,mxy=0;
+    p.forEach(q=>{ if(q[0]<mnx)mnx=q[0]; if(q[0]>mxx)mxx=q[0]; if(q[1]<mny)mny=q[1]; if(q[1]>mxy)mxy=q[1]; });
+    const wpx=(mxx-mnx)*W, hpx=(mxy-mny)*H;
+    const chord=()=>hits.push({x:muQ((mnx+mxx)/2),inst:s.inst,chord:true,y0:mny,y1:mxy});
+    if(wpx<7&&hpx<7){ hits.push({x:muQ((mnx+mxx)/2),inst:s.inst,y:(mny+mxy)/2}); return; }
+    if(wpx<12&&hpx>=wpx*2){ chord(); return; }
+    /* ділимо штрих на шматки, що йдуть в один бік по часу */
+    const segs=[]; let cur=[p[0].slice()], dir=0;
+    for(let i=1;i<p.length;i++){
+      const last=cur[cur.length-1], dx=p[i][0]-last[0], d=Math.abs(dx)*W<.8?0:Math.sign(dx);
+      if(d===0){ last[1]=p[i][1]; continue; }
+      if(dir===0||d===dir){ dir=d; cur.push(p[i].slice()); }
+      else { segs.push(cur); cur=[last.slice(),p[i].slice()]; dir=d; }
+    }
+    segs.push(cur);
+    let n=0;
+    segs.forEach((sg,j)=>{
+      if(sg.length<2) return;
+      if(sg[0][0]>sg[sg.length-1][0]) sg.reverse();
+      const x0=sg[0][0], x1=sg[sg.length-1][0]; if((x1-x0)*W<4) return;
+      const pc={id:si+"_"+j,inst:s.inst,xs:sg.map(q=>q[0]),ys:sg.map(q=>q[1]),x0,x1};
+      n++;
+      if(ins.drum){ /* ударні по лінії = дріб на шістнадцятих */
+        const G=MU_BEATS*4;
+        for(let k=Math.ceil(x0*G);k<=Math.floor(x1*G);k++) hits.push({x:Math.min(1-1e-6,k/G),inst:s.inst,y:pieceY(pc,k/G),roll:true});
+      } else pieces.push(pc);
+    });
+    if(!n) chord();
+  });
+  return {hits,pieces};
+}
+function muChordNotes(h){
+  const rows=muRows(MU_SCALES[muComp.scale].st?muComp.scale:0), n=rows.length;
+  const i0=Math.max(0,Math.min(n-1,Math.floor((1-h.y1)*n))), i1=Math.max(0,Math.min(n-1,Math.floor((1-h.y0)*n)));
+  let list=rows.slice(i0,i1+1);
+  if(list.length>6){ const out=[]; for(let k=0;k<6;k++) out.push(list[Math.round(k*(list.length-1)/5)]); list=out; }
+  return list;
+}
+function muDoHit(ctx,dest,h,t,flash){
+  const ins=MU_INST[h.inst];
+  if(ins.drum){
+    const types=h.chord?[...new Set([drumAt(h.y1),drumAt((h.y0+h.y1)/2),drumAt(h.y0)])]:[drumAt(h.y)];
+    types.forEach(d=>drumHit(ctx,dest,d,t,h.roll?.8:1));
+  } else {
+    const ms=h.chord?muChordNotes(h):[muNoteAt(h.y).m];
+    ms.forEach((m,k)=>{ const tt=t+k*.028, v=makeVoice(ctx,dest,ins,tt,hzOf(m)); v.release(tt+ins.hold); });
+  }
+  if(flash) muFlash.push({h,t});
+}
+function muRecalc(){
+  if(!muComp) return;
+  muEv=muEvents();
+  if(audioCtx&&muVoices.size){
+    const ids=new Set(muEv.pieces.map(p=>p.id)), now=audioCtx.currentTime;
+    muVoices.forEach((v,id)=>{ if(!ids.has(id)){ v.release(now); muVoices.delete(id); } });
+  }
+}
+function muChanged(){ muDirty=true; muRecalc(); muSaveDraft(); muUpdateUI(); }
+
+/* ---------- відтворення ---------- */
+function muLoopDur(){ return MU_BEATS*60/muComp.bpm; }
+function muPos(){ return (muPlay&&audioCtx)?(audioCtx.currentTime-muStartT)/muLoopDur():muPausePos; }
+function muReleaseAll(){ if(!audioCtx) return; const t=audioCtx.currentTime; muVoices.forEach(v=>v.release(t)); muVoices.clear(); }
+function muStart(){
+  if(!muComp.strokes.length){ toast(L("Спершу намалюй мелодію","Draw a melody first")); return; }
+  muEnsureBus();
+  const now=audioCtx.currentTime+.04; if(muPausePos>=1||muPausePos<0) muPausePos=0;
+  muStartT=now-muPausePos*muLoopDur(); muSchedUntil=now; muPlay=true; muUpdateUI();
+}
+function muPause(){
+  if(!muPlay) return;
+  const p=muPos(); muPausePos=p<0?0:p%1; muPlay=false; muReleaseAll(); muUpdateUI();
+}
+function muStop(){ if(muPlay){ muPlay=false; muReleaseAll(); } muPausePos=0; muUpdateUI(); }
+function muTick(){
+  if(muPlay&&audioCtx&&muBus){
+    const now=audioCtx.currentTime, D=muLoopDur(), pos=(now-muStartT)/D;
+    if(pos>=1&&!muLoop){ muStop(); }
+    else {
+      /* точні удари/ноти плануємо наперед на годиннику звукової карти */
+      const to=now+.12;
+      if(muSchedUntil<to){
+        const from=Math.max(muSchedUntil,muStartT), k0=Math.max(0,Math.floor((from-muStartT)/D)), k1=Math.floor((to-muStartT)/D);
+        for(let k=k0;k<=k1;k++){
+          if(!muLoop&&k>0) break;
+          muEv.hits.forEach(h=>{ const te=muStartT+(k+h.x)*D; if(te>=from&&te<to) muDoHit(audioCtx,muBus.inp,h,Math.max(te,now),true); });
+        }
+        muSchedUntil=to;
+      }
+      /* мелодійні лінії: голос іде за лінією під курсором */
+      const act=new Set();
+      if(pos>=0){
+        const fr=pos%1;
+        muEv.pieces.forEach(pc=>{
+          if(fr<pc.x0||fr>pc.x1) return;
+          const nt=muNoteAt(pieceY(pc,fr)), f=hzOf(nt.m), ins=MU_INST[pc.inst];
+          let v=muVoices.get(pc.id);
+          if(!v){ if(muVoices.size>=MU_MAXV) return; v=makeVoice(audioCtx,muBus.inp,ins,now,f); v.idx=nt.idx; muVoices.set(pc.id,v); }
+          else { v.setFreq(f,now,nt.idx<0?.02:.012); if(nt.idx>=0&&nt.idx!==v.idx){ if(ins.perc) v.retrig(now); v.idx=nt.idx; } }
+          act.add(pc.id);
+        });
+      }
+      muVoices.forEach((v,id)=>{ if(!act.has(id)){ v.release(now); muVoices.delete(id); } });
+    }
+  }
+  try{ muDraw(); }catch(e){ console.warn(e); }
+  if(muOpen) muRaf=requestAnimationFrame(muTick);
+}
+
+/* ---------- полотно ---------- */
+function muResize(){
+  const st=$("mu-stage"), dpr=Math.min(window.devicePixelRatio||1,2), w=Math.max(1,st.clientWidth), h=Math.max(1,st.clientHeight);
+  muC.width=Math.floor(w*dpr); muC.height=Math.floor(h*dpr); muC.style.width=w+"px"; muC.style.height=h+"px";
+  muX.setTransform(dpr,0,0,dpr,0,0);
+  muRecalc();
+}
+function muStrokePath(x,p,W,H,col,glow){
+  if(p.length===1){ x.beginPath(); x.arc(p[0][0]*W,p[0][1]*H,5,0,Math.PI*2); x.fillStyle=col; x.shadowColor=col; x.shadowBlur=glow; x.fill(); x.shadowBlur=0; return; }
+  x.beginPath(); p.forEach((q,i)=>{ const px=q[0]*W, py=q[1]*H; if(i) x.lineTo(px,py); else x.moveTo(px,py); });
+  x.strokeStyle=col; x.lineWidth=3.2; x.shadowColor=col; x.shadowBlur=glow; x.stroke(); x.shadowBlur=0;
+}
+function muDraw(){
+  if(!muComp) return;
+  const W=MU_W(), H=MU_H(), x=muX, sc=MU_SCALES[muComp.scale];
+  x.clearRect(0,0,W,H);
+  x.textAlign="left"; x.textBaseline="middle";
+  if(sc.st){
+    const rows=muRows(muComp.scale), n=rows.length, bh=H/n;
+    rows.forEach((m,i)=>{
+      const y0=H-(i+1)*bh, isC=(m-MU_LOW)%12===0;
+      if(i%2===0){ x.fillStyle="rgba(40,70,130,.10)"; x.fillRect(0,y0,W,bh); }
+      if(isC){ x.fillStyle="rgba(90,150,255,.12)"; x.fillRect(0,y0,W,bh); }
+      if(bh>=10){ x.fillStyle=isC?"rgba(170,210,255,.8)":"rgba(140,170,220,.4)"; x.font=(isC?"bold ":"")+Math.min(11,Math.floor(bh*.7))+"px system-ui"; x.fillText(NOTE_N[m%12]+(Math.floor(m/12)-1),3,y0+bh/2); }
+    });
+  } else {
+    for(let m=MU_LOW;m<=MU_LOW+12*MU_OCT;m++){
+      const r=(m-MU_LOW)%12, isC=r===0; if(!isC&&[2,4,7,9].indexOf(r)<0) continue;
+      const y=H*(1-(m-MU_LOW)/(12*MU_OCT));
+      x.strokeStyle=isC?"rgba(110,170,255,.38)":"rgba(80,120,190,.15)"; x.lineWidth=1; x.beginPath(); x.moveTo(0,y); x.lineTo(W,y); x.stroke();
+      if(isC){ x.fillStyle="rgba(170,210,255,.75)"; x.font="bold 10px system-ui"; x.fillText("C"+(Math.floor(m/12)-1),3,Math.max(8,Math.min(H-8,y-7))); }
+    }
+  }
+  /* долі й такти */
+  for(let b=0;b<=MU_BEATS;b++){
+    const bx=Math.round(b/MU_BEATS*W)+.5, bar=b%4===0;
+    x.strokeStyle=bar?"rgba(120,170,255,.38)":"rgba(80,120,190,.14)"; x.lineWidth=bar?1.5:1;
+    x.beginPath(); x.moveTo(bx,0); x.lineTo(bx,H); x.stroke();
+  }
+  if(MU_INST[muInst].drum){
+    x.setLineDash([5,6]); x.strokeStyle="rgba(255,120,120,.4)"; x.lineWidth=1;
+    [1/3,2/3].forEach(f=>{ x.beginPath(); x.moveTo(0,H*f); x.lineTo(W,H*f); x.stroke(); }); x.setLineDash([]);
+    x.textAlign="right"; x.fillStyle="rgba(255,170,170,.65)"; x.font="bold 11px system-ui";
+    x.fillText("🥁 "+L("тарілка","hi-hat"),W-6,H/6); x.fillText("🥁 "+L("малий","snare"),W-6,H/2); x.fillText("🥁 "+L("бочка","kick"),W-6,H*5/6);
+    x.textAlign="left";
+  }
+  x.lineCap="round"; x.lineJoin="round";
+  muComp.strokes.forEach(s=>{ const ins=MU_INST[s.inst]; if(ins.drum) x.setLineDash([2,6]); muStrokePath(x,s.p,W,H,"hsl("+ins.hue+",90%,62%)",6); x.setLineDash([]); });
+  muLive.forEach(lv=>muStrokePath(x,lv.st.p,W,H,"hsl("+MU_INST[lv.st.inst].hue+",100%,78%)",14));
+  /* курсор часу */
+  const pos=muPos(), fr=pos<0?0:pos%1, px=fr*W;
+  x.beginPath(); x.moveTo(px,0); x.lineTo(px,H);
+  x.strokeStyle=muPlay?"rgba(255,255,255,.85)":"rgba(255,255,255,.3)"; x.lineWidth=2; x.shadowColor="#9ff"; x.shadowBlur=muPlay?12:0; x.stroke(); x.shadowBlur=0;
+  if(muPlay){
+    muEv.pieces.forEach(pc=>{ if(!muVoices.has(pc.id)) return; const yy=pieceY(pc,fr)*H, col="hsl("+MU_INST[pc.inst].hue+",100%,75%)";
+      x.beginPath(); x.arc(px,yy,7,0,Math.PI*2); x.fillStyle="#fff"; x.shadowColor=col; x.shadowBlur=18; x.fill(); x.shadowBlur=0; });
+  }
+  if(audioCtx&&muFlash.length){
+    const now=audioCtx.currentTime;
+    muFlash=muFlash.filter(f=>now<f.t+.4);
+    muFlash.forEach(f=>{ if(now<f.t) return; const a=1-(now-f.t)/.4, h=f.h, yy=(h.chord?(h.y0+h.y1)/2:h.y)*H;
+      x.beginPath(); x.arc(h.x*W,yy,6+(1-a)*16,0,Math.PI*2); x.strokeStyle="hsla("+MU_INST[h.inst].hue+",100%,75%,"+a.toFixed(2)+")"; x.lineWidth=2.5; x.stroke(); });
+  }
+}
+
+/* ---------- малювання пальцями (кілька пальців = кілька голосів) ---------- */
+function muPt(e){
+  const r=muC.getBoundingClientRect();
+  return [+Math.max(0,Math.min(1,(e.clientX-r.left)/Math.max(1,r.width))).toFixed(4),+Math.max(0,Math.min(1,(e.clientY-r.top)/Math.max(1,r.height))).toFixed(4)];
+}
+muC.addEventListener("pointerdown",e=>{
+  if(!muOpen||!muComp) return;
+  e.preventDefault(); try{ muC.setPointerCapture(e.pointerId); }catch(_){}
+  muClosePop(); muEnsureBus();
+  const p=muPt(e), ins=MU_INST[muInst], lv={st:{inst:muInst,p:[p]},v:null,idx:-1,lane:-1}, now=audioCtx.currentTime;
+  if(ins.drum){ lv.lane=drumAt(p[1]); drumHit(audioCtx,muBus.inp,lv.lane,now,1); }
+  else { const nt=muNoteAt(p[1]); lv.v=makeVoice(audioCtx,muBus.inp,ins,now,hzOf(nt.m)); lv.idx=nt.idx; }
+  muLive.set(e.pointerId,lv); $("mu-hint").style.display="none";
+});
+muC.addEventListener("pointermove",e=>{
+  const lv=muLive.get(e.pointerId); if(!lv) return;
+  e.preventDefault();
+  let evs=e.getCoalescedEvents?e.getCoalescedEvents():null; if(!evs||!evs.length) evs=[e];
+  const W=MU_W(), H=MU_H();
+  evs.forEach(ev=>{ const p=muPt(ev), lp=lv.st.p[lv.st.p.length-1]; if(Math.hypot((p[0]-lp[0])*W,(p[1]-lp[1])*H)>=2.5) lv.st.p.push(p); });
+  if(!audioCtx) return;
+  const p=lv.st.p[lv.st.p.length-1], now=audioCtx.currentTime, ins=MU_INST[lv.st.inst];
+  if(ins.drum){ const ln=drumAt(p[1]); if(ln!==lv.lane){ lv.lane=ln; drumHit(audioCtx,muBus.inp,ln,now,.8); } }
+  else if(lv.v){ const nt=muNoteAt(p[1]); lv.v.setFreq(hzOf(nt.m),now,nt.idx<0?.02:.012); if(nt.idx>=0&&nt.idx!==lv.idx){ if(ins.perc) lv.v.retrig(now); lv.idx=nt.idx; } }
+});
+function muUp(e){
+  const lv=muLive.get(e.pointerId); if(!lv) return;
+  muLive.delete(e.pointerId);
+  if(lv.v&&audioCtx) lv.v.release(audioCtx.currentTime);
+  if(muComp.strokes.length>=400){ toast(L("Забагато штрихів (макс. 400)","Too many strokes (max 400)")); return; }
+  muComp.strokes.push(lv.st); muChanged();
+}
+muC.addEventListener("pointerup",muUp);
+muC.addEventListener("pointercancel",muUp);
+
+/* ---------- запис у WAV (з мелодією всередині — файл можна відкрити знову) ---------- */
+async function muRender(loops){
+  const OAC=window.OfflineAudioContext||window.webkitOfflineAudioContext;
+  if(!OAC) throw new Error("OfflineAudioContext");
+  const D=muLoopDur(), sr=44100, ctx=new OAC(2,Math.ceil((loops*D+2.8)*sr),sr), bus=muMakeBus(ctx,ctx.destination), ev=muEv;
+  bus.master.gain.value=.75;
+  for(let k=0;k<loops;k++){
+    const base=k*D+.02;
+    ev.hits.forEach(h=>muDoHit(ctx,bus.inp,h,base+h.x*D,false));
+    ev.pieces.forEach(pc=>{
+      const ins=MU_INST[pc.inst], t0=base+pc.x0*D, t1=base+pc.x1*D;
+      let nt=muNoteAt(pc.ys[0]), idx=nt.idx; const v=makeVoice(ctx,bus.inp,ins,t0,hzOf(nt.m));
+      for(let tt=t0+.01;tt<t1;tt+=.01){
+        const n2=muNoteAt(pieceY(pc,(tt-base)/D));
+        v.setFreq(hzOf(n2.m),tt,n2.idx<0?.02:.012);
+        if(n2.idx>=0&&n2.idx!==idx){ if(ins.perc) v.retrig(tt); idx=n2.idx; }
+      }
+      v.release(t1);
+    });
+  }
+  const r=ctx.startRendering();
+  return (r&&r.then)?await r:await new Promise(res=>{ ctx.oncomplete=e=>res(e.renderedBuffer); });
+}
+function muWavBytes(buf,meta){
+  const n=buf.length, cL=buf.getChannelData(0), cR=buf.numberOfChannels>1?buf.getChannelData(1):cL;
+  let peak=0; for(let i=0;i<n;i++){ const a=Math.abs(cL[i]), b=Math.abs(cR[i]); if(a>peak) peak=a; if(b>peak) peak=b; }
+  const gn=peak>.97?.97/peak:1, mb=new TextEncoder().encode(JSON.stringify(meta)), pad=mb.length&1, dataLen=n*4;
+  const size=12+24+8+mb.length+pad+8+dataLen, ab=new ArrayBuffer(size), dv=new DataView(ab), u8=new Uint8Array(ab);
+  let o=0; const str=s=>{ for(let i=0;i<4;i++) dv.setUint8(o++,s.charCodeAt(i)); };
+  str("RIFF"); dv.setUint32(o,size-8,true); o+=4; str("WAVE");
+  str("fmt "); dv.setUint32(o,16,true); o+=4; dv.setUint16(o,1,true); o+=2; dv.setUint16(o,2,true); o+=2;
+  dv.setUint32(o,buf.sampleRate,true); o+=4; dv.setUint32(o,buf.sampleRate*4,true); o+=4; dv.setUint16(o,4,true); o+=2; dv.setUint16(o,16,true); o+=2;
+  str("gMUS"); dv.setUint32(o,mb.length,true); o+=4; u8.set(mb,o); o+=mb.length+pad;
+  str("data"); dv.setUint32(o,dataLen,true); o+=4;
+  for(let i=0;i<n;i++){
+    dv.setInt16(o,Math.round(Math.max(-1,Math.min(1,cL[i]*gn))*32767),true); o+=2;
+    dv.setInt16(o,Math.round(Math.max(-1,Math.min(1,cR[i]*gn))*32767),true); o+=2;
+  }
+  return ab;
+}
+function parseWavChunk(ab,want){
+  try{
+    const dv=new DataView(ab);
+    if(dv.byteLength<12||dv.getUint32(0)!==0x52494646) return null;
+    let o=12;
+    while(o+8<=dv.byteLength){
+      const id=dv.getUint32(o), len=dv.getUint32(o+4,true);
+      if(id===want) return JSON.parse(new TextDecoder().decode(new Uint8Array(ab,o+8,Math.min(len,dv.byteLength-o-8))));
+      o+=8+len+(len&1);
+    }
+  }catch(e){}
+  return null;
+}
+function muDownload(file){
+  const a=document.createElement("a"); a.href=URL.createObjectURL(file); a.download=file.name;
+  document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },1500);
+  toast(L("Звук збережено: ","Audio saved: ")+file.name,3500);
+}
+async function muExportWav(){
+  if(!muComp.strokes.length){ toast(L("Спершу намалюй мелодію","Draw a melody first")); return; }
+  if(muBusy) return; muBusy=true;
+  toast(L("Записую мелодію у звук…","Rendering the melody to audio…"),8000);
+  try{
+    const buf=await muRender(2);
+    const c=JSON.parse(JSON.stringify(muComp)); delete c.id;
+    const ab=muWavBytes(buf,{app:"photo-shape-wave",kind:"music",v:1,comp:c});
+    const nm=(muComp.name||"melody").replace(/[^\p{L}\p{N}_-]+/gu,"_").slice(0,40)||"melody";
+    const file=new File([ab],"music_"+nm+".wav",{type:"audio/wav"});
+    if(navigator.canShare&&navigator.canShare({files:[file]})){
+      navigator.share({files:[file],title:"🎼 "+(muComp.name||"Melody")})
+        .then(()=>toast(L("Мелодію передано · у месенджері краще як файл — тоді її можна відкрити знову для редагування","Melody shared · send it as a file in messengers so it can be opened again for editing"),4500))
+        .catch(err=>{ if(err&&err.name==="AbortError") return; muDownload(file); });
+    } else muDownload(file);
+  }catch(e){ console.warn(e); toast(L("Не вдалося записати звук","Could not render audio"),3000); }
+  finally{ muBusy=false; }
+}
+
+/* ---------- інтерфейс ---------- */
+let muArm="", muArmT=0;
+function muArmed(key){ if(muArm===key&&Date.now()-muArmT<3500){ muArm=""; return true; } muArm=key; muArmT=Date.now(); return false; }
+function muUpdateUI(){
+  if(!muComp) return;
+  const pb=$("mu-play"); pb.textContent=muPlay?"⏸":"▶"; pb.classList.toggle("on",muPlay);
+  const ins=MU_INST[muInst], ib=$("mu-inst");
+  ib.textContent=ins.ic+" "+L(ins.uk,ins.en); ib.style.borderColor="hsl("+ins.hue+",90%,60%)"; ib.style.color="hsl("+ins.hue+",95%,82%)";
+  const sc=MU_SCALES[muComp.scale]; $("mu-scale").textContent="🎼 "+L(sc.uk,sc.en);
+  $("mu-loop").classList.toggle("on",muLoop); $("mu-rev").classList.toggle("on",!!muComp.rev);
+  $("mu-bpm").value=muComp.bpm; $("mu-bpm-v").textContent=String(muComp.bpm);
+  $("mu-hint").style.display=(muComp.strokes.length||muLive.size)?"none":"block";
+  $("mu-title").textContent=(muComp.name||L("Нова мелодія","New melody"))+(muDirty&&muComp.strokes.length?" •":"")+" · "+muComp.strokes.length;
+}
+function muThumb(c,cv){
+  const x=cv.getContext("2d"), W=cv.width, H=cv.height;
+  x.fillStyle="#081226"; x.fillRect(0,0,W,H); x.lineCap="round"; x.lineJoin="round";
+  (c.strokes||[]).forEach(s=>{ const col="hsl("+(MU_INST[s.inst]||MU_INST[0]).hue+",90%,62%)";
+    if(s.p.length===1){ x.beginPath(); x.arc(s.p[0][0]*W,s.p[0][1]*H,2.5,0,Math.PI*2); x.fillStyle=col; x.fill(); return; }
+    x.beginPath(); s.p.forEach((q,i)=>i?x.lineTo(q[0]*W,q[1]*H):x.moveTo(q[0]*W,q[1]*H)); x.strokeStyle=col; x.lineWidth=2; x.stroke(); });
+}
+function muRenderList(){
+  const box=$("mu-list"); box.innerHTML="";
+  const nw=document.createElement("div"); nw.className="mu-item mu-new";
+  nw.innerHTML="<b>➕</b><span>"+L("Нова","New")+"</span>"; nw.onclick=()=>muLoadComp(null); box.appendChild(nw);
+  mdb.forEach(c=>{
+    const it=document.createElement("div"); it.className="mu-item"+(muComp&&c.id===muComp.id?" active":"");
+    const cv=document.createElement("canvas"); cv.width=140; cv.height=68; muThumb(c,cv); it.appendChild(cv);
+    const lb=document.createElement("div"); lb.className="lab"; lb.textContent=c.name||"♪"; it.appendChild(lb);
+    const del=document.createElement("button"); del.className="del"; del.textContent="×";
+    del.onclick=ev=>{
+      ev.stopPropagation();
+      if(!muArmed("del"+c.id)){ toast(L("Торкнись × ще раз, щоб видалити","Tap × again to delete")); return; }
+      mdb=mdb.filter(z=>z.id!==c.id); muSaveDB();
+      if(muComp&&muComp.id===c.id){ muComp.id=null; muDirty=true; muSaveDraft(); }
+      muRenderList(); muUpdateUI(); toast(L("Видалено","Deleted"));
+    };
+    it.appendChild(del);
+    it.onclick=()=>{ if(muComp&&c.id===muComp.id&&!muDirty) return; muLoadComp(c); };
+    box.appendChild(it);
+  });
+}
+function muLoadComp(c){
+  if(muDirty&&muComp&&muComp.strokes.length&&!muArmed("load"+(c?c.id:"new"))){
+    toast(L("Поточна мелодія не збережена — торкнись ще раз, щоб усе одно відкрити іншу","Current melody isn't saved — tap again to open another anyway"),3500); return;
+  }
+  muStop();
+  muComp=c?muSanitize(JSON.parse(JSON.stringify(c))):muNew();
+  muDirty=false; muRecalc(); muSaveDraft(); muUpdateUI(); muRenderList();
+}
+function muSaveComp(){
+  if(!muComp.strokes.length){ toast(L("Спершу намалюй мелодію","Draw a melody first")); return; }
+  if(!muComp.id) muComp.id="m_"+Date.now()+"_"+Math.random().toString(36).slice(2,6);
+  if(!muComp.name){ const d=new Date(); muComp.name=L("Мелодія ","Melody ")+String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0"); }
+  if(!muComp.created) muComp.created=Date.now();
+  const entry=JSON.parse(JSON.stringify(muComp)), i=mdb.findIndex(z=>z.id===muComp.id);
+  if(i>=0) mdb[i]=entry; else mdb.unshift(entry);
+  while(mdb.length>30) mdb.pop();
+  const ok=muSaveDB();
+  muDirty=!ok; muSaveDraft(); muRenderList(); muUpdateUI();
+  toast(ok?L("Мелодію збережено","Melody saved")+" ("+mdb.length+")":L("Сховище переповнене — не збережено","Storage is full — not saved"),2600);
+}
+function muBuildPop(){
+  const pop=$("mu-pop"); pop.innerHTML="";
+  MU_INST.forEach((ins,i)=>{
+    const b=document.createElement("button"); b.className="btn"+(i===muInst?" active":"");
+    b.textContent=ins.ic+" "+L(ins.uk,ins.en); b.style.borderColor="hsl("+ins.hue+",90%,60%)"; b.style.color="hsl("+ins.hue+",95%,82%)";
+    b.onclick=()=>{
+      muInst=i; muClosePop(); muUpdateUI();
+      const bus=muEnsureBus(), now=audioCtx.currentTime;   /* прослуховування інструмента */
+      if(ins.drum){ drumHit(audioCtx,bus.inp,0,now,1); drumHit(audioCtx,bus.inp,1,now+.22,1); drumHit(audioCtx,bus.inp,2,now+.44,1); }
+      else { const v=makeVoice(audioCtx,bus.inp,ins,now,hzOf(64)); v.release(now+Math.min(.9,ins.hold)); }
+    };
+    pop.appendChild(b);
+  });
+}
+function muClosePop(){ $("mu-pop").classList.remove("show"); }
+function openMusic(comp){
+  if(drawMode) setDrawMode(false);
+  if(dbSelect) setDbSelect(false);
+  if(!muOpen){ muPowerBefore=powerOn; hardMute(); }
+  muOpen=true; $("music-view").classList.add("show");
+  if(comp){ muStop(); muComp=muSanitize(comp); muComp.id=null; muComp.created=undefined; muDirty=true; muSaveDraft(); }
+  else if(!muComp){ muComp=muLoadDraft(); muDirty=!!(muComp.strokes.length&&!(muComp.id&&mdb.some(z=>z.id===muComp.id))); }
+  try{ muEnsureBus(); }catch(e){ console.warn(e); }
+  muResize(); muBuildPop(); muUpdateUI(); muRenderList();
+  cancelAnimationFrame(muRaf); muRaf=requestAnimationFrame(muTick);
+}
+function closeMusic(){
+  muStop();
+  if(audioCtx){ const t=audioCtx.currentTime; muLive.forEach(lv=>{ if(lv.v) lv.v.release(t); }); }
+  muLive.clear(); muClosePop(); muSaveDraft();
+  muOpen=false; $("music-view").classList.remove("show"); cancelAnimationFrame(muRaf);
+  if(muPowerBefore){ muPowerBefore=false; setPower(true); }
+  else if(audioCtx) setTimeout(()=>{ if(!muOpen&&!powerOn&&playLeft<=0&&audioCtx.state==="running") audioCtx.suspend(); },900);
+}
+$("btn-music").onclick=()=>openMusic(null);
+$("mu-close").onclick=closeMusic;
+$("mu-play").onclick=()=>{ if(muPlay) muPause(); else muStart(); };
+$("mu-stop").onclick=muStop;
+$("mu-inst").onclick=()=>{ const pop=$("mu-pop"); if(pop.classList.contains("show")){ muClosePop(); return; } muBuildPop(); pop.style.top=$("mu-top").offsetHeight+"px"; pop.classList.add("show"); };
+$("mu-scale").onclick=()=>{ muComp.scale=(muComp.scale+1)%MU_SCALES.length; muChanged(); };
+$("mu-bpm").oninput=e=>{
+  const pos=muPos(); muComp.bpm=+e.target.value;
+  if(muPlay&&audioCtx) muStartT=audioCtx.currentTime-pos*muLoopDur();
+  $("mu-bpm-v").textContent=String(muComp.bpm); muDirty=true;
+};
+$("mu-bpm").onchange=()=>{ muSaveDraft(); muUpdateUI(); };
+$("mu-loop").onclick=()=>{ muLoop=!muLoop; muUpdateUI(); };
+$("mu-rev").onclick=()=>{ muComp.rev=muComp.rev?0:1; if(muBus&&audioCtx) muBus.wet.gain.setTargetAtTime(muComp.rev?.3:0,audioCtx.currentTime,.05); muChanged(); };
+$("mu-undo").onclick=()=>{ if(!muComp.strokes.length) return; muComp.strokes.pop(); muChanged(); };
+$("mu-clear").onclick=()=>{
+  const b=$("mu-clear"); if(!muComp.strokes.length) return;
+  if(!muArmed("clear")){ b.textContent=L("Точно?","Sure?"); clearTimeout(b._t); b._t=setTimeout(()=>{ b.textContent="🗑"; },3500); return; }
+  clearTimeout(b._t); b.textContent="🗑"; muComp.strokes=[]; muChanged();
+};
+$("mu-save").onclick=muSaveComp;
+$("mu-wav").onclick=muExportWav;
+if(window.ResizeObserver){ try{ new ResizeObserver(()=>{ if(muOpen) muResize(); }).observe($("mu-stage")); }catch(e){} }
+window.addEventListener("resize",()=>{ if(muOpen) muResize(); });
+document.addEventListener("visibilitychange",()=>{
+  if(document.hidden&&muOpen){ muPause(); if(audioCtx){ const t=audioCtx.currentTime; muLive.forEach(lv=>{ if(lv.v) lv.v.release(t); }); } muLive.clear(); muSaveDraft(); }
+});
+
+/* ================= 📐 Формули: формула → фігура і фігура → формула =================
+   Мова формул (без eval — власний розбирач):
+     x(t) = …  y(t) = …        параметрична крива      t = 0 .. 2*pi
+     r(t) = …                  полярна (r від кута t)   t = 0 .. 2*pi
+     y = …                     графік функції           x = -5 .. 5
+   Кілька кривих — одна за одною (порожній рядок або новий x(t)= починає нову).
+   Фігура → формула: ряд Фур'є. Замкнений контур — x(t)=a0+Σ(aₙcos nt+bₙsin nt), t∈[0,2π];
+   окремий штрих — косинус-ряд x(t)=a0+Σ aₙcos(nπt), t∈[0,1]. Результат можна знову вставити як формулу. */
+const FX_FN={sin:Math.sin,cos:Math.cos,tan:Math.tan,tg:Math.tan,cot:x=>1/Math.tan(x),ctg:x=>1/Math.tan(x),sec:x=>1/Math.cos(x),csc:x=>1/Math.sin(x),
+  asin:Math.asin,acos:Math.acos,atan:Math.atan,arcsin:Math.asin,arccos:Math.acos,arctan:Math.atan,arctg:Math.atan,atan2:Math.atan2,
+  sinh:Math.sinh,cosh:Math.cosh,tanh:Math.tanh,exp:Math.exp,ln:Math.log,log:Math.log,lg:Math.log10,sqrt:Math.sqrt,cbrt:Math.cbrt,
+  abs:Math.abs,sign:Math.sign,floor:Math.floor,ceil:Math.ceil,round:Math.round,frac:x=>x-Math.floor(x),min:Math.min,max:Math.max,pow:Math.pow,
+  mod:(a,b)=>((a%b)+b)%b};
+const FX_CONST={pi:Math.PI,e:Math.E,tau:2*Math.PI};
+const FX_NAMES=Object.keys(FX_FN).concat(Object.keys(FX_CONST),["t","x"]).sort((a,b)=>b.length-a.length);
+function fxNorm(s){
+  return String(s).replace(/[−–—]/g,"-").replace(/[×·∙⋅]/g,"*").replace(/÷/g,"/").replace(/π/g,"pi").replace(/[θφ]/g,"t")
+    .replace(/²/g,"^2").replace(/³/g,"^3").replace(/√/g,"sqrt").replace(/\*\*/g,"^").replace(/…/g,"..");
+}
+function fxSplitId(w){ /* «sint» → sin t, «pit» → pi t */
+  if(!w) return [];
+  for(const n of FX_NAMES) if(w.startsWith(n)){ const r=fxSplitId(w.slice(n.length)); if(r) return [n].concat(r); }
+  return null;
+}
+function fxTokens(s){
+  const out=[]; let i=0;
+  while(i<s.length){
+    const c=s[i], rest=s.slice(i);
+    if(/\s/.test(c)){ i++; continue; }
+    const m=/^(\d+\.?\d*|\.\d+)([eE][+-]?\d+)?/.exec(rest);
+    if(m){ out.push({k:"num",n:parseFloat(m[0])}); i+=m[0].length; continue; }
+    const id=/^(atan2|[A-Za-z_]+)/.exec(rest);
+    if(id){
+      const w=id[0].toLowerCase(), parts=(FX_FN[w]||FX_CONST[w]!=null||w==="t"||w==="x")?[w]:fxSplitId(w);
+      if(!parts) throw new Error(L("невідоме ім'я «","unknown name «")+id[0]+"»");
+      parts.forEach(v=>out.push({k:"id",v})); i+=id[0].length; continue;
+    }
+    if("+-*/^(),".indexOf(c)>=0){ out.push({k:"op",v:c}); i++; continue; }
+    throw new Error(L("незрозумілий символ «","unexpected symbol «")+c+"»");
+  }
+  return out;
+}
+function fxCompile(src,vars){
+  const toks=fxTokens(fxNorm(src)); let i=0;
+  if(!toks.length) throw new Error(L("порожній вираз","empty expression"));
+  const peek=()=>toks[i], next=()=>toks[i++];
+  const isOp=(t,v)=>t&&t.k==="op"&&t.v===v;
+  const starts=t=>t&&(t.k==="num"||t.k==="id"||isOp(t,"("));
+  function expect(v){ const t=next(); if(!isOp(t,v)) throw new Error(L("очікувалось «","expected «")+v+"»"); }
+  function expr(){
+    let a=term();
+    while(isOp(peek(),"+")||isOp(peek(),"-")){ const op=next().v, b=term(), A=a; a=op==="+"?(e=>A(e)+b(e)):(e=>A(e)-b(e)); }
+    return a;
+  }
+  function term(){
+    let a=unary();
+    for(;;){
+      const t=peek();
+      if(isOp(t,"*")||isOp(t,"/")){ next(); const b=unary(), A=a; a=t.v==="*"?(e=>A(e)*b(e)):(e=>A(e)/b(e)); }
+      else if(starts(t)){ const b=power(), A=a; a=e=>A(e)*b(e); }   /* 2t, 3sin(t), t(t+1) */
+      else break;
+    }
+    return a;
+  }
+  function unary(){
+    if(isOp(peek(),"-")){ next(); const a=unary(); return e=>-a(e); }
+    if(isOp(peek(),"+")){ next(); return unary(); }
+    return power();
+  }
+  function power(){
+    const b=primary();
+    if(isOp(peek(),"^")){ next(); const ex=unary(); return e=>Math.pow(b(e),ex(e)); }
+    return b;
+  }
+  function primary(){
+    const t=next();
+    if(!t) throw new Error(L("вираз обірвано","expression is incomplete"));
+    if(t.k==="num"){ const v=t.n; return ()=>v; }
+    if(isOp(t,"(")){ const a=expr(); expect(")"); return a; }
+    if(t.k==="id"){
+      if(FX_CONST[t.v]!=null){ const v=FX_CONST[t.v]; return ()=>v; }
+      if(t.v==="t"||t.v==="x"){ if(vars.indexOf(t.v)<0) throw new Error(L("тут змінна — ","the variable here is ")+(vars[0]||"—")+L(", а не "," not ")+t.v); const v=t.v; return e=>e[v]; }
+      const f=FX_FN[t.v];
+      if(isOp(peek(),"(")){
+        next(); const args=[expr()]; while(isOp(peek(),",")){ next(); args.push(expr()); } expect(")");
+        if(args.length===1){ const a=args[0]; return e=>f(a(e)); }
+        return e=>f.apply(null,args.map(a=>a(e)));
+      }
+      /* sin t, sin 2t, cos^2? — без дужок аргумент тягнеться до наступного множення/функції */
+      let a=power();
+      while(starts(peek())&&!(peek().k==="id"&&FX_FN[peek().v])){ const b=power(), A=a; a=e=>A(e)*b(e); }
+      return e=>f(a(e));
+    }
+    throw new Error(L("неочікуване «","unexpected «")+t.v+"»");
+  }
+  const fn=expr();
+  if(i<toks.length) throw new Error(L("зайве «","extra «")+(toks[i].v!=null?toks[i].v:toks[i].n)+"»");
+  return fn;
+}
+function fxRange(s){
+  s=fxNorm(s).replace(/^[\[(]\s*/,"").replace(/\s*[\])]$/,"");
+  let p=s.split(".."); if(p.length!==2) p=s.split(/[,;]/);
+  if(p.length!==2) throw new Error(L("межі пишуться так: 0 .. 2*pi","write limits like: 0 .. 2*pi"));
+  const a=fxCompile(p[0],[])({}), b=fxCompile(p[1],[])({});
+  if(!isFinite(a)||!isFinite(b)||a===b) throw new Error(L("неправильні межі","invalid limits"));
+  return [a,b];
+}
+/* текст → список кривих {kind, fx, fy, fr, range} */
+function fxParse(text){
+  const blocks=[], errs=[]; let cur=null;
+  const done=b=>b&&((b.kind==="param"&&b.x&&b.y)||(b.kind==="polar"&&b.r)||(b.kind==="graph"&&b.y));
+  const close=()=>{ if(cur&&cur.kind) blocks.push(cur); else if(cur&&!cur.kind&&cur.range) {} cur=null; };
+  const want=(kind,key,ln)=>{ if(!cur||cur[key]||(cur.kind&&cur.kind!==kind)){ close(); cur={ln}; } cur.kind=kind; if(!cur.ln) cur.ln=ln; };
+  String(text).split(/\n/).forEach((raw,li)=>{
+    raw.replace(/(#|\/\/).*$/,"").split(";").forEach(part=>{
+      const ln=li+1, line=part.trim();
+      if(!line){ if(done(cur)) close(); return; }
+      try{
+        let m=/^(t|x)\s*(=|∈|:|in\b)\s*(.+)$/i.exec(line);
+        if(m&&(m[1].toLowerCase()==="t"||/\.\.|…/.test(m[3]))){ if(!cur) cur={ln}; cur.range=fxRange(m[3]); cur.rv=m[1].toLowerCase(); return; }
+        m=/^(x|y|r)\s*(\(\s*([a-zθφ])\s*\))?\s*=\s*(.+)$/i.exec(fxNorm(line).replace(/^r\s*\(\s*pi\s*\)/i,"r(t)"));
+        if(!m) throw new Error(L("не схоже на «x(t) = …», «y(t) = …», «r(t) = …», «y = …» або «t = 0 .. 2pi»","doesn't look like «x(t) = …», «y(t) = …», «r(t) = …», «y = …» or «t = 0 .. 2pi»"));
+        const key=m[1].toLowerCase(), arg=(m[3]||"").toLowerCase(), rhs=m[4];
+        if(key==="x"){ want("param","x",ln); cur.x=fxCompile(rhs,["t"]); cur.xs=rhs; }
+        else if(key==="r"){ want("polar","r",ln); cur.r=fxCompile(rhs,["t"]); cur.rs=rhs; }
+        else if(arg==="t"||(!arg&&cur&&cur.kind==="param"&&!cur.y)){ want("param","y",ln); cur.y=fxCompile(rhs,["t"]); cur.ys=rhs; }
+        else { want("graph","y",ln); cur.y=fxCompile(rhs,["x"]); cur.ys=rhs; }
+      }catch(e){ errs.push(L("Рядок ","Line ")+ln+": "+e.message); }
+    });
+  });
+  close();
+  blocks.forEach(b=>{
+    if(b.kind==="param"&&!(b.x&&b.y)) errs.push(L("Рядок ","Line ")+b.ln+": "+L("бракує ","missing ")+(b.x?"y(t)":"x(t)"));
+    if(!b.range) b.range=b.kind==="graph"?[-5,5]:[0,2*Math.PI];
+  });
+  return {blocks:blocks.filter(b=>b.kind!=="param"||(b.x&&b.y)),errs};
+}
+function fxSplitJumps(polys){
+  const st=[]; let mnx=1e18,mxx=-1e18,mny=1e18,mxy=-1e18;
+  polys.forEach(p=>p.forEach((q,i)=>{ if(i) st.push(Math.hypot(q.x-p[i-1].x,q.y-p[i-1].y)); mnx=Math.min(mnx,q.x); mxx=Math.max(mxx,q.x); mny=Math.min(mny,q.y); mxy=Math.max(mxy,q.y); }));
+  if(!st.length) return polys;
+  const med=Float64Array.from(st).sort()[st.length>>1], thr=Math.max(25*med,.12*Math.hypot(mxx-mnx,mxy-mny));
+  const out=[];
+  polys.forEach(p=>{ let cur=[p[0]]; for(let i=1;i<p.length;i++){ if(Math.hypot(p[i].x-p[i-1].x,p[i].y-p[i-1].y)>thr){ if(cur.length>1) out.push(cur); cur=[]; } cur.push(p[i]); } if(cur.length>1) out.push(cur); });
+  return out;
+}
+/* крива → ламані у математичних координатах (y угору) */
+function fxSample(b){
+  const [a0,a1]=b.range, n=Math.max(400,Math.min(6000,Math.round(Math.abs(a1-a0)*120)));
+  let polys=[], cur=[];
+  for(let i=0;i<=n;i++){
+    const t=a0+(a1-a0)*i/n; let x,y;
+    try{
+      if(b.kind==="param"){ x=b.x({t}); y=b.y({t}); }
+      else if(b.kind==="polar"){ const r=b.r({t}); x=r*Math.cos(t); y=r*Math.sin(t); }
+      else { x=t; y=b.y({x:t}); }
+    }catch(e){ x=NaN; }
+    if(!isFinite(x)||!isFinite(y)||Math.abs(x)>1e9||Math.abs(y)>1e9){ if(cur.length>1) polys.push(cur); cur=[]; continue; }
+    cur.push({x,y});
+  }
+  if(cur.length>1) polys.push(cur);
+  if(b.kind==="graph"&&polys.length){ /* асимптоти (tan, 1/x) не роздувають масштаб */
+    const ys=[]; polys.forEach(p=>p.forEach(q=>ys.push(q.y))); ys.sort((u,v)=>u-v);
+    const p5=ys[Math.floor(ys.length*.05)], p95=ys[Math.floor(ys.length*.95)], s=(p95-p5)||1, lo=p5-1.5*s, hi=p95+1.5*s, out=[];
+    polys.forEach(p=>{ let c=[]; p.forEach(q=>{ if(q.y<lo||q.y>hi){ if(c.length>1) out.push(c); c=[]; } else c.push(q); }); if(c.length>1) out.push(c); });
+    polys=out;
+  }
+  return fxSplitJumps(polys);
+}
+function fxBox(polys){
+  let mnx=1e18,mxx=-1e18,mny=1e18,mxy=-1e18;
+  polys.forEach(p=>p.forEach(q=>{ mnx=Math.min(mnx,q.x); mxx=Math.max(mxx,q.x); mny=Math.min(mny,q.y); mxy=Math.max(mxy,q.y); }));
+  return {mnx,mxx,mny,mxy,w:mxx-mnx,h:mxy-mny,cx:(mnx+mxx)/2,cy:(mny+mxy)/2};
+}
+function fxSizeCanvas(c){
+  const dpr=Math.min(window.devicePixelRatio||1,2), w=Math.max(1,c.clientWidth), h=Math.max(1,c.clientHeight);
+  if(c.width!==Math.floor(w*dpr)||c.height!==Math.floor(h*dpr)){ c.width=Math.floor(w*dpr); c.height=Math.floor(h*dpr); }
+  const x=c.getContext("2d"); x.setTransform(dpr,0,0,dpr,0,0); return {x,w,h};
+}
+/* малює набори ламаних [{polys, color, width, alpha}] у спільному масштабі + осі */
+function fxPlot(c,layers,axes){
+  const {x,w,h}=fxSizeCanvas(c); x.clearRect(0,0,w,h);
+  const all=[]; layers.forEach(l=>l.polys.forEach(p=>all.push(p)));
+  if(!all.length) return;
+  const bx=fxBox(all), sc=Math.min((w-24)/(bx.w||1),(h-24)/(bx.h||1)), X=v=>w/2+(v-bx.cx)*sc, Y=v=>h/2-(v-bx.cy)*sc;
+  if(axes){
+    x.strokeStyle="rgba(120,160,220,.28)"; x.lineWidth=1; x.beginPath();
+    if(bx.mny<=0&&bx.mxy>=0){ x.moveTo(0,Y(0)); x.lineTo(w,Y(0)); }
+    if(bx.mnx<=0&&bx.mxx>=0){ x.moveTo(X(0),0); x.lineTo(X(0),h); }
+    x.stroke();
+  }
+  x.lineJoin="round"; x.lineCap="round";
+  layers.forEach(l=>{
+    x.globalAlpha=l.alpha||1; x.strokeStyle=l.color; x.lineWidth=l.width||2; x.shadowColor=l.color; x.shadowBlur=l.glow||0;
+    l.polys.forEach(p=>{ x.beginPath(); p.forEach((q,i)=>i?x.lineTo(X(q.x),Y(q.y)):x.moveTo(X(q.x),Y(q.y))); x.stroke(); });
+  });
+  x.globalAlpha=1; x.shadowBlur=0;
+}
+/* ламані → нова поточна фігура */
+function fxMakeShape(polys,name,formula){
+  polys=polys.filter(p=>p.length>=2); if(!polys.length) return false;
+  const bx=fxBox(polys), span=Math.max(bx.w,bx.h)||1, sc=1.85/span;
+  let route;
+  const p0=polys[0];
+  if(polys.length===1&&Math.hypot(p0[0].x-p0[p0.length-1].x,p0[0].y-p0[p0.length-1].y)<span*.02) route=resampleClosed(p0.slice(0,-1),Math.min(1200,Math.max(240,p0.length)));
+  else route=piecesRoute(polys,TEX_POINTS);
+  const pts=route.map(q=>({x:+((q.x-bx.cx)*sc).toFixed(route.length>1000?3:4),y:+((q.y-bx.cy)*sc).toFixed(route.length>1000?3:4)}));
+  current={id:"fx_"+Date.now()+"_"+Math.random().toString(36).slice(2,6),name:(name||"ƒ").slice(0,60),points:pts,
+    color:"hsl("+((Math.random()*360)|0)+",85%,65%)",created:Date.now(),formula:formula?String(formula).slice(0,6000):undefined};
+  showCurrentInfo(); renderDB(); t=0; playShape(1);
+  return true;
+}
+
+/* ---------- редактор формул ---------- */
+const FX_EXAMPLES=[
+  {uk:"Серце",en:"Heart",s:"x(t) = 16 sin(t)^3\ny(t) = 13cos(t) - 5cos(2t) - 2cos(3t) - cos(4t)"},
+  {uk:"Троянда",en:"Rose",s:"r(t) = cos(4t)"},
+  {uk:"Метелик",en:"Butterfly",s:"r(t) = exp(sin t) - 2cos(4t) + sin((2t - pi)/24)^5\nt = 0 .. 12pi"},
+  {uk:"Ліссажу",en:"Lissajous",s:"x(t) = sin(3t)\ny(t) = sin(2t)"},
+  {uk:"Спіраль",en:"Spiral",s:"r(t) = t\nt = 0 .. 6pi"},
+  {uk:"Астроїда",en:"Astroid",s:"x(t) = cos(t)^3\ny(t) = sin(t)^3"},
+  {uk:"Епіциклоїда",en:"Epicycloid",s:"x(t) = 5cos(t) - cos(5t)\ny(t) = 5sin(t) - sin(5t)"},
+  {uk:"Синусоїда",en:"Sine wave",s:"y = sin(x)\nx = -2pi .. 2pi"},
+  {uk:"Парабола",en:"Parabola",s:"y = x^2\nx = -2 .. 2"},
+  {uk:"Смайлик",en:"Smiley",s:"# коло\nx(t) = cos t\ny(t) = sin t\n\n# очі\nx(t) = -0.35 + 0.1cos t\ny(t) = 0.3 + 0.12sin t\n\nx(t) = 0.35 + 0.1cos t\ny(t) = 0.3 + 0.12sin t\n\n# усмішка\nx(t) = 0.55cos t\ny(t) = 0.55sin t\nt = 1.15pi .. 1.85pi"}
+];
+let fxLast="", fxTimer=0, fxCurves=[], fxDrawFrame=null, fxDrawTexts=[], fxDrawExact=true;
+function fxRun(){
+  const src=$("fx-src").value; let res, polys=[];
+  try{ res=fxParse(src); res.blocks.forEach(b=>fxSample(b).forEach(p=>polys.push(p))); }
+  catch(e){ res={blocks:[],errs:[e.message]}; }
+  fxCurves=polys;
+  const n=res.blocks.length;
+  $("fx-err").textContent=res.errs.length?"⚠ "+res.errs.slice(0,3).join(" · "):(n?"✓ "+L("кривих: ","curves: ")+n:L("Напиши формулу або вибери приклад","Write a formula or pick an example"));
+  $("fx-err").style.color=res.errs.length?"#f99":"#9e9";
+  fxPlot($("fx-prev"),[{polys,color:"#7ff",width:2.2,glow:6}],true);
+  $("fx-go").disabled=!polys.length;
+}
+function fxOpenEditor(text){
+  $("fx-ex").innerHTML="";
+  FX_EXAMPLES.forEach(ex=>{ const b=document.createElement("button"); b.className="btn"; b.textContent=L(ex.uk,ex.en);
+    b.onclick=()=>{ $("fx-src").value=ex.s; fxRun(); }; $("fx-ex").appendChild(b); });
+  if(text!=null) $("fx-src").value=text; else if(!$("fx-src").value.trim()) $("fx-src").value=fxLast||FX_EXAMPLES[0].s;
+  $("fx-go").textContent=drawMode?L("➕ Додати до малюнка","➕ Add to drawing"):L("✓ Зробити фігурою","✓ Make it the shape");
+  $("fx-edit").classList.add("show");
+  requestAnimationFrame(fxRun);
+}
+function fxNameOf(src){
+  const ex=FX_EXAMPLES.find(e=>e.s.trim()===src.trim()); if(ex) return "ƒ "+L(ex.uk,ex.en);
+  const q=/«([^»]{1,40})»/.exec(src); if(q) return q[1].replace(/ ƒ\d+$/,"")+" ƒ";
+  const m=/=\s*(.+)/.exec(src.replace(/(#|\/\/).*$/gm,"")); return "ƒ "+(m?m[1].trim().slice(0,22):"");
+}
+function fxGo(){
+  if(!fxCurves.length) return;
+  const src=$("fx-src").value; fxLast=src;
+  if(drawMode){
+    const W=mainC.clientWidth||300, H=mainC.clientHeight||300;
+    if(!fxDrawFrame){ const bx=fxBox(fxCurves), u=Math.min(W*.8/(bx.w||1),H*.62/(bx.h||1)); fxDrawFrame={u,cx:W/2-u*bx.cx,cy:H/2+u*bx.cy}; }
+    const F=fxDrawFrame;
+    fxCurves.forEach(p=>{
+      const step=Math.max(1,Math.floor(p.length/1500)), st=[];
+      for(let i=0;i<p.length;i+=step) st.push({x:F.cx+F.u*p[i].x,y:F.cy-F.u*p[i].y});
+      if(st.length&&(p.length-1)%step) st.push({x:F.cx+F.u*p[p.length-1].x,y:F.cy-F.u*p[p.length-1].y});
+      if(st.length>=2){ st.fx=true; strokes.push(st); }
+    });
+    fxDrawTexts.push(src);
+    $("fx-edit").classList.remove("show"); updateDrawInfo();
+  } else {
+    $("fx-edit").classList.remove("show");
+    fxMakeShape(fxCurves,fxNameOf(src),src);
+    toast(L("Фігуру створено з формули · 📐 — її формула","Shape created from the formula · 📐 — its formula"),3000);
+  }
+}
+
+/* ---------- фігура → формула (ряд Фур'є) ---------- */
+function fxPiecesOf(points){
+  const n=points.length, jf=jumpFlags(points);
+  if(!jf) return [{pts:points,closed:true}];
+  let f0=0; for(let i=0;i<n;i++) if(jf[i]){ f0=i; break; }
+  const out=[]; let cur=[];
+  for(let k=1;k<=n;k++){ const i=(f0+k)%n; cur.push(points[i]); if(jf[i]){ if(cur.length>=2) out.push({pts:cur,closed:false}); cur=[]; } }
+  if(cur.length>=2) out.push({pts:cur,closed:false});
+  out.forEach(pc=>{ /* штрих, що повертається у свій початок, — замкнений контур (точніший ряд) */
+    const p=pc.pts, bx=fxBox([p]), a=p[0], z=p[p.length-1];
+    if(p.length>8&&Math.hypot(a.x-z.x,a.y-z.y)<=Math.max(bx.w,bx.h)*.03){ pc.closed=true; pc.pts=p.slice(0,-1); }
+  });
+  return out;
+}
+function fxOpenSamples(p,M){ /* рівномірно за довжиною, s = k/(M-1) */
+  const L0=[0]; for(let i=1;i<p.length;i++) L0.push(L0[i-1]+Math.hypot(p[i].x-p[i-1].x,p[i].y-p[i-1].y));
+  const tot=L0[L0.length-1]||1, out=[]; let j=0;
+  for(let k=0;k<M;k++){ const tg=tot*k/(M-1); while(j<L0.length-2&&L0[j+1]<tg) j++;
+    const sg=L0[j+1]-L0[j], u=sg<1e-12?0:Math.min(1,Math.max(0,(tg-L0[j])/sg)); out.push({x:p[j].x+(p[j+1].x-p[j].x)*u,y:p[j].y+(p[j+1].y-p[j].y)*u}); }
+  return out;
+}
+let fxA=null, fxTab="fourier";
+function fxAnalyze(points){
+  let pieces=fxPiecesOf(points), global=false;
+  if(pieces.length>12){ pieces=[{pts:points,closed:true}]; global=true; }
+  const maxN=global?150:80, M=global?1024:512;
+  const res=pieces.map(pc=>{
+    const S=pc.closed?resampleClosed(pc.pts,M):fxOpenSamples(pc.pts,M), m=S.length;
+    const ax=new Float64Array(maxN+1), bx=new Float64Array(maxN+1), ay=new Float64Array(maxN+1), by=new Float64Array(maxN+1);
+    for(let n=0;n<=maxN;n++){
+      let sax=0,sbx=0,say=0,sby=0;
+      for(let j=0;j<m;j++){
+        let c,s,w;
+        if(pc.closed){ const a=2*Math.PI*j/m; c=Math.cos(n*a); s=Math.sin(n*a); w=1/m; }
+        else { const a=Math.PI*j/(m-1); c=Math.cos(n*a); s=0; w=(j===0||j===m-1?.5:1)/(m-1); }
+        sax+=S[j].x*c*w; say+=S[j].y*c*w; sbx+=S[j].x*s*w; sby+=S[j].y*s*w;
+      }
+      const k=n?2:1; ax[n]=sax*k; ay[n]=say*k; bx[n]=sbx*k; by[n]=sby*k;
+    }
+    /* похибка для кожного N — нарощуємо по одній гармоніці */
+    const X=new Float64Array(m).fill(ax[0]), Y=new Float64Array(m).fill(ay[0]), err=new Float64Array(maxN+1);
+    for(let n=1;n<=maxN;n++){
+      let e=0;
+      for(let j=0;j<m;j++){
+        const a=pc.closed?2*Math.PI*j/m:Math.PI*j/(m-1), c=Math.cos(n*a), s=pc.closed?Math.sin(n*a):0;
+        X[j]+=ax[n]*c+bx[n]*s; Y[j]+=ay[n]*c+by[n]*s;
+        const dx=X[j]-S[j].x, dy=Y[j]-S[j].y; e+=dx*dx+dy*dy;
+      }
+      err[n]=e/m;
+    }
+    return {closed:pc.closed,S,ax,bx,ay,by,err,m};
+  });
+  const pb=fxBox([points]), span=Math.max(pb.w,pb.h)||1;
+  const errAt=N=>{ let e=0,c=0; res.forEach(r=>{ e+=r.err[N]*r.m; c+=r.m; }); return Math.sqrt(e/c)/span*100; };
+  let best=maxN; for(let N=2;N<=maxN;N++) if(errAt(N)<.7){ best=N; break; }
+  let simple=null; if(!global){ try{ simple=fxRecognize(pieces); }catch(e){ console.warn(e); } }
+  return {res,global,maxN,errAt,N:best,orig:pieces.map(p=>p.pts),simple};
+}
+/* ---------- розпізнавання простих фігур: пряма, парабола, коло (дуга), еліпс ---------- */
+function fxSolve(A,b){ /* метод Гаусса з вибором головного елемента */
+  const n=b.length, M=A.map((r,i)=>r.concat([b[i]]));
+  for(let c=0;c<n;c++){
+    let p=c; for(let r=c+1;r<n;r++) if(Math.abs(M[r][c])>Math.abs(M[p][c])) p=r;
+    if(Math.abs(M[p][c])<1e-12) return null;
+    [M[c],M[p]]=[M[p],M[c]];
+    for(let r=0;r<n;r++){ if(r===c) continue; const f=M[r][c]/M[c][c]; for(let k=c;k<=n;k++) M[r][k]-=f*M[c][k]; }
+  }
+  return M.map((r,i)=>r[n]/r[i]);
+}
+function fxLS(rows,rhs){ /* найменші квадрати: (AᵀA)x = Aᵀb */
+  const n=rows[0].length, A=[...Array(n)].map(()=>new Array(n).fill(0)), b=new Array(n).fill(0);
+  rows.forEach((r,j)=>{ for(let i=0;i<n;i++){ b[i]+=r[i]*rhs[j]; for(let k=0;k<n;k++) A[i][k]+=r[i]*r[k]; } });
+  return fxSolve(A,b);
+}
+function fxPrettyNum(v){ const s=fxNum(v); return s.startsWith("-")?"− "+s.slice(1):s; }
+function fxPoly(cs,v){ /* [a,b,c] → «a*v^2 + b*v + c» (для розбирача) */
+  const terms=[]; const deg=cs.length-1;
+  cs.forEach((c,i)=>{ const p=deg-i, r=Math.round(c*1000)/1000; if(Math.abs(r)<.0005) return;
+    const ab=fxNum(Math.abs(r)), body=p===0?ab:((ab==="1"?"":ab+"*")+v+(p>1?"^"+p:"")); terms.push([r<0?"-":"+",body]); });
+  if(!terms.length) return "0";
+  return terms.map((q,i)=>i?" "+q[0]+" "+q[1]:(q[0]==="-"?"-":"")+q[1]).join("");
+}
+const fxPretty=s=>s.replace(/\*([xy])\^2/g,"$1²").replace(/\*([xyt])\b/g,"$1").replace(/\^2/g,"²").replace(/\*/g,"·").replace(/ - /g," − ").replace(/^-/,"−");
+function fxFitPiece(P,closed,span){
+  const n=P.length; if(n<5) return null;
+  let mx=0,my=0; P.forEach(q=>{ mx+=q.x; my+=q.y; }); mx/=n; my/=n;
+  let sxx=0,syy=0,sxy=0; P.forEach(q=>{ const dx=q.x-mx, dy=q.y-my; sxx+=dx*dx; syy+=dy*dy; sxy+=dx*dy; });
+  const bx=fxBox([P]), ps=Math.max(bx.w,bx.h)||1, cands=[];
+  const pct=e=>e/ps*100, rng=(a,b,k,f)=>{ const o=[]; for(let i=0;i<=k;i++) o.push(f(a+(b-a)*i/k)); return o; };
+  const rms=a=>Math.sqrt(a.reduce((s,v)=>s+v*v,0)/a.length);
+  if(!closed){
+    /* пряма */
+    const ang=.5*Math.atan2(2*sxy,sxx-syy), ux=Math.cos(ang), uy=Math.sin(ang);
+    const e=rms(P.map(q=>-(q.x-mx)*uy+(q.y-my)*ux));
+    let text,poly,cls;
+    if(Math.abs(ux)>.25){
+      const k=uy/ux, c=my-k*mx; text="y = "+fxPoly([k,c],"x")+"\nx = "+fxNum(bx.mnx)+" .. "+fxNum(bx.mxx);
+      cls="y = "+fxPretty(fxPoly([k,c],"x")); poly=rng(bx.mnx,bx.mxx,40,x=>({x,y:k*x+c}));
+    } else {
+      const k=ux/uy, c=mx-k*my; text="x(t) = "+fxPoly([k,c],"t")+"\ny(t) = t\nt = "+fxNum(bx.mny)+" .. "+fxNum(bx.mxy);
+      cls="x = "+fxPretty(fxPoly([k,c],"y")); poly=rng(bx.mny,bx.mxy,40,y=>({x:k*y+c,y}));
+    }
+    cands.push({kind:"line",err:pct(e),poly,text,cls});
+    /* парабола: y = ax²+bx+c або x = ay²+by+c */
+    [false,true].forEach(sw=>{
+      const U=P.map(q=>sw?q.y:q.x), V=P.map(q=>sw?q.x:q.y);
+      const s=fxLS(U.map(u=>[u*u,u,1]),V); if(!s||Math.abs(s[0])<1e-6) return;
+      const [a,b,c]=s, er=rms(U.map((u,i)=>(V[i]-(a*u*u+b*u+c))/Math.sqrt(1+Math.pow(2*a*u+b,2))));
+      const u0=Math.min(...U), u1=Math.max(...U), vu=-b/(2*a), vv=c-b*b/(4*a);
+      const poly=rng(u0,u1,160,u=>sw?{x:a*u*u+b*u+c,y:u}:{x:u,y:a*u*u+b*u+c});
+      const text=sw?"x(t) = "+fxPoly([a,b,c],"t")+"\ny(t) = t\nt = "+fxNum(u0)+" .. "+fxNum(u1):"y = "+fxPoly([a,b,c],"x")+"\nx = "+fxNum(u0)+" .. "+fxNum(u1);
+      const cls=(sw?"x = "+fxPretty(fxPoly([a,b,c],"y")):"y = "+fxPretty(fxPoly([a,b,c],"x")))+L(", вершина (",", vertex (")+(sw?fxNum(vv)+"; "+fxNum(vu):fxNum(vu)+"; "+fxNum(vv))+")";
+      cands.push({kind:"parabola",err:pct(er),poly,text,cls});
+    });
+  }
+  /* коло або дуга */
+  const cs=fxLS(P.map(q=>[q.x,q.y,1]),P.map(q=>-(q.x*q.x+q.y*q.y)));
+  if(cs){
+    const h=-cs[0]/2, k=-cs[1]/2, r2=h*h+k*k-cs[2];
+    if(r2>0&&Math.sqrt(r2)<ps*4){
+      const r=Math.sqrt(r2), e=rms(P.map(q=>Math.hypot(q.x-h,q.y-k)-r));
+      let a0=0,a1=2*Math.PI, arc=false;
+      if(!closed){
+        let prev=Math.atan2(P[0].y-k,P[0].x-h); a0=prev; let acc=prev;
+        for(let i=1;i<n;i++){ const a=Math.atan2(P[i].y-k,P[i].x-h); let d=a-prev; while(d>Math.PI) d-=2*Math.PI; while(d<-Math.PI) d+=2*Math.PI; acc+=d; prev=a; }
+        a1=acc; arc=Math.abs(a1-a0)<2*Math.PI*.97;
+        if(!arc){ a1=a0+2*Math.PI*Math.sign(a1-a0||1); }
+      }
+      const H=fxNum(h), K=fxNum(k), R=fxNum(r), poly=rng(a0,a1,240,t=>({x:h+r*Math.cos(t),y:k+r*Math.sin(t)}));
+      const text="x(t) = "+(H==="0"?"":H+" + ")+R+"*cos(t)\ny(t) = "+(K==="0"?"":K+" + ")+R+"*sin(t)"+(arc||!closed?"\nt = "+fxNum(a0)+" .. "+fxNum(a1):"");
+      const sx=h>=0?" − "+fxNum(h):" + "+fxNum(-h), sy=k>=0?" − "+fxNum(k):" + "+fxNum(-k);
+      const cls=(H==="0"?"x²":"(x"+sx+")²")+" + "+(K==="0"?"y²":"(y"+sy+")²")+" = "+fxNum(r)+"²"+L(", центр (",", centre (")+H+"; "+K+L("), радіус ","), radius ")+R+(arc?L(", дуга ",", arc ")+Math.round(Math.abs(a1-a0)*180/Math.PI)+"°":"");
+      cands.push({kind:arc?"arc":"circle",err:pct(e),poly,text,cls});
+    }
+  }
+  /* еліпс (з нахилом) — лише для замкнених */
+  if(closed){
+    const phi=.5*Math.atan2(2*sxy,sxx-syy), c=Math.cos(phi), s=Math.sin(phi);
+    const UW=P.map(q=>({u:(q.x-mx)*c+(q.y-my)*s,w:-(q.x-mx)*s+(q.y-my)*c}));
+    const sol=fxLS(UW.map(p=>[p.u*p.u,p.w*p.w,p.u,p.w]),UW.map(()=>1));
+    if(sol&&sol[0]>0&&sol[1]>0){
+      const [A,C,D,E]=sol, hu=-D/(2*A), kw=-E/(2*C), G=1+D*D/(4*A)+E*E/(4*C);
+      if(G>0){
+        let a=Math.sqrt(G/A), b=Math.sqrt(G/C), f=phi;
+        const h=mx+hu*c-kw*s, k=my+hu*s+kw*c;
+        const e=rms(UW.map(p=>(Math.sqrt(Math.pow((p.u-hu)/a,2)+Math.pow((p.w-kw)/b,2))-1)*Math.sqrt(a*b)));
+        if(b>a){ [a,b]=[b,a]; f+=Math.PI/2; }
+        while(f>Math.PI/2) f-=Math.PI; while(f<=-Math.PI/2) f+=Math.PI;
+        let deg=Math.round(f*180/Math.PI); if(Math.abs(deg)<=2) deg=0;
+        const vert=Math.abs(deg)>=88; if(vert) deg=90;
+        const cf=Math.cos(f), sf=Math.sin(f), H=fxNum(h), K=fxNum(k);
+        const ax=vert?b:a, ay=vert?a:b;   /* півосі вздовж x і y для неповернутого еліпса */
+        const sxx=h>=0?" − "+fxNum(h):" + "+fxNum(-h), syy=k>=0?" − "+fxNum(k):" + "+fxNum(-k);
+        const poly=rng(0,2*Math.PI,300,t=>({x:h+a*Math.cos(t)*cf-b*Math.sin(t)*sf,y:k+a*Math.cos(t)*sf+b*Math.sin(t)*cf}));
+        const aligned=deg===0||vert;
+        const text=aligned
+          ?"x(t) = "+(H==="0"?"":H+" + ")+fxNum(ax)+"*cos(t)\ny(t) = "+(K==="0"?"":K+" + ")+fxNum(ay)+"*sin(t)"
+          :("x(t) = "+(H==="0"?"":H+" + ")+fxNum(a*cf)+"*cos(t) - "+fxNum(b*sf)+"*sin(t)\ny(t) = "+(K==="0"?"":K+" + ")+fxNum(a*sf)+"*cos(t) + "+fxNum(b*cf)+"*sin(t)").replace(/= \+ /g,"= ");
+        const cls=(aligned?(H==="0"?"x²":"(x"+sxx+")²")+"/"+fxNum(ax)+"² + "+(K==="0"?"y²":"(y"+syy+")²")+"/"+fxNum(ay)+"² = 1, ":"")+L("центр (","centre (")+H+"; "+K+L("), півосі ","), semi-axes ")+fxNum(a)+L(" і "," and ")+fxNum(b)+(aligned?"":L(", нахил ",", tilt ")+deg+"°");
+        cands.push({kind:"ellipse",err:pct(e),poly,text:text.replace(/\+ -/g,"- ").replace(/- -/g,"+ "),cls:cls.replace(/− -/g,"+ ")});
+      }
+    }
+  }
+  if(!cands.length) return null;
+  const best=Math.min(...cands.map(q=>q.err));
+  if(best>2.5) return null;
+  const order=["line","circle","arc","parabola","ellipse"];
+  cands.sort((p,q)=>order.indexOf(p.kind)-order.indexOf(q.kind));
+  return cands.find(q=>q.err<=Math.max(best*1.35,best+.3));
+}
+const FX_KIND={line:["Пряма","Line"],parabola:["Парабола","Parabola"],circle:["Коло","Circle"],arc:["Дуга кола","Circular arc"],ellipse:["Еліпс","Ellipse"]};
+function fxRecognize(pieces){
+  const out=[];
+  for(const pc of pieces){ const f=fxFitPiece(pc.closed?pc.pts:pc.pts,pc.closed); if(!f) return null; out.push(f); }
+  return out;
+}
+function fxSimpleText(){
+  const S=fxA.simple, nm=(current&&current.name)||"", lines=[];
+  lines.push("# "+L("Фігура «","Shape «")+nm+L("» — розпізнано: ","» — recognised: ")+S.map(f=>L(...FX_KIND[f.kind]).toLowerCase()).join(", "));
+  S.forEach((f,i)=>{
+    lines.push("");
+    lines.push("# "+(S.length>1?(i+1)+". ":"")+L(...FX_KIND[f.kind])+": "+f.cls);
+    lines.push(f.text);
+  });
+  return lines.join("\n");
+}
+
+function fxNum(v){ let s=(Math.round(v*1000)/1000).toFixed(3).replace(/\.?0+$/,""); return s==="-0"?"0":s; }
+function fxSeries(a,b,N,closed){
+  const terms=[];
+  const add=(coef,fn)=>{ const r=Math.round(coef*1000)/1000; if(Math.abs(r)<.0005) return;
+    const ab=Math.abs(r), c=fn?((ab===1?"":fxNum(ab)+"*")+fn):fxNum(ab); terms.push([r<0?"-":"+",c]); };
+  add(a[0],null);
+  for(let n=1;n<=N;n++){
+    const arg=closed?(n===1?"t":n+"*t"):(n===1?"pi*t":n+"*pi*t");
+    add(a[n],"cos("+arg+")"); if(closed) add(b[n],"sin("+arg+")");
+  }
+  if(!terms.length) return "0";
+  return terms.map((q,i)=>i?" "+q[0]+" "+q[1]:(q[0]==="-"?"-":"")+q[1]).join("");
+}
+function fxApproxPolys(N){
+  return fxA.res.map(r=>{
+    const K=r.closed?480:320, out=[];
+    for(let k=0;k<=K;k++){
+      const a=r.closed?2*Math.PI*k/K:Math.PI*k/K; let x=r.ax[0], y=r.ay[0];
+      for(let n=1;n<=N;n++){ const c=Math.cos(n*a), s=r.closed?Math.sin(n*a):0; x+=r.ax[n]*c+r.bx[n]*s; y+=r.ay[n]*c+r.by[n]*s; }
+      out.push({x,y});
+    }
+    return out;
+  });
+}
+function fxFourierText(N){
+  const nm=(current&&current.name)||"", e=fxA.errAt(N), R=fxA.res, lines=[];
+  lines.push("# "+L("Фігура «","Shape «")+nm+L("» — ряд Фур'є, гармонік: ","» — Fourier series, harmonics: ")+N+L(", похибка ",", error ")+e.toFixed(2)+"%");
+  if(fxA.global) lines.push("# "+L("багато окремих ліній — одна загальна формула для всього маршруту","many separate lines — one formula for the whole route"));
+  R.forEach((r,i)=>{
+    if(R.length>1) lines.push("","# "+L("Штрих ","Stroke ")+(i+1)+L(" з "," of ")+R.length);
+    lines.push("x(t) = "+fxSeries(r.ax,r.bx,N,r.closed));
+    lines.push("y(t) = "+fxSeries(r.ay,r.by,N,r.closed));
+    lines.push(r.closed?"t = 0 .. 2*pi":"t = 0 .. 1");
+  });
+  return lines.join("\n");
+}
+function fxShowAn(){
+  if(!fxA) return;
+  if(fxTab==="exact"&&!(current&&current.formula)) fxTab="fourier";
+  if(fxTab==="simple"&&!fxA.simple) fxTab="fourier";
+  const mode=fxTab;
+  $("fx-tab-ex").style.display=current&&current.formula?"inline-block":"none";
+  $("fx-tab-sm").style.display=fxA.simple?"inline-block":"none";
+  if(fxA.simple){ const k=[...new Set(fxA.simple.map(f=>f.kind))]; $("fx-tab-sm").textContent="✨ "+(k.length===1&&fxA.simple.length===1?L(...FX_KIND[k[0]]):L("Прості фігури","Simple shapes")); }
+  $("fx-tab-ex").classList.toggle("active",mode==="exact"); $("fx-tab-sm").classList.toggle("active",mode==="simple"); $("fx-tab-fr").classList.toggle("active",mode==="fourier");
+  $("fx-n-wrap").style.display=mode==="fourier"?"flex":"none";
+  $("fx-apply").style.display=mode==="exact"?"none":"inline-block";
+  const N=+$("fx-n").value; $("fx-n-v").textContent=String(N);
+  const jf=getJF(current), orig=[]; let cur=[];
+  current.points.forEach((q,i)=>{ cur.push(q); if(jf&&jf[i]){ orig.push(cur); cur=[]; } }); if(cur.length) { if(!jf) cur.push(current.points[0]); orig.push(cur); }
+  const grey={polys:orig,color:"rgba(150,170,200,.9)",width:4,alpha:.35};
+  if(mode==="exact"){
+    $("fx-out").value=current.formula;
+    $("fx-info").textContent=L("Фігура задана цією формулою","This shape was defined by this formula");
+    fxPlot($("fx-an-c"),[{polys:orig,color:current.color||"#8cf",width:2.2,glow:6}],true);
+  } else if(mode==="simple"){
+    const S=fxA.simple, e=Math.max(...S.map(f=>f.err));
+    $("fx-out").value=fxSimpleText();
+    $("fx-info").textContent=S.map(f=>L(...FX_KIND[f.kind])).join(", ")+" · "+L("збіг ","match ")+Math.max(0,100-e).toFixed(1)+"%";
+    fxPlot($("fx-an-c"),[grey,{polys:S.map(f=>f.poly),color:"#7fffb0",width:1.8,glow:6}],true);
+  } else {
+    $("fx-out").value=fxFourierText(N);
+    const e=fxA.errAt(N);
+    $("fx-info").textContent=L("Похибка: ","Error: ")+e.toFixed(2)+"% · "+(fxA.res.length>1?L("штрихів: ","strokes: ")+fxA.res.length:(fxA.res[0].closed?L("замкнений контур","closed contour"):L("відкритий штрих","open stroke")))+" · "+L("членів у формулі: ","terms: ")+(($("fx-out").value.match(/\*?(cos|sin)\(/g)||[]).length);
+    fxPlot($("fx-an-c"),[grey,{polys:fxApproxPolys(N),color:"#ffe066",width:1.8,glow:6}],true);
+  }
+}
+function fxOpenAnalysis(){
+  if(!current||!current.points||current.points.length<3){ toast(L("Немає фігури","No shape")); return; }
+  toast(L("Обчислюю формулу…","Computing the formula…"),1200);
+  setTimeout(()=>{
+    try{ fxA=fxAnalyze(current.points); }catch(e){ console.warn(e); toast(L("Не вдалося обчислити формулу","Could not compute the formula")); return; }
+    const n=$("fx-n"); n.max=String(fxA.maxN); n.value=String(fxA.N);
+    fxTab=current.formula?"exact":(fxA.simple?"simple":"fourier");
+    $("fx-an-title").textContent="📐 "+(current.name||"");
+    $("fx-an").classList.add("show"); requestAnimationFrame(fxShowAn);
+  },30);
+}
+async function fxCopy(){
+  const v=$("fx-out").value;
+  try{ await navigator.clipboard.writeText(v); toast(L("Формулу скопійовано","Formula copied")); return; }catch(e){}
+  try{ const ta=$("fx-out"); ta.removeAttribute("readonly"); ta.select(); document.execCommand("copy"); ta.setAttribute("readonly",""); toast(L("Формулу скопійовано","Formula copied")); }
+  catch(e){ toast(L("Виділи текст і скопіюй вручну","Select the text and copy it manually")); }
+}
+$("btn-fx").onclick=fxOpenAnalysis;
+$("fx-an-close").onclick=()=>$("fx-an").classList.remove("show");
+$("fx-n").oninput=()=>{ clearTimeout(fxTimer); fxTimer=setTimeout(fxShowAn,40); };
+$("fx-tab-ex").onclick=()=>{ fxTab="exact"; fxShowAn(); };
+$("fx-tab-fr").onclick=()=>{ fxTab="fourier"; fxShowAn(); };
+$("fx-copy").onclick=fxCopy;
+$("fx-edit-btn").onclick=()=>{ const v=$("fx-out").value; $("fx-an").classList.remove("show"); fxOpenEditor(v); };
+$("fx-tab-sm").onclick=()=>{ fxTab="simple"; fxShowAn(); };
+$("fx-apply").onclick=()=>{
+  if(fxTab==="simple"&&fxA.simple){
+    const nm=(current.name||"").replace(/ ƒ\d*$/,"")+" ƒ";
+    $("fx-an").classList.remove("show"); fxMakeShape(fxA.simple.map(f=>f.poly),nm,fxSimpleText());
+    toast(L("Фігуру замінено точною формулою · 💾 щоб зберегти","Shape replaced by the exact formula · 💾 to save"),3200); return;
+  }
+  const N=+$("fx-n").value, txt=fxFourierText(N), nm=(current.name||"").replace(/ ƒ\d+$/,"")+" ƒ"+N;
+  $("fx-an").classList.remove("show"); fxMakeShape(fxApproxPolys(N),nm,txt);
+  toast(L("Фігуру замінено формулою (","Shape replaced by the formula (")+N+L(" гармонік) · 💾 щоб зберегти"," harmonics) · 💾 to save"),3200);
+};
+$("fx-src").addEventListener("input",()=>{ clearTimeout(fxTimer); fxTimer=setTimeout(fxRun,250); });
+$("fx-go").onclick=fxGo;
+$("fx-e-close").onclick=()=>$("fx-edit").classList.remove("show");
+$("btn-draw-fx").onclick=()=>fxOpenEditor(null);
+$("btn-draw-undo").onclick=()=>{ const k=strokes.pop(); if(k&&k.fx) fxDrawExact=false; updateDrawInfo(); };
+["touchstart","mousedown"].forEach(ev=>{ $("btn-draw-fx").addEventListener(ev,e=>e.stopPropagation(),{passive:true}); $("btn-draw-undo").addEventListener(ev,e=>e.stopPropagation(),{passive:true}); });
+window.addEventListener("resize",()=>{ if($("fx-edit").classList.contains("show")) fxRun(); if($("fx-an").classList.contains("show")) fxShowAn(); });
 
 /* ================= UI ================= */
 $("btn-play").onclick=()=>{ if(current) playShape(1); else toast("Немає фігури"); };
@@ -1887,12 +3153,14 @@ $("thresh").oninput=e=>{
   if(pendingImg&&$("overlay").classList.contains("show")&&mode==="auto"){ clearTimeout(reTimer); reTimer=setTimeout(()=>runAuto(null),250); }
 };
 $("speed").oninput=e=>speed=+e.target.value;
-$("vol").oninput=e=>{ volume=+e.target.value; applySound(); };
+$("vol").oninput=e=>{ volume=+e.target.value; applySound(); if(muBus) muBus.master.gain.value=muMasterGain(); };
 window.addEventListener("keydown",e=>{
   if(e.code==="Space"){
     const tg=e.target&&e.target.tagName;
     if(tg==="INPUT"||tg==="TEXTAREA") return;
-    e.preventDefault(); setPower(!powerOn);
+    e.preventDefault();
+    if(muOpen){ if(muPlay) muPause(); else muStart(); return; }
+    setPower(!powerOn);
   }
 });
 mainC.addEventListener("mousedown",onMainDown);
@@ -2262,7 +3530,19 @@ const I18N_EXACT={
 "Сайт програми:":"App website:",
 "🌐 Відкрити сайт → там 📲 Встановити":"🌐 Open the site → then 📲 Install",
 "Файл для інших телефонів — кнопка «📲» у ньому одразу відкриє твій сайт, без GitHub:":"File for other phones — its «📲» button opens your site directly, no GitHub needed:",
-"📤 Надіслати файл":"📤 Send file","💾 Зберегти файл":"💾 Save file","⚙️ Оновити сайт на GitHub":"⚙️ Update the site on GitHub"
+"📤 Надіслати файл":"📤 Send file",
+"🎼 Музика":"🎼 Music","📐 Формула":"📐 Formula","Математична формула поточної фігури":"Mathematical formula of the current shape",
+"Додати криву за формулою":"Add a curve from a formula","ƒ Фігура з формули":"ƒ Shape from a formula","Точна":"Exact","Ряд Фур'є":"Fourier series",
+"Гармонік":"Harmonics","Сіра лінія — фігура, жовта/зелена — її формула. Більше гармонік — точніше, але довша формула. «✏️ Редагувати» — змінити числа у формулі й побачити нову фігуру.":"Grey line — the shape, yellow/green — its formula. More harmonics — more accurate but a longer formula. «✏️ Edit» — change numbers in the formula and see the new shape.","📋 Копіювати":"📋 Copy","✏️ Редагувати":"✏️ Edit","✓ Замінити фігуру":"✓ Replace the shape","✓ Зробити фігурою":"✓ Make it the shape",
+"Як писати:":"How to write:",
+"x(t) = … і y(t) = … — параметрична крива · r(t) = … — полярна · y = … — графік (змінна x) · межі: t = 0 .. 2pi або x = -5 .. 5 · нова крива — з порожнього рядка · # коментар":"x(t) = … and y(t) = … — parametric curve · r(t) = … — polar · y = … — graph (variable x) · limits: t = 0 .. 2pi or x = -5 .. 5 · a new curve starts after a blank line · # comment",
+"Дії: + - * / ^ ( ) · множення можна не писати: 2t, 3sin(t), sin 2t · функції: sin cos tan cot asin acos atan sinh cosh tanh exp ln lg sqrt abs sign floor min max pow mod · сталі: pi, e":"Operations: + - * / ^ ( ) · multiplication can be implicit: 2t, 3sin(t), sin 2t · functions: sin cos tan cot asin acos atan sinh cosh tanh exp ln lg sqrt abs sign floor min max pow mod · constants: pi, e",
+"Сіра лінія — фігура, жовта — її формула. Більше гармонік — точніше, але довша формула. «✏️ Редагувати» — змінити числа у формулі й побачити нову фігуру.":"Grey line — the shape, yellow — its formula. More harmonics — more accurate but a longer formula. «✏️ Edit» — change numbers in the formula and see the new shape.","🌫 Луна":"🌫 Reverb","Повтор по колу":"Loop","Луна (реверберація)":"Reverb",
+"Скасувати останній штрих":"Undo last stroke","Стерти все":"Clear all","Зберегти мелодію":"Save melody",
+"Записати мелодію у звуковий файл":"Render the melody to an audio file","Темп (ударів за хвилину)":"Tempo (beats per minute)",
+"🎼 Малюй музику пальцем":"🎼 Draw music with your finger","← час · ↑ висота ноти":"← time · ↑ pitch",
+"лінія — мелодія · крапка — нота · риска ↕ — акорд":"line — melody · dot — note · stroke ↕ — chord",
+"кілька пальців — кілька голосів · колір — інструмент":"several fingers — several voices · colour — instrument","💾 Зберегти файл":"💾 Save file","⚙️ Оновити сайт на GitHub":"⚙️ Update the site on GitHub"
 };
 const I18N_RX=[
 [/^Малюнок (\d{1,2}:\d{2})$/,"Drawing $1"],
@@ -2335,6 +3615,7 @@ function setLang(l){
   i18nBusy=true; try{ i18nWalk(document.body); } finally { i18nBusy=false; }
   document.querySelectorAll(".btn-lang").forEach(b=>b.textContent=LANG==="en"?"🌐 UA":"🌐 EN");
   try{ setMode(mode); }catch(e){}
+  try{ if(muOpen){ muBuildPop(); muUpdateUI(); muRenderList(); } }catch(e){}
   if($("inst-guide").classList.contains("show")) $("inst-guide").classList.remove("show");
 }
 document.querySelectorAll(".btn-lang").forEach(b=>b.onclick=()=>setLang(LANG==="en"?"uk":"en"));
